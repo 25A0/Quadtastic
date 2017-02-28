@@ -36,6 +36,8 @@ local count = 0
 function love.draw()
   imgui.begin_frame(gui_state)
   love.graphics.scale(scale, scale)
+
+  love.graphics.clear(203, 222, 227)
   state.filepath = Inputfield.draw(gui_state, 10, 150, nil, nil, state.filepath)
 
   local pressed, active = Button.draw(gui_state, 200, 150, nil, nil, "Hello World!")
