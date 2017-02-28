@@ -10,9 +10,14 @@ end
 local Button = require("Button")
 local mousex, mousey
 
-button = Button:new("Hello World!", nil, 400, 300)
+-- Scaling factor
+local scale = 2
+
+button = Button:new("Hello World!", nil, 200, 150)
 
 function love.load()
+  love.graphics.setDefaultFilter("nearest", "nearest")
+
   font = love.graphics.newFont("res/m5x7.ttf", 16)
   love.graphics.setFont(font)
 
@@ -20,6 +25,7 @@ function love.load()
 end
 
 function love.draw()
+  love.graphics.scale(scale, scale)
   button:draw(mousex, mousey)
 end
 
@@ -28,7 +34,7 @@ function love.mousepressed(x, y, button)
 end
 
 function love.mousemoved(x, y, dx, dy)
-	mousex, mousey = x, y
+	mousex, mousey = x / scale, y / scale
 
 end
 
