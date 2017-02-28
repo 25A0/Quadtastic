@@ -15,6 +15,7 @@ local Label = require("Label")
 local gui_state
 local state = {
   filepath = "", -- the path to the file that we want to edit
+  image = nil, -- the loaded image
 }
 
 -- Scaling factor
@@ -43,11 +44,18 @@ function love.draw()
   state.filepath = Inputfield.draw(gui_state, 30, 2, 160, nil, state.filepath)
 
   local pressed, active = Button.draw(gui_state, 200, 2, nil, nil, "Doggo!!")
-  if pressed then count = count + 1 end
-  Button.draw(gui_state, 200, 170, nil, nil, tostring(count))
-  local text = ""
-  if active then text = "\\o/" end
-  Button.draw(gui_state, 200, 190, nil, nil, text)
+  if pressed then 
+    success, more = pcall(love.graphics.newImage, state.filepath)
+    if success then
+      state.image = more
+    else
+      print(more)
+    end
+  end
+  if state.image then
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.draw(state.image, 2, 32)
+  end
 
   imgui.end_frame(gui_state)
 end

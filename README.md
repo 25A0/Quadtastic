@@ -4,9 +4,9 @@ This is a little LÖVE tool to handle sprite atlases while keeping your sanity.
 
 ## Roadmap
 
- - [ ] Select a file
- - [ ] Load the image
- - [ ] Display the image
+ - [x] Select a file
+ - [x] Load the image
+ - [x] Display the image
  - [ ] Define quads
  - [ ] Name quads
  - [ ] Export defined quads as lua code
