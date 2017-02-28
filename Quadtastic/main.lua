@@ -14,8 +14,9 @@ local Inputfield = require("Inputfield")
 local Label = require("Label")
 local gui_state
 local state = {
-  filepath = "", -- the path to the file that we want to edit
+  filepath = "res/style.png", -- the path to the file that we want to edit
   image = nil, -- the loaded image
+  displayzoom = 1, -- additional zoom factor for the displayed image
 }
 
 -- Scaling factor
@@ -54,7 +55,20 @@ function love.draw()
   end
   if state.image then
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.draw(state.image, 2, 32)
+    love.graphics.draw(state.image, 2, 32, 0,
+                       state.displayzoom, state.displayzoom)
+  end
+  do
+    local pressed = Button.draw(gui_state, 2, 300 - 16, 13, 14, "+")
+    if pressed then
+      state.displayzoom = math.min(12, state.displayzoom + 1)
+    end
+  end
+  do
+    local pressed = Button.draw(gui_state, 14, 300 - 16, 13, 14, "-")
+    if pressed then
+      state.displayzoom = math.max(1, state.displayzoom - 1)
+    end
   end
 
   imgui.end_frame(gui_state)
