@@ -44,7 +44,7 @@ local draw_border = function(sprite, x, y, w, h)
   love.graphics.draw(sprite, buttonquads.l, x        , y + 3   , 0, 1  , h-6)
   love.graphics.draw(sprite, buttonquads.r, x + w - 3, y + 3   , 0, 1  , h-6)
   love.graphics.draw(sprite, buttonquads.t, x + 3    , y       , 0, w-6, 1  )
-  love.graphics.draw(sprite, buttonquads.b, x + 3    , y + h -6, 0, w-6, 1  )
+  love.graphics.draw(sprite, buttonquads.b, x + 3    , y + h -3, 0, w-6, 1  )
   -- center
   love.graphics.draw(sprite, buttonquads.c, x + 3, y + 3, 0, w - 6, h - 6)
 end
