@@ -14,7 +14,7 @@ local buttonquads = {
    c = love.graphics.newQuad( 3,  3, 1, 1, 32, 32),
 }
 
-Button.new = function(self, label, icon, x, y, w, h, rgba, textrgba)
+Button.new = function(self, label, icon, x, y, w, h, textrgba)
   local button = {
     label = label or "Button",
     icon = nil,
@@ -22,7 +22,6 @@ Button.new = function(self, label, icon, x, y, w, h, rgba, textrgba)
                   y or 0,
                   w or 70,
                   h or 16),
-    rgba = rgba or {0, 0, 0, 255},
     textrgba = textrgba or {255, 255, 255, 255}, 
   }
 
@@ -45,19 +44,23 @@ local draw_border = function(sprite, x, y, w, h)
   love.graphics.draw(sprite, buttonquads.r, x + w - 3, y + 3   , 0, 1  , h-6)
   love.graphics.draw(sprite, buttonquads.t, x + 3    , y       , 0, w-6, 1  )
   love.graphics.draw(sprite, buttonquads.b, x + 3    , y + h -3, 0, w-6, 1  )
+
   -- center
   love.graphics.draw(sprite, buttonquads.c, x + 3, y + 3, 0, w - 6, h - 6)
 end
 
 Button.draw = function(self, mousex, mousey)
-  love.graphics.setColor(unpack(self.rgba))
-  love.graphics.rectangle("fill", self.r.x, self.r.y, self.r.w, self.r.h)
+  -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
   draw_border(buttonsprite, self.r.x, self.r.y, self.r.w, self.r.h)
+
+  -- Print label
   local margin_x = 4
   local margin_y = (self.r.h - 16) / 2
   love.graphics.setColor(unpack(self.textrgba))
   love.graphics.print(self.label, self.r.x + margin_x, self.r.y + margin_y)
+
+  -- Highlight if mouse is over button
   if mousex and mousey and self.r:contains(mousex, mousey) then
     love.graphics.setColor(255, 255, 255, 100)
     love.graphics.rectangle("fill", self.r.x + 2, self.r.y + 2,
@@ -65,12 +68,12 @@ Button.draw = function(self, mousex, mousey)
   end
 end
 
-Button.text = function(self, label, x, y, w, h, rgba)
-	return Button.new(label, nil, x, y, w, h, rgba)
+Button.text = function(self, label, x, y, w, h, trgba)
+	return Button.new(label, nil, x, y, w, h, trgba)
 end
 
-Button.icon = function(self, icon, x, y, w, h, rgba)
-	return Button.new(label, "", icon, x, y, w, h, rgba)
+Button.icon = function(self, icon, x, y, w, h, trgba)
+	return Button.new(label, "", icon, x, y, w, h, trgba)
 end
 
 setmetatable(Button, {
