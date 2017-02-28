@@ -1,4 +1,5 @@
 local Rectangle = require("Rectangle")
+local renderutils = require("Renderutils")
 
 local Button = {}
 
@@ -14,23 +15,6 @@ local buttonquads = {
    c = love.graphics.newQuad( 3,  3, 1, 1, 128, 128),
 }
 
-local draw_border = function(sprite, x, y, w, h)
-  -- corners
-  love.graphics.draw(sprite, buttonquads.ul, x        , y        )
-  love.graphics.draw(sprite, buttonquads.ll, x        , y + h - 3)
-  love.graphics.draw(sprite, buttonquads.ur, x + w - 3, y        )
-  love.graphics.draw(sprite, buttonquads.lr, x + w - 3, y + h - 3)
-
-  -- borders
-  love.graphics.draw(sprite, buttonquads.l, x        , y + 3   , 0, 1  , h-6)
-  love.graphics.draw(sprite, buttonquads.r, x + w - 3, y + 3   , 0, 1  , h-6)
-  love.graphics.draw(sprite, buttonquads.t, x + 3    , y       , 0, w-6, 1  )
-  love.graphics.draw(sprite, buttonquads.b, x + 3    , y + h -3, 0, w-6, 1  )
-
-  -- center
-  love.graphics.draw(sprite, buttonquads.c, x + 3, y + 3, 0, w - 6, h - 6)
-end
-
 -- Draws a button at the indicated position. Returns, in this, order, whether
 -- it was just triggered, whether it is active, and whether the mouse is inside
 -- the button's bounding box.
@@ -40,7 +24,7 @@ Button.draw = function(state, x, y, w, h, label)
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
-  draw_border(stylesprite, x, y, w, h)
+  renderutils.draw_border(stylesprite, buttonquads, x, y, w, h)
 
   -- Print label
   local margin_x = 4
