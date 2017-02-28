@@ -1,0 +1,3 @@
+[submodule "lovedebug"]
+	path = lib/lovedebug
+	url = ../Ridge/lib/lovedebug
