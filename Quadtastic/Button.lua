@@ -23,7 +23,7 @@ Button.new = function(self, label, icon, x, y, w, h, rgba, textrgba)
                   w or 70,
                   h or 16),
     rgba = rgba or {0, 0, 0, 255},
-    textrgba = textrgba or {37, 82, 105, 255}, 
+    textrgba = textrgba or {255, 255, 255, 255}, 
   }
 
   setmetatable(button, {
