@@ -8,12 +8,10 @@ if os.getenv("DEBUG") then
 end
 
 local Button = require("Button")
-local mousex, mousey
+local state = {}
 
 -- Scaling factor
 local scale = 2
-
-button = Button:new("Hello World!", nil, 200, 150)
 
 function love.load()
   love.graphics.setDefaultFilter("nearest", "nearest")
@@ -26,7 +24,7 @@ end
 
 function love.draw()
   love.graphics.scale(scale, scale)
-  button:draw(mousex, mousey)
+  Button.draw(state, 200, 150, nil, nil, "Hello World!")
 end
 
 function love.mousepressed(x, y, button)
@@ -34,7 +32,7 @@ function love.mousepressed(x, y, button)
 end
 
 function love.mousemoved(x, y, dx, dy)
-	mousex, mousey = x / scale, y / scale
+	state.mousex, state.mousey = x / scale, y / scale
 
 end
 
