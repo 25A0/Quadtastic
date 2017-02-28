@@ -60,7 +60,8 @@ Button.draw = function(self, mousex, mousey)
   love.graphics.print(self.label, self.r.x + margin_x, self.r.y + margin_y)
   if mousex and mousey and self.r:contains(mousex, mousey) then
     love.graphics.setColor(255, 255, 255, 100)
-    love.graphics.rectangle("fill", self.r.x, self.r.y, self.r.w, self.r.h)
+    love.graphics.rectangle("fill", self.r.x + 2, self.r.y + 2,
+                            self.r.w - 4, self.r.h - 4)
   end
 end
 
