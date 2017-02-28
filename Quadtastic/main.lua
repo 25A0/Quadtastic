@@ -21,7 +21,7 @@ function love.load()
   font = love.graphics.newFont("res/m5x7.ttf", 16)
   love.graphics.setFont(font)
 
-  buttonsprite = love.graphics.newImage("res/button.png")
+  stylesprite = love.graphics.newImage("res/style.png")
 
   love.keyboard.setKeyRepeat(true)
   state = imgui.init_state()

@@ -3,15 +3,15 @@ local Rectangle = require("Rectangle")
 local Button = {}
 
 local buttonquads = {
-  ul = love.graphics.newQuad( 0,  0, 3, 3, 32, 32),
-   l = love.graphics.newQuad( 0,  3, 3, 1, 32, 32),
-  ll = love.graphics.newQuad( 0, 13, 3, 3, 32, 32),
-   b = love.graphics.newQuad( 3, 13, 1, 3, 32, 32),
-  lr = love.graphics.newQuad(29, 13, 3, 3, 32, 32),
-   r = love.graphics.newQuad(29,  3, 3, 1, 32, 32),
-  ur = love.graphics.newQuad(29,  0, 3, 3, 32, 32),
-   t = love.graphics.newQuad( 3,  0, 1, 3, 32, 32),
-   c = love.graphics.newQuad( 3,  3, 1, 1, 32, 32),
+  ul = love.graphics.newQuad( 0,  0, 3, 3, 128, 128),
+   l = love.graphics.newQuad( 0,  3, 3, 1, 128, 128),
+  ll = love.graphics.newQuad( 0, 13, 3, 3, 128, 128),
+   b = love.graphics.newQuad( 3, 13, 1, 3, 128, 128),
+  lr = love.graphics.newQuad(29, 13, 3, 3, 128, 128),
+   r = love.graphics.newQuad(29,  3, 3, 1, 128, 128),
+  ur = love.graphics.newQuad(29,  0, 3, 3, 128, 128),
+   t = love.graphics.newQuad( 3,  0, 1, 3, 128, 128),
+   c = love.graphics.newQuad( 3,  3, 1, 1, 128, 128),
 }
 
 local draw_border = function(sprite, x, y, w, h)
@@ -40,7 +40,7 @@ Button.draw = function(state, x, y, w, h, label)
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
-  draw_border(buttonsprite, x, y, w, h)
+  draw_border(stylesprite, x, y, w, h)
 
   -- Print label
   local margin_x = 4
