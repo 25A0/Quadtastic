@@ -31,6 +31,9 @@ local draw_border = function(sprite, x, y, w, h)
   love.graphics.draw(sprite, buttonquads.c, x + 3, y + 3, 0, w - 6, h - 6)
 end
 
+-- Draws a button at the indicated position. Returns, in this, order, whether
+-- it was just triggered, whether it is active, and whether the mouse is inside
+-- the button's bounding box.
 Button.draw = function(state, x, y, w, h, label)
   w = w or 70
   h = h or 18
@@ -48,13 +51,21 @@ Button.draw = function(state, x, y, w, h, label)
   if state and state.mouse and 
     Rectangle(x, y, w, h):contains(state.mouse.x, state.mouse.y)
   then
+    local active
     if state.mouse.buttons[1] and state.mouse.buttons[1].pressed then
       love.graphics.setColor(0, 0, 0, 70)
+      active = true
     else
       love.graphics.setColor(255, 255, 255, 70)
+      active = false
     end
     love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
+    -- We consider this button clicked when the mouse is in the button's area
+    -- and the left mouse button was just clicked
+    return state.mouse.buttons[1] and state.mouse.buttons[1].presses > 0,
+      active, true
   end
+  return false
 end
 
 setmetatable(Button, {

@@ -27,11 +27,16 @@ function love.load()
   state = imgui.init_state()
 end
 
+local count = 0
 function love.draw()
   imgui.begin_frame(state)
   love.graphics.scale(scale, scale)
-  Button.draw(state, 200, 150, nil, nil, "Hello World!")
-
+  local pressed, active = Button.draw(state, 200, 150, nil, nil, "Hello World!")
+  if pressed then count = count + 1 end
+  Button.draw(state, 200, 170, nil, nil, tostring(count))
+  local text = ""
+  if active then text = "\\o/" end
+  Button.draw(state, 200, 190, nil, nil, text)
 
   imgui.end_frame(state)
 end
