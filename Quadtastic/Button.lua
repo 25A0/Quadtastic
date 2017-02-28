@@ -21,7 +21,7 @@ Button.new = function(self, label, icon, x, y, w, h, textrgba)
     r = Rectangle(x or 0,
                   y or 0,
                   w or 70,
-                  h or 16),
+                  h or 18),
     textrgba = textrgba or {255, 255, 255, 255}, 
   }
 
