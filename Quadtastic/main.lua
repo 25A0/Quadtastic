@@ -10,7 +10,7 @@ end
 local imgui = require("imgui")
 
 local Button = require("Button")
-local state
+local gui_state
 
 -- Scaling factor
 local scale = 2
@@ -24,21 +24,22 @@ function love.load()
   stylesprite = love.graphics.newImage("res/style.png")
 
   love.keyboard.setKeyRepeat(true)
-  state = imgui.init_state()
+  gui_state = imgui.init_state()
 end
 
 local count = 0
 function love.draw()
-  imgui.begin_frame(state)
+  imgui.begin_frame(gui_state)
   love.graphics.scale(scale, scale)
-  local pressed, active = Button.draw(state, 200, 150, nil, nil, "Hello World!")
+
+  local pressed, active = Button.draw(gui_state, 200, 150, nil, nil, "Hello World!")
   if pressed then count = count + 1 end
-  Button.draw(state, 200, 170, nil, nil, tostring(count))
+  Button.draw(gui_state, 200, 170, nil, nil, tostring(count))
   local text = ""
   if active then text = "\\o/" end
-  Button.draw(state, 200, 190, nil, nil, text)
+  Button.draw(gui_state, 200, 190, nil, nil, text)
 
-  imgui.end_frame(state)
+  imgui.end_frame(gui_state)
 end
 
 local function unproject(x, y)
@@ -47,34 +48,34 @@ end
 
 function love.mousepressed(x, y, button)
   x, y = unproject(x, y)
-  imgui.mousepressed(state, x, y, button)
+  imgui.mousepressed(gui_state, x, y, button)
 end
 
 function love.mousereleased(x, y, button)
   x, y = unproject(x, y)
-  imgui.mousereleased(state, x, y, button)
+  imgui.mousereleased(gui_state, x, y, button)
 end
 
 function love.mousemoved(x, y, dx, dy)
   x ,  y = unproject(x ,  y)
   dx, dy = unproject(dx, dy)
-  imgui.mousemoved(state, x, y, dx, dy)
+  imgui.mousemoved(gui_state, x, y, dx, dy)
 end
 
 function love.wheelmoved(x, y)
-  imgui.wheelmoved(state, x, y)
+  imgui.wheelmoved(gui_state, x, y)
 end
 
 function love.keypressed(key, scancode, isrepeat)
-  imgui.keypressed(state, key, scancode, isrepeat)
+  imgui.keypressed(gui_state, key, scancode, isrepeat)
 end
 
 function love.keyreleased(key, scancode)
-  imgui.keyreleased(state, key, scancode, isrepeat)
+  imgui.keyreleased(gui_state, key, scancode, isrepeat)
 end
 
 function love.textinput(text)
-  imgui.textinput(state, text)
+  imgui.textinput(gui_state, text)
 end
 
 function love.update()
