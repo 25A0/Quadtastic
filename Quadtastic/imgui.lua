@@ -21,6 +21,9 @@ imgui.init_state = function()
       text = nil, -- Text that has been typed since last update
     },
     dt = 0, -- Time since last update
+    style = {
+      font = nil, -- The font that is being used
+    },
   }
   return state
 end

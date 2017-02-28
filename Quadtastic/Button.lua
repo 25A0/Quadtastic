@@ -19,7 +19,9 @@ local buttonquads = {
 -- it was just triggered, whether it is active, and whether the mouse is inside
 -- the button's bounding box.
 Button.draw = function(state, x, y, w, h, label)
-  w = w or 70
+  local margin_x = 4
+  local textwidth = state.style.font and state.style.font:getWidth(label)
+  w = w or math.max(32, 2*margin_x + (textwidth or 32))
   h = h or 18
 
   -- Draw border
@@ -27,7 +29,6 @@ Button.draw = function(state, x, y, w, h, label)
   renderutils.draw_border(stylesprite, buttonquads, x, y, w, h)
 
   -- Print label
-  local margin_x = 4
   local margin_y = (h - 16) / 2
   love.graphics.print(label, x + margin_x, y + margin_y)
 

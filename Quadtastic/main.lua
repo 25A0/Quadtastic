@@ -29,13 +29,14 @@ function love.load()
 
   love.keyboard.setKeyRepeat(true)
   gui_state = imgui.init_state()
+  gui_state.style.font = font
 end
 
 local count = 0
 function love.draw()
   imgui.begin_frame(gui_state)
   love.graphics.scale(scale, scale)
-  state.filepath = Inputfield.draw(gui_state, 10, 150, 180, 18, state.filepath)
+  state.filepath = Inputfield.draw(gui_state, 10, 150, nil, nil, state.filepath)
 
   local pressed, active = Button.draw(gui_state, 200, 150, nil, nil, "Hello World!")
   if pressed then count = count + 1 end

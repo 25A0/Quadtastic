@@ -15,7 +15,9 @@ local quads = {
 }
 
 Inputfield.draw = function(state, x, y, w, h, content)
-  w = w or 70
+  local margin_x = 4
+  local textwidth = state.style.font and state.style.font:getWidth(content)
+  w = w or math.max(32, 2*margin_x + (textwidth or 32))
   h = h or 18
 
   -- Draw border
@@ -23,7 +25,6 @@ Inputfield.draw = function(state, x, y, w, h, content)
   renderutils.draw_border(stylesprite, quads, x, y, w, h)
 
   -- Print label
-  local margin_x = 4
   local margin_y = (h - 16) / 2
   love.graphics.print(content, x + margin_x, y + margin_y)
 
