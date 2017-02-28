@@ -11,6 +11,7 @@ local imgui = require("imgui")
 
 local Button = require("Button")
 local Inputfield = require("Inputfield")
+local Label = require("Label")
 local gui_state
 local state = {
   filepath = "", -- the path to the file that we want to edit
@@ -38,9 +39,10 @@ function love.draw()
   love.graphics.scale(scale, scale)
 
   love.graphics.clear(203, 222, 227)
-  state.filepath = Inputfield.draw(gui_state, 10, 150, nil, nil, state.filepath)
+  Label.draw(gui_state, 2, 2, nil, nil, "File:")
+  state.filepath = Inputfield.draw(gui_state, 30, 2, 160, nil, state.filepath)
 
-  local pressed, active = Button.draw(gui_state, 200, 150, nil, nil, "Hello World!")
+  local pressed, active = Button.draw(gui_state, 200, 2, nil, nil, "Doggo!!")
   if pressed then count = count + 1 end
   Button.draw(gui_state, 200, 170, nil, nil, tostring(count))
   local text = ""
