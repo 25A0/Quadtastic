@@ -45,13 +45,13 @@ Button.draw = function(state, x, y, w, h, label)
   love.graphics.print(label, x + margin_x, y + margin_y)
 
   -- Highlight if mouse is over button
-  if state and state.mousex and state.mousey and 
-    Rectangle(x, y, w, h):contains(state.mousex, state.mousey)
+  if state and state.mouse and 
+    Rectangle(x, y, w, h):contains(state.mouse.x, state.mouse.y)
   then
-    if state.mousepressed then
-      love.graphics.setColor(0, 0, 0, 100)
+    if state.mouse.buttons[1] and state.mouse.buttons[1].pressed then
+      love.graphics.setColor(0, 0, 0, 70)
     else
-      love.graphics.setColor(255, 255, 255, 100)
+      love.graphics.setColor(255, 255, 255, 70)
     end
     love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
   end

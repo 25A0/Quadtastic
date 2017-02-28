@@ -18,4 +18,5 @@ This is a little LÖVE tool to handle sprite atlases while keeping your sanity.
  - aseprite by David Kapello https://www.aseprite.org/.
    Oh, also, the pixelated Quadtastic UI is my lousy attempt to mimic the gorgeous UI in aseprite.
  - lovedebug by kalle2990, maintained by Ranguna https://github.com/Ranguna/LOVEDEBUG
+ - Nuklear for guidance on how to write IMGUI https://github.com/vurtun/nuklear
  - inspect.lua by kikito http://github.com/kikito/inspect.lua
