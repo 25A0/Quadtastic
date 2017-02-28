@@ -20,6 +20,7 @@ imgui.init_state = function()
       -- times it has been typed since the last update.
       text = nil, -- Text that has been typed since last update
     },
+    dt = 0, -- Time since last update
   }
   return state
 end
@@ -145,5 +146,8 @@ imgui.textinput = function(state, text)
   state.keyboard.text = text
 end
 
+imgui.update = function(state, dt)
+  state.dt = dt
+end
 
 return imgui
