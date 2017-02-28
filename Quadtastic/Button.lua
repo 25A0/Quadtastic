@@ -48,7 +48,11 @@ Button.draw = function(state, x, y, w, h, label)
   if state and state.mousex and state.mousey and 
     Rectangle(x, y, w, h):contains(state.mousex, state.mousey)
   then
-    love.graphics.setColor(255, 255, 255, 100)
+    if state.mousepressed then
+      love.graphics.setColor(0, 0, 0, 100)
+    else
+      love.graphics.setColor(255, 255, 255, 100)
+    end
     love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
   end
 end

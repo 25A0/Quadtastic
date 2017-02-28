@@ -28,7 +28,11 @@ function love.draw()
 end
 
 function love.mousepressed(x, y, button)
+  state.mousepressed = true
+end
 
+function love.mousereleased(x, y, button)
+  state.mousepressed = false
 end
 
 function love.mousemoved(x, y, dx, dy)
