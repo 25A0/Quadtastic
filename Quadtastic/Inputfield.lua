@@ -15,10 +15,16 @@ local quads = {
 }
 
 Inputfield.draw = function(state, x, y, w, h, content)
+  x = x or state.layout.next_x
+  y = y or state.layout.next_y
+
   local margin_x = 4
   local textwidth = state.style.font and state.style.font:getWidth(content)
   w = w or math.max(32, 2*margin_x + (textwidth or 32))
   h = h or 18
+
+  state.layout.adv_x = w
+  state.layout.adv_y = h
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)

@@ -13,6 +13,7 @@ local Button = require("Button")
 local Inputfield = require("Inputfield")
 local Label = require("Label")
 local Frame = require("Frame")
+local Layout = require("Layout")
 
 -- Make the state variables local unless we are in debug mode
 if not _DEBUG then
@@ -67,41 +68,59 @@ function love.draw()
   love.graphics.scale(scale, scale)
 
   love.graphics.clear(203, 222, 227)
-  Label.draw(gui_state, 2, 2, nil, nil, "File:")
-  state.filepath = Inputfield.draw(gui_state, 30, 2, 160, nil, state.filepath)
+  Layout.start(gui_state, 2, 2)
 
-  local pressed, active = Button.draw(gui_state, 200, 2, nil, nil, "Doggo!!")
-  if pressed then 
-    success, more = pcall(love.graphics.newImage, state.filepath)
-    if success then
-      state.image = more
-    else
-      print(more)
-    end
-  end
-  Frame.start(gui_state, 2, 24, 400 - 2, 160)
-  love.graphics.translate(state.display.x, state.display.y)
-  backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
-  love.graphics.draw(backgroundcanvas, backgroundquad, 4, 26, 0,
-                     state.display.zoom, state.display.zoom)
-  if state.image then
-    love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.draw(state.image, 4, 26, 0,
-                       state.display.zoom, state.display.zoom)
-  end
-  Frame.finish()
-  do
-    local pressed = Button.draw(gui_state, 2, 300 - 16, 13, 14, "+")
-    if pressed then
-      state.display.zoom = math.min(12, state.display.zoom + 1)
-    end
-  end
-  do
-    local pressed = Button.draw(gui_state, 14, 300 - 16, 13, 14, "-")
-    if pressed then
-      state.display.zoom = math.max(1, state.display.zoom - 1)
-    end
-  end
+    Layout.start(gui_state)
+      Label.draw(gui_state, nil, nil, nil, nil, "File:")
+      Layout.next(gui_state, "-", 2)
+
+      state.filepath = Inputfield.draw(gui_state, nil, nil, 160, nil, state.filepath)
+      Layout.next(gui_state, "-", 2)
+
+      local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Doggo!!")
+      if pressed then 
+        success, more = pcall(love.graphics.newImage, state.filepath)
+        if success then
+          state.image = more
+        else
+          print(more)
+        end
+      end
+    Layout.finish(gui_state, "-")
+
+    Layout.next(gui_state, "|", 2)
+
+    Frame.start(gui_state, nil, nil, 400 - 2, 160)
+      love.graphics.translate(state.display.x, state.display.y)
+      backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
+      love.graphics.draw(backgroundcanvas, backgroundquad, 0, 0, 0,
+                         state.display.zoom, state.display.zoom)
+      if state.image then
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.draw(state.image, 0, 0, 0,
+                           state.display.zoom, state.display.zoom)
+      end
+    Frame.finish()
+
+    Layout.next(gui_state, "|", 2)
+
+    Layout.start(gui_state)
+      do
+        local pressed = Button.draw(gui_state, nil, nil, 13, 14, "+")
+        if pressed then
+          state.display.zoom = math.min(12, state.display.zoom + 1)
+        end
+      end
+      Layout.next(gui_state, "-")
+      do
+        local pressed = Button.draw(gui_state, nil, nil, 13, 14, "-")
+        if pressed then
+          state.display.zoom = math.max(1, state.display.zoom - 1)
+        end
+      end
+    Layout.finish(gui_state, "-")
+
+  Layout.finish(gui_state, "|")
 
   -- Image panning
 

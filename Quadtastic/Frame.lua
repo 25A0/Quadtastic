@@ -5,6 +5,11 @@ local Frame = {}
 local quads = renderutils.border_quads(48, 0, 16, 16, 128, 128, 2)
 
 Frame.start = function(state, x, y, w, h)
+  x = x or state.layout.next_x
+  y = y or state.layout.next_y
+
+  state.layout.adv_x = w
+  state.layout.adv_y = h
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)

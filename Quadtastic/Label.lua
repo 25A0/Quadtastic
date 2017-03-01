@@ -6,10 +6,16 @@ local Label = {}
 -- is active (i.e. getting clicked on), and whether the mouse is over this
 -- label.
 Label.draw = function(state, x, y, w, h, label)
+  x = x or state.layout.next_x
+  y = y or state.layout.next_y
+
   local margin_x = 4
   local textwidth = state.style.font and state.style.font:getWidth(label)
   w = w or math.max(32, 2*margin_x + (textwidth or 32))
   h = h or 18
+
+  state.layout.adv_x = w
+  state.layout.adv_y = h
 
   -- Print label
   love.graphics.setColor(32, 63, 73, 255)
