@@ -22,7 +22,7 @@ Inputfield.draw = function(state, x, y, w, h, content)
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
-  renderutils.draw_border(stylesprite, quads, x, y, w, h)
+  renderutils.draw_border(stylesprite, quads, x, y, w, h, 3)
 
   -- Push state
   love.graphics.push("all")
