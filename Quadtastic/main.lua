@@ -13,8 +13,14 @@ local Button = require("Button")
 local Inputfield = require("Inputfield")
 local Label = require("Label")
 local Frame = require("Frame")
-local gui_state
-local state = {
+
+-- Make the state variables local unless we are in debug mode
+if not _DEBUG then
+  local gui_state
+  local state
+end
+
+state = {
   filepath = "res/style.png", -- the path to the file that we want to edit
   image = nil, -- the loaded image
   display = {
@@ -97,7 +103,7 @@ function love.draw()
   end
 
   -- Image panning
-  
+
   local friction = 0.5
   local threshold = 3
 
