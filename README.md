@@ -21,3 +21,4 @@ This is a little LÖVE tool to handle sprite atlases while keeping your sanity.
  - lovedebug by kalle2990, maintained by Ranguna https://github.com/Ranguna/LOVEDEBUG
  - Nuklear for guidance on how to write IMGUI https://github.com/vurtun/nuklear
  - inspect.lua by kikito http://github.com/kikito/inspect.lua
+ - affine for reverse transformation by [Minh Ngo](https://github.com/markandgo/simple-transform)
