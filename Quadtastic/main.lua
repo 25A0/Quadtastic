@@ -31,6 +31,16 @@ function love.load()
 
   stylesprite = love.graphics.newImage("res/style.png")
 
+  backgroundcanvas = love.graphics.newCanvas(8, 8)
+  do
+    -- Create a canvas with the background texture on it
+    backgroundquad = love.graphics.newQuad(48, 16, 8, 8, 128, 128)
+    backgroundcanvas:setWrap("repeat", "repeat")
+    backgroundcanvas:renderTo(function()
+      love.graphics.draw(stylesprite, backgroundquad)
+    end)
+  end
+
   love.keyboard.setKeyRepeat(true)
   gui_state = imgui.init_state()
   gui_state.style.font = font
@@ -55,9 +65,12 @@ function love.draw()
     end
   end
   Frame.start(gui_state, 2, 24, 400 - 2, 160)
+  backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
+  love.graphics.draw(backgroundcanvas, backgroundquad, 4, 26, 0,
+                     state.displayzoom, state.displayzoom)
   if state.image then
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.draw(state.image, 2, 32, 0,
+    love.graphics.draw(state.image, 4, 26, 0,
                        state.displayzoom, state.displayzoom)
   end
   Frame.finish()
