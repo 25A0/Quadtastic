@@ -20,24 +20,25 @@ if not _DEBUG then
   local state
 end
 
-state = {
-  filepath = "res/style.png", -- the path to the file that we want to edit
-  image = nil, -- the loaded image
-  display = {
-    x = 0, -- the x offset where the image should start, in screen coords
-    y = 0, -- the y offset where the image should start, in screen coords
-    tx = 0, -- target translate translation in x
-    ty = 0, -- target translate translation in y
-    last_dx = 0, -- last translate speed in x
-    last_dy = 0, -- last translate speed in y
-    zoom = 1, -- additional zoom factor for the displayed image
-  },
-}
-
 -- Scaling factor
 local scale = 2
 
 function love.load()
+  -- Initialize the state
+  state = {
+    filepath = "res/style.png", -- the path to the file that we want to edit
+    image = nil, -- the loaded image
+    display = {
+      x = 0, -- the x offset where the image should start, in screen coords
+      y = 0, -- the y offset where the image should start, in screen coords
+      tx = 0, -- target translate translation in x
+      ty = 0, -- target translate translation in y
+      last_dx = 0, -- last translate speed in x
+      last_dy = 0, -- last translate speed in y
+      zoom = 1, -- additional zoom factor for the displayed image
+    },
+  }
+
   love.graphics.setDefaultFilter("nearest", "nearest")
 
   font = love.graphics.newFont("res/m5x7.ttf", 16)
