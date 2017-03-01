@@ -114,6 +114,13 @@ function love.draw()
           love.graphics.setColor(255, 255, 255, 255)
           love.graphics.draw(state.image)
         end
+        -- Draw a bright pixel where the mouse is
+        love.graphics.setColor(255, 255, 255, 255)
+        do
+          local mx, my = gui_state.transform.unproject(gui_state.mouse.x, gui_state.mouse.y)
+          mx, my = math.floor(mx - .5), math.floor(my - .5)
+          love.graphics.rectangle("fill", mx, my, 1, 1)
+        end
       love.graphics.pop()
     Frame.finish()
 
