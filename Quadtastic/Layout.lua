@@ -9,9 +9,9 @@ Layout.start = function(state, x, y)
 
 	imgui.push_layout_state(state)
 
-	state.layout.next_x = x
-	state.layout.next_y = y
+	love.graphics.push("all")
 
+	love.graphics.translate(x, y)
 end
 
 local function update_state(state, orientation, spacing)
@@ -51,6 +51,8 @@ Layout.finish = function(state, orientation)
 
 	local acc_adv_x = state.layout.acc_adv_x
 	local acc_adv_y = state.layout.acc_adv_y
+
+	love.graphics.pop()
 
 	imgui.pop_layout_state(state)
 

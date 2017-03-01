@@ -40,7 +40,7 @@ Button.draw = function(state, x, y, w, h, label)
 
   -- Highlight if mouse is over button
   if state and state.mouse and 
-    Rectangle(x, y, w, h):contains(state.mouse.x, state.mouse.y)
+    Rectangle(x, y, w, h):contains(state.transform.unproject(state.mouse.x, state.mouse.y))
   then
     local active
     if state.mouse.buttons[1] and state.mouse.buttons[1].pressed then

@@ -41,4 +41,5 @@ return {
         base_x + corner_size, base_y + corner_size, 1, 1, sprite_w, sprite_h),
     }
   end,
+
 }

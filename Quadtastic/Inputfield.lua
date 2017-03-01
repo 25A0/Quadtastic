@@ -2,6 +2,8 @@ local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
 local Inputfield = {}
 
+local transform = require("transform")
+
 local quads = {
   ul = love.graphics.newQuad( 0, 16, 3, 3, 128, 128),
    l = love.graphics.newQuad( 0, 19, 3, 1, 128, 128),
@@ -34,7 +36,11 @@ Inputfield.draw = function(state, x, y, w, h, content)
   love.graphics.push("all")
 
   -- Restrict printing to the encolsed area
-  love.graphics.setScissor((x + 2) * 2, (y + 2) * 2, (w - 2) * 2, (h - 2) * 2)
+  do
+    local abs_x, abs_y = state.transform.project(x + 2, y + 2)
+    local abs_w, abs_h = state.transform.project_dimensions(w - 4, h - 4)
+    love.graphics.setScissor(abs_x, abs_y, abs_w, abs_h)
+  end
 
   -- Print label
   local margin_y = (h - 16) / 2
@@ -49,7 +55,7 @@ Inputfield.draw = function(state, x, y, w, h, content)
 
   -- Highlight if mouse is over button
   if state and state.mouse and 
-    Rectangle(x, y, w, h):contains(state.mouse.x, state.mouse.y)
+    Rectangle(x, y, w, h):contains(state.transform.unproject(state.mouse.x, state.mouse.y))
   then
     love.graphics.setColor(255, 255, 255, 70)
     love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
