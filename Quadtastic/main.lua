@@ -105,15 +105,16 @@ function love.draw()
     Layout.next(gui_state, "|", 2)
 
     Frame.start(gui_state, nil, nil, 400 - 2, 160)
-      love.graphics.translate(state.display.x, state.display.y)
-      backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
-      love.graphics.draw(backgroundcanvas, backgroundquad, 0, 0, 0,
-                         state.display.zoom, state.display.zoom)
-      if state.image then
-        love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.draw(state.image, 0, 0, 0,
-                           state.display.zoom, state.display.zoom)
-      end
+      love.graphics.push("all")
+        love.graphics.translate(state.display.x, state.display.y)
+        love.graphics.scale(state.display.zoom, state.display.zoom)
+        backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
+        love.graphics.draw(backgroundcanvas, backgroundquad)
+        if state.image then
+          love.graphics.setColor(255, 255, 255, 255)
+          love.graphics.draw(state.image)
+        end
+      love.graphics.pop()
     Frame.finish()
 
     Layout.next(gui_state, "|", 2)
