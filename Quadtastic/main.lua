@@ -17,7 +17,11 @@ local gui_state
 local state = {
   filepath = "res/style.png", -- the path to the file that we want to edit
   image = nil, -- the loaded image
-  displayzoom = 1, -- additional zoom factor for the displayed image
+  display = {
+    x = 0, -- the x offset where the image should start, in screen coords
+    y = 0, -- the y offset where the image should start, in screen coords
+    zoom = 1, -- additional zoom factor for the displayed image
+  },
 }
 
 -- Scaling factor
@@ -65,27 +69,31 @@ function love.draw()
     end
   end
   Frame.start(gui_state, 2, 24, 400 - 2, 160)
+  love.graphics.translate(state.display.x, state.display.y)
   backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
   love.graphics.draw(backgroundcanvas, backgroundquad, 4, 26, 0,
-                     state.displayzoom, state.displayzoom)
+                     state.display.zoom, state.display.zoom)
   if state.image then
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.draw(state.image, 4, 26, 0,
-                       state.displayzoom, state.displayzoom)
+                       state.display.zoom, state.display.zoom)
   end
   Frame.finish()
   do
     local pressed = Button.draw(gui_state, 2, 300 - 16, 13, 14, "+")
     if pressed then
-      state.displayzoom = math.min(12, state.displayzoom + 1)
+      state.display.zoom = math.min(12, state.display.zoom + 1)
     end
   end
   do
     local pressed = Button.draw(gui_state, 14, 300 - 16, 13, 14, "-")
     if pressed then
-      state.displayzoom = math.max(1, state.displayzoom - 1)
+      state.display.zoom = math.max(1, state.display.zoom - 1)
     end
   end
+
+  state.display.x = state.display.x - gui_state.mouse.wheel_dx * scale
+  state.display.y = state.display.y + gui_state.mouse.wheel_dy * scale
 
   imgui.end_frame(gui_state)
 end
