@@ -24,9 +24,22 @@ Inputfield.draw = function(state, x, y, w, h, content)
   love.graphics.setColor(255, 255, 255, 255)
   renderutils.draw_border(stylesprite, quads, x, y, w, h)
 
+  -- Push state
+  love.graphics.push("all")
+
+  -- Restrict printing to the encolsed area
+  love.graphics.setScissor((x + 2) * 2, (y + 2) * 2, (w - 2) * 2, (h - 2) * 2)
+
   -- Print label
   local margin_y = (h - 16) / 2
-  love.graphics.print(content, x + margin_x, y + margin_y)
+
+  -- Move text start to the left if text width is larger than field width
+  local text_x = x + margin_x
+  if textwidth + 20 > w - 6 then
+    text_x = text_x - (textwidth + 20 - (w-6))
+  end
+
+  love.graphics.print(content, text_x, y + margin_y)
 
   -- Highlight if mouse is over button
   if state and state.mouse and 
@@ -36,6 +49,8 @@ Inputfield.draw = function(state, x, y, w, h, content)
     love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
   end
   content = content .. (state.keyboard.text or "")
+  -- Restore state
+  love.graphics.pop()
   return content
 end
 
