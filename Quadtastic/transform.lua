@@ -15,20 +15,25 @@ local lgpop = love.graphics.pop
 local transform = {}
 
 local matrix = affine.id()
+local scale = {1, 1}
 local transform_stack = {}
+local scale_stack = {}
 
 function transform.origin()
 	matrix = affine.id()
+	scale = {1, 1}
 	lgorigin()
 end
 
 function transform.push(...)
 	table.insert(transform_stack, matrix)
+	table.insert(scale_stack, scale)
 	lgpush(...)
 end
 
 function transform.pop()
 	matrix = table.remove(transform_stack)
+	scale = table.remove(scale_stack)
 	lgpop()
 end
 
@@ -53,6 +58,7 @@ end
 
 function transform.scale(sx, sy)
 	matrix = matrix * affine.scale(sx, sy)
+	scale[1], scale[2] = scale[1] * sx, scale[2] * sy
 	lgscale(sx, sy)
 end
 
@@ -67,6 +73,14 @@ end
 
 function transform.unproject(x, y)
 	return (affine.inverse(matrix))(x, y)
+end
+
+function transform.project_dimensions(w, h)
+	return w * scale[1], h * scale[2]
+end
+
+function transform.unproject_dimensions(w, h)
+	return w / scale[1], h / scale[2]
 end
 
 return transform
