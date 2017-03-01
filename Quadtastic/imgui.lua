@@ -1,5 +1,25 @@
 local imgui = {}
 
+imgui.init_layout_state = function()
+  return {
+    next_x = 0, -- where the next layout-aware component should be drawn
+    next_y = 0,
+    adv_x = 0, -- the advance in x and y of the last drawn element
+    adv_y = 0,
+    acc_adv_x = 0, -- the accumulative advance in x and y
+    acc_adv_y = 0,
+  }
+end
+
+imgui.push_layout_state = function(state)
+  table.insert(state.layoutstack, state.layout)
+  state.layout = imgui.init_layout_state()
+end
+
+imgui.pop_layout_state = function(state)
+  state.layout = table.remove(state.layoutstack)
+end
+
 imgui.init_state = function()
   -- Initialize the state
   local state = {
@@ -24,6 +44,9 @@ imgui.init_state = function()
     style = {
       font = nil, -- The font that is being used
     },
+    layoutstack = {}, -- Nested layouts will push the previous layout state on
+                      -- the layout stack
+    layout = imgui.init_layout_state(), -- the current layout
   }
   return state
 end
