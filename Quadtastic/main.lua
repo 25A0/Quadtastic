@@ -21,6 +21,20 @@ if not _DEBUG then
   local state
 end
 
+local transform = require('Quadtastic/transform')
+
+-- Cover love transformation functions
+do
+  local lg = love.graphics
+  lg.translate = transform.translate
+  lg.rotate = transform.rotate
+  lg.scale = transform.scale
+  lg.shear = transform.shear
+  lg.origin = transform.origin
+  lg.push = transform.push
+  lg.pop = transform.pop
+end
+
 -- Scaling factor
 local scale = 2
 
@@ -58,7 +72,7 @@ function love.load()
   end
 
   love.keyboard.setKeyRepeat(true)
-  gui_state = imgui.init_state()
+  gui_state = imgui.init_state(transform)
   gui_state.style.font = font
 end
 
@@ -151,23 +165,19 @@ function love.draw()
   imgui.end_frame(gui_state)
 end
 
-local function unproject(x, y)
-  return x / scale, y / scale
-end
-
 function love.mousepressed(x, y, button)
-  x, y = unproject(x, y)
+  x, y = x, y
   imgui.mousepressed(gui_state, x, y, button)
 end
 
 function love.mousereleased(x, y, button)
-  x, y = unproject(x, y)
+  x, y = x, y
   imgui.mousereleased(gui_state, x, y, button)
 end
 
 function love.mousemoved(x, y, dx, dy)
-  x ,  y = unproject(x ,  y)
-  dx, dy = unproject(dx, dy)
+  x ,  y = x ,  y
+  dx, dy = dx, dy
   imgui.mousemoved(gui_state, x, y, dx, dy)
 end
 

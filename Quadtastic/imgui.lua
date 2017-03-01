@@ -20,7 +20,7 @@ imgui.pop_layout_state = function(state)
   state.layout = table.remove(state.layoutstack)
 end
 
-imgui.init_state = function()
+imgui.init_state = function(transform)
   -- Initialize the state
   local state = {
     mouse = {
@@ -47,11 +47,15 @@ imgui.init_state = function()
     layoutstack = {}, -- Nested layouts will push the previous layout state on
                       -- the layout stack
     layout = imgui.init_layout_state(), -- the current layout
+    transform = transform, -- the current transform
   }
   return state
 end
 
-imgui.begin_frame = function(state) end
+imgui.begin_frame = function(state)
+  state.transform.origin()
+end
+
 imgui.end_frame = function(state)
   -- Reset mouse deltas
   state.mouse.dx = 0
