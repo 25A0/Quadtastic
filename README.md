@@ -22,3 +22,4 @@ This is a little LÖVE tool to handle sprite atlases while keeping your sanity.
  - Nuklear for guidance on how to write IMGUI https://github.com/vurtun/nuklear
  - inspect.lua by kikito http://github.com/kikito/inspect.lua
  - affine for reverse transformation by [Minh Ngo](https://github.com/markandgo/simple-transform)
+ - xform for practical ideas related to reverse transformation [pgimeno](https://love2d.org/forums/viewtopic.php?p=201884#p201884)
