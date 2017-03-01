@@ -20,6 +20,10 @@ local state = {
   display = {
     x = 0, -- the x offset where the image should start, in screen coords
     y = 0, -- the y offset where the image should start, in screen coords
+    tx = 0, -- target translate translation in x
+    ty = 0, -- target translate translation in y
+    last_dx = 0, -- last translate speed in x
+    last_dy = 0, -- last translate speed in y
     zoom = 1, -- additional zoom factor for the displayed image
   },
 }
@@ -92,8 +96,31 @@ function love.draw()
     end
   end
 
-  state.display.x = state.display.x - gui_state.mouse.wheel_dx * scale
-  state.display.y = state.display.y + gui_state.mouse.wheel_dy * scale
+  -- Image panning
+  
+  local friction = 0.5
+  local threshold = 3
+
+  if gui_state.mouse.wheel_dx ~= 0 then
+    state.display.tx = state.display.x - 2*gui_state.mouse.wheel_dx
+  elseif math.abs(state.display.last_dx) > threshold then
+    state.display.tx = state.display.x + state.display.last_dx
+  end
+  local dx = friction * (state.display.tx - state.display.x)
+
+  if gui_state.mouse.wheel_dy ~= 0 then
+    state.display.ty = state.display.y + 2*gui_state.mouse.wheel_dy
+  elseif math.abs(state.display.last_dy) > threshold then
+    state.display.ty = state.display.y + state.display.last_dy
+  end
+  local dy = friction * (state.display.ty - state.display.y)
+
+  -- Apply the translation change
+  state.display.x = state.display.x + dx
+  state.display.y = state.display.y + dy
+  -- Remember the last delta to possibly trigger floating in the next frame
+  state.display.last_dx = dx
+  state.display.last_dy = dy
 
   imgui.end_frame(gui_state)
 end
