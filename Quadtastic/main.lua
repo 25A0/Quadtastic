@@ -104,7 +104,7 @@ function love.draw()
 
     Layout.next(gui_state, "|", 2)
 
-    Frame.start(gui_state, nil, nil, 400 - 2, 160)
+    Frame.start(gui_state, nil, nil, 400 - 4, 160)
       love.graphics.push("all")
         love.graphics.translate(state.display.x, state.display.y)
         love.graphics.scale(state.display.zoom, state.display.zoom)
