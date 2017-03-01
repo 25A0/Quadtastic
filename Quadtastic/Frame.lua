@@ -16,13 +16,6 @@ Frame.start = function(state, x, y, w, h)
   -- Restrict printing to the encolsed area
   love.graphics.setScissor((x + 2) * 2, (y + 2) * 2, (w - 4) * 2, (h - 4) * 2)
 
-  -- Highlight if mouse is over button
-  if state and state.mouse and 
-    Rectangle(x, y, w, h):contains(state.mouse.x, state.mouse.y)
-  then
-    love.graphics.setColor(255, 255, 255, 70)
-    love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
-  end
 end
 
 Frame.finish = function(state)
