@@ -12,6 +12,7 @@ local imgui = require("imgui")
 local Button = require("Button")
 local Inputfield = require("Inputfield")
 local Label = require("Label")
+local Frame = require("Frame")
 local gui_state
 local state = {
   filepath = "res/style.png", -- the path to the file that we want to edit
@@ -53,11 +54,13 @@ function love.draw()
       print(more)
     end
   end
+  Frame.start(gui_state, 2, 24, 400 - 2, 160)
   if state.image then
     love.graphics.setColor(255, 255, 255, 255)
     love.graphics.draw(state.image, 2, 32, 0,
                        state.displayzoom, state.displayzoom)
   end
+  Frame.finish()
   do
     local pressed = Button.draw(gui_state, 2, 300 - 16, 13, 14, "+")
     if pressed then
