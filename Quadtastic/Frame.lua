@@ -16,6 +16,10 @@ Frame.start = function(state, x, y, w, h)
   -- Restrict printing to the encolsed area
   love.graphics.setScissor((x + 2) * 2, (y + 2) * 2, (w - 4) * 2, (h - 4) * 2)
 
+  -- Translate so that 0, 0 will be at the upper left corner of the inside of
+  -- the frame. The +2 corrects for the border.
+  love.graphics.translate(x + 2, y + 2)
+
 end
 
 Frame.finish = function(state)
