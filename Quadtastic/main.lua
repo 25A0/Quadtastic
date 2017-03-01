@@ -109,14 +109,14 @@ function love.draw()
   local threshold = 3
 
   if gui_state.mouse.wheel_dx ~= 0 then
-    state.display.tx = state.display.x - 2*gui_state.mouse.wheel_dx
+    state.display.tx = state.display.x - 4*gui_state.mouse.wheel_dx
   elseif math.abs(state.display.last_dx) > threshold then
     state.display.tx = state.display.x + state.display.last_dx
   end
   local dx = friction * (state.display.tx - state.display.x)
 
   if gui_state.mouse.wheel_dy ~= 0 then
-    state.display.ty = state.display.y + 2*gui_state.mouse.wheel_dy
+    state.display.ty = state.display.y + 4*gui_state.mouse.wheel_dy
   elseif math.abs(state.display.last_dy) > threshold then
     state.display.ty = state.display.y + state.display.last_dy
   end
