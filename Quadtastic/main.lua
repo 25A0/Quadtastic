@@ -54,6 +54,8 @@ function love.load()
     },
   }
 
+  love.window.setMode(800, 600, {resizable=true, minwidth=400, minheight=300})
+
   love.graphics.setDefaultFilter("nearest", "nearest")
 
   font = love.graphics.newFont("res/m5x7.ttf", 16)
@@ -82,7 +84,10 @@ function love.draw()
   love.graphics.scale(scale, scale)
 
   love.graphics.clear(203, 222, 227)
-  Layout.start(gui_state, 2, 2)
+  local w, h = gui_state.transform.unproject_dimensions(
+    love.graphics.getWidth(), love.graphics.getHeight()
+  )
+  Layout.start(gui_state, 2, 2, w - 4, h - 4)
 
     Layout.start(gui_state)
       Label.draw(gui_state, nil, nil, nil, nil, "File:")
@@ -104,25 +109,27 @@ function love.draw()
 
     Layout.next(gui_state, "|", 2)
 
-    Frame.start(gui_state, nil, nil, 400 - 4, 160)
-      love.graphics.push("all")
-        love.graphics.translate(state.display.x, state.display.y)
-        love.graphics.scale(state.display.zoom, state.display.zoom)
-        backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
-        love.graphics.draw(backgroundcanvas, backgroundquad)
-        if state.image then
+    Layout.start(gui_state, nil, nil, nil, 160)
+      Frame.start(gui_state)
+        love.graphics.push("all")
+          love.graphics.translate(state.display.x, state.display.y)
+          love.graphics.scale(state.display.zoom, state.display.zoom)
+          backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
+          love.graphics.draw(backgroundcanvas, backgroundquad)
+          if state.image then
+            love.graphics.setColor(255, 255, 255, 255)
+            love.graphics.draw(state.image)
+          end
+          -- Draw a bright pixel where the mouse is
           love.graphics.setColor(255, 255, 255, 255)
-          love.graphics.draw(state.image)
-        end
-        -- Draw a bright pixel where the mouse is
-        love.graphics.setColor(255, 255, 255, 255)
-        do
-          local mx, my = gui_state.transform.unproject(gui_state.mouse.x, gui_state.mouse.y)
-          mx, my = math.floor(mx - .5), math.floor(my - .5)
-          love.graphics.rectangle("fill", mx, my, 1, 1)
-        end
-      love.graphics.pop()
-    Frame.finish()
+          do
+            local mx, my = gui_state.transform.unproject(gui_state.mouse.x, gui_state.mouse.y)
+            mx, my = math.floor(mx - .5), math.floor(my - .5)
+            love.graphics.rectangle("fill", mx, my, 1, 1)
+          end
+        love.graphics.pop()
+      Frame.finish(gui_state)
+    Layout.finish(gui_state)
 
     Layout.next(gui_state, "|", 2)
 

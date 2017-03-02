@@ -9,7 +9,7 @@ Layout.start = function(state, x, y, w, h)
 	w = w or state.layout.max_w
 	h = h or state.layout.max_h
 
-	imgui.push_layout_state(state)
+	imgui.push_layout_state(state, 0, 0, w, h)
 
 	love.graphics.push("all")
 

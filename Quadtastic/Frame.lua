@@ -10,8 +10,8 @@ Frame.start = function(state, x, y, w, h)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
 
-  state.layout.adv_x = w
-  state.layout.adv_y = h
+  w = w or state.layout.max_w
+  h = h or state.layout.max_h
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
@@ -33,7 +33,10 @@ Frame.start = function(state, x, y, w, h)
 
 end
 
-Frame.finish = function(state)
+Frame.finish = function(state, w, h)
+  state.layout.adv_x = w or state.layout.max_w
+  state.layout.adv_y = h or state.layout.max_h
+
   -- Restore state
   love.graphics.pop()
 end
