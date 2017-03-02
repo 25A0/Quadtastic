@@ -15,7 +15,7 @@ Frame.start = function(state, x, y, w, h)
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
-  renderutils.draw_border(stylesprite, quads, x, y, w, h, 2)
+  renderutils.draw_border(state.style.stylesheet, quads, x, y, w, h, 2)
 
   -- Push state
   love.graphics.push("all")

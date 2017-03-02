@@ -32,7 +32,7 @@ Button.draw = function(state, x, y, w, h, label)
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
-  renderutils.draw_border(stylesprite, buttonquads, x, y, w, h, 3)
+  renderutils.draw_border(state.style.stylesheet, buttonquads, x, y, w, h, 3)
 
   -- Print label
   local margin_y = (h - 16) / 2

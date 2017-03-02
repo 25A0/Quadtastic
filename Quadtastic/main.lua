@@ -61,7 +61,7 @@ function love.load()
   font = love.graphics.newFont("res/m5x7.ttf", 16)
   love.graphics.setFont(font)
 
-  stylesprite = love.graphics.newImage("res/style.png")
+  local stylesprite = love.graphics.newImage("res/style.png")
 
   backgroundcanvas = love.graphics.newCanvas(8, 8)
   do
@@ -76,6 +76,7 @@ function love.load()
   love.keyboard.setKeyRepeat(true)
   gui_state = imgui.init_state(transform)
   gui_state.style.font = font
+  gui_state.style.stylesheet = stylesprite
 end
 
 local count = 0

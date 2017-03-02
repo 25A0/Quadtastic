@@ -52,6 +52,7 @@ imgui.init_state = function(transform)
     dt = 0, -- Time since last update
     style = {
       font = nil, -- The font that is being used
+      stylesheet = nil, -- A texture atlas with gui styles
     },
     layout = imgui.init_layout_state(nil), -- the current layout
     transform = transform, -- the current transform
