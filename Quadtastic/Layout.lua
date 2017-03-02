@@ -3,9 +3,11 @@ local imgui = require("imgui")
 local Layout = {}
 
 -- Orientation should be "|" for vertical or "-" for horizontal
-Layout.start = function(state, x, y)
+Layout.start = function(state, x, y, w, h)
 	x = x or state.layout.next_x
 	y = y or state.layout.next_y
+	w = w or state.layout.max_w
+	h = h or state.layout.max_h
 
 	imgui.push_layout_state(state)
 

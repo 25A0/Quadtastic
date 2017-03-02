@@ -1,11 +1,17 @@
 local imgui = {}
 
-imgui.init_layout_state = function(parent_layout)
+imgui.init_layout_state = function(
+  parent_layout, -- the layout that contains this layout
+  next_x, -- where the next layout-aware component should be drawn
+  next_y,
+  max_w, -- the maximum dimensions that this layout should span
+  max_h
+)
   return {
-    next_x = 0, -- where the next layout-aware component should be drawn
-    next_y = 0,
-    max_w = nil,
-    max_h = nil,
+    next_x = next_x or 0, -- where the next layout-aware component should be drawn
+    next_y = next_y or 0,
+    max_w = max_w or (parent_layout and parent_layout.max_w),
+    max_h = max_h or (parent_layout and parent_layout.max_h),
     adv_x = 0, -- the advance in x and y of the last drawn element
     adv_y = 0,
     acc_adv_x = 0, -- the accumulative advance in x and y
@@ -15,8 +21,8 @@ imgui.init_layout_state = function(parent_layout)
   }
 end
 
-imgui.push_layout_state = function(state)
-  state.layout = imgui.init_layout_state(state.layout)
+imgui.push_layout_state = function(state, x, y, w, h)
+  state.layout = imgui.init_layout_state(state.layout, x, y, w, h)
 end
 
 imgui.pop_layout_state = function(state)
