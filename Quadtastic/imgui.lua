@@ -1,23 +1,26 @@
 local imgui = {}
 
-imgui.init_layout_state = function()
+imgui.init_layout_state = function(parent_layout)
   return {
     next_x = 0, -- where the next layout-aware component should be drawn
     next_y = 0,
+    max_w = nil,
+    max_h = nil,
     adv_x = 0, -- the advance in x and y of the last drawn element
     adv_y = 0,
     acc_adv_x = 0, -- the accumulative advance in x and y
     acc_adv_y = 0,
+    parent_layout = parent_layout, -- the layout that contains this layout,
+                                   -- or nil if this is the root layout.
   }
 end
 
 imgui.push_layout_state = function(state)
-  table.insert(state.layoutstack, state.layout)
-  state.layout = imgui.init_layout_state()
+  state.layout = imgui.init_layout_state(state.layout)
 end
 
 imgui.pop_layout_state = function(state)
-  state.layout = table.remove(state.layoutstack)
+  state.layout = state.layout.parent_layout
 end
 
 imgui.init_state = function(transform)
@@ -44,9 +47,7 @@ imgui.init_state = function(transform)
     style = {
       font = nil, -- The font that is being used
     },
-    layoutstack = {}, -- Nested layouts will push the previous layout state on
-                      -- the layout stack
-    layout = imgui.init_layout_state(), -- the current layout
+    layout = imgui.init_layout_state(nil), -- the current layout
     transform = transform, -- the current transform
   }
   return state
