@@ -1,5 +1,6 @@
 local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
+local Layout = require("Layout")
 local Frame = {}
 
 local transform = require("transform")
@@ -17,28 +18,14 @@ Frame.start = function(state, x, y, w, h)
   love.graphics.setColor(255, 255, 255, 255)
   renderutils.draw_border(state.style.stylesheet, quads, x, y, w, h, 2)
 
-  -- Push state
-  love.graphics.push("all")
-
-  -- Restrict printing to the encolsed area
-  do
-    local abs_x, abs_y = state.transform.project(x + 2, y + 2)
-    local abs_w, abs_h = state.transform.project_dimensions(w - 4, h - 4)
-    love.graphics.setScissor(abs_x, abs_y, abs_w, abs_h)
-  end
-
-  -- Translate so that 0, 0 will be at the upper left corner of the inside of
-  -- the frame. The +2 corrects for the border.
-  love.graphics.translate(x + 2, y + 2)
-
+  Layout.start(state, x+2, y+2, w - 4, h - 4)
 end
 
 Frame.finish = function(state, w, h)
+  Layout.finish(state)
   state.layout.adv_x = w or state.layout.max_w
   state.layout.adv_y = h or state.layout.max_h
 
-  -- Restore state
-  love.graphics.pop()
 end
 
 return Frame
