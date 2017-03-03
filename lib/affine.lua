@@ -125,6 +125,14 @@ affine.inverse = function (u)
 	return t
 end
 
+affine.clone = function(self)
+	local c = affine.id()
+	c[1] = {self[1][1], self[1][2], self[1][3]}
+	c[2] = {self[2][1], self[2][2], self[2][3]}
+	c[3] = {self[3][1], self[3][2], self[3][3]}
+	return c
+end
+
 affine.polar = function (x,y)
 	local r     = (x^2 + y^2)^0.5
 	local theta = math.atan2(y,x)
