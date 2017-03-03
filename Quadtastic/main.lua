@@ -14,6 +14,7 @@ local Inputfield = require("Inputfield")
 local Label = require("Label")
 local Frame = require("Frame")
 local Layout = require("Layout")
+local Scrollpane = require("Scrollpane")
 
 -- Make the state variables local unless we are in debug mode
 if not _DEBUG then
@@ -52,6 +53,7 @@ function love.load()
       last_dy = 0, -- last translate speed in y
       zoom = 1, -- additional zoom factor for the displayed image
     },
+    scrollpane_state,
   }
 
   love.window.setMode(800, 600, {resizable=true, minwidth=400, minheight=300})
@@ -110,27 +112,22 @@ function love.draw()
 
     Layout.next(gui_state, "|", 2)
 
-    Layout.start(gui_state, nil, nil, nil, 160)
-      Frame.start(gui_state)
-        love.graphics.push("all")
-          love.graphics.translate(state.display.x, state.display.y)
-          love.graphics.scale(state.display.zoom, state.display.zoom)
-          backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
-          love.graphics.draw(backgroundcanvas, backgroundquad)
-          if state.image then
-            love.graphics.setColor(255, 255, 255, 255)
-            love.graphics.draw(state.image)
-          end
-          -- Draw a bright pixel where the mouse is
-          love.graphics.setColor(255, 255, 255, 255)
-          do
-            local mx, my = gui_state.transform.unproject(gui_state.mouse.x, gui_state.mouse.y)
-            mx, my = math.floor(mx - .5), math.floor(my - .5)
-            love.graphics.rectangle("fill", mx, my, 1, 1)
-          end
-        love.graphics.pop()
-      Frame.finish(gui_state)
-    Layout.finish(gui_state)
+    Scrollpane.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 30, state.scrollpane_state)
+      love.graphics.scale(state.display.zoom, state.display.zoom)
+      backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
+      love.graphics.draw(backgroundcanvas, backgroundquad)
+      if state.image then
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.draw(state.image)
+      end
+      -- Draw a bright pixel where the mouse is
+      love.graphics.setColor(255, 255, 255, 255)
+      do
+        local mx, my = gui_state.transform.unproject(gui_state.mouse.x, gui_state.mouse.y)
+        mx, my = math.floor(mx - .5), math.floor(my - .5)
+        love.graphics.rectangle("fill", mx, my, 1, 1)
+      end
+    Scrollpane.finish(gui_state, scrollpane_state)
 
     Layout.next(gui_state, "|", 2)
 

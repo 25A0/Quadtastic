@@ -20,6 +20,11 @@ Rectangle.centered = function(self, x, y, w, h)
   return self:new(x - w/2, y - h/2, w, h)
 end
 
+-- Returns the center of the rectangle
+Rectangle.center = function(self)
+  return self.x + self.w/2, self.y + self.h/2
+end
+
 -- Checks whether this rectangle contains the given point
 Rectangle.contains = function(self, px, py)
   return px >= self.x and px < self.x + self.w and
