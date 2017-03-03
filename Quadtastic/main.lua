@@ -106,8 +106,9 @@ function love.draw()
 
     Layout.next(gui_state, "|", 2)
 
+    Frame.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 30)
     state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
-      gui_state.layout.max_h - 30, state.scrollpane_state
+      nil, state.scrollpane_state
     )
       love.graphics.scale(state.display.zoom, state.display.zoom)
       backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
@@ -124,6 +125,7 @@ function love.draw()
         love.graphics.rectangle("fill", mx, my, 1, 1)
       end
     Scrollpane.finish(gui_state, state.scrollpane_state)
+    Frame.finish(gui_state)
 
     Layout.next(gui_state, "|", 2)
 
