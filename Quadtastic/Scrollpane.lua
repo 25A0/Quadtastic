@@ -156,8 +156,10 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	local w = state.layout.max_w
 	local h = state.layout.max_h
 
-	local has_vertical = content_h > state.layout.max_h - scrollbar_margin
-	local has_horizontal = content_w > state.layout.max_w - scrollbar_margin
+	local has_vertical = content_h > state.layout.max_h - 
+		(scrollpane_state.had_horizontal and scrollbar_margin or 0)
+	local has_horizontal = content_w > state.layout.max_w - 
+		(scrollpane_state.had_vertical and scrollbar_margin or 0)
 
 	-- Render the vertical scrollbar if necessary
 	if has_vertical then
