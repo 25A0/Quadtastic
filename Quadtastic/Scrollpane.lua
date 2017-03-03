@@ -78,9 +78,9 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 	w = w or state.layout.max_w
 	h = h or state.layout.max_h
 
-	print("starting scrollpane layout")
 	-- Start a layout that contains this scrollpane
 	Layout.start(state, x, y, w, h)
+	love.graphics.clear(76, 100, 117)
 
 	-- Start a layout that encloses the viewport's content
 	-- Note the flipped signs for the scrollpane's offset
