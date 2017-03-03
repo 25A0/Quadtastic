@@ -73,6 +73,26 @@ Scrollpane.set_focus = function(scrollpane_state, bounds, mode)
 	}
 end
 
+Scrollpane.is_mouse_inside_widget = function(gui_state, scrollpane_state, mx, my)
+	-- We cannot check this until the scrollpane was drawn once
+	if not (scrollpane_state.transform and scrollpane_state.w and 
+		    scrollpane_state.h)
+	then 
+		return false
+	end
+
+	-- If no specific coordinates are given, use the current mouse coords
+	mx = mx or gui_state.mouse.x
+	my = my or gui_state.mouse.y
+
+	-- Transform to local coordinates. We use the cached transform here since we
+	-- cannot know which transforms were applied since then.
+	local x, y = scrollpane_state.transform.unproject(mx, my)
+
+	-- Now we can just check whether the mouse is within the viewport's dimensions
+	return x >= 0 and x < scrollpane_state.w and y >= 0 and y < scrollpane_state.h
+end
+
 Scrollpane.init_scrollpane_state = function(x, y, min_x, min_y, max_x, max_y)
 	return  {
 		x = x or 0, -- the x offset of the viewport
@@ -87,6 +107,9 @@ Scrollpane.init_scrollpane_state = function(x, y, min_x, min_y, max_x, max_y)
 		-- automatically
 		w = nil,
 		h = nil,
+		-- We need a reference to the transform that is being used when the
+		-- scrollpane starts.
+		transform = nil,
 
 		-- whether the scrollpane needed scrollbars in the last frame
 		had_vertical = false,
@@ -130,6 +153,8 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 	-- Update the scrollpane's viewport width and height
 	scrollpane_state.w = state.layout.max_w
 	scrollpane_state.h = state.layout.max_h
+	-- Update the scrollpane's transform
+	scrollpane_state.transform = state.transform
 
 	-- Apply focus if there is one
 	if scrollpane_state.focus then
@@ -197,28 +222,27 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	scrollpane_state.had_vertical = has_vertical
 	scrollpane_state.had_horizontal = has_horizontal
 
-	-- This layout always fills the available space
-	state.layout.adv_x = state.layout.max_w
-	state.layout.adv_y = state.layout.max_h
-	Layout.finish(state)
-
 	-- Image panning
-
 	local friction = 0.5
-	local threshold = 3
 
-	if state.mouse.wheel_dx ~= 0 then
-		scrollpane_state.tx = scrollpane_state.x + 4*state.mouse.wheel_dx
-	elseif math.abs(scrollpane_state.last_dx) > threshold then
-		scrollpane_state.tx = scrollpane_state.x + scrollpane_state.last_dx
+	-- Only handle image panning if the mousewheel was triggered inside
+	-- this widget.
+	if Scrollpane.is_mouse_inside_widget(state, scrollpane_state) then
+    	local threshold = 3
+		if state.mouse.wheel_dx ~= 0 then
+			scrollpane_state.tx = scrollpane_state.x + 4*state.mouse.wheel_dx
+		elseif math.abs(scrollpane_state.last_dx) > threshold then
+			scrollpane_state.tx = scrollpane_state.x + scrollpane_state.last_dx
+		end
+		if state.mouse.wheel_dy ~= 0 then
+			scrollpane_state.ty = scrollpane_state.y - 4*state.mouse.wheel_dy
+		elseif math.abs(scrollpane_state.last_dy) > threshold then
+			scrollpane_state.ty = scrollpane_state.y + scrollpane_state.last_dy
+		end
 	end
+
+	-- Gently pan to target position
 	local dx = friction * (scrollpane_state.tx - scrollpane_state.x)
-
-	if state.mouse.wheel_dy ~= 0 then
-		scrollpane_state.ty = scrollpane_state.y - 4*state.mouse.wheel_dy
-	elseif math.abs(scrollpane_state.last_dy) > threshold then
-		scrollpane_state.ty = scrollpane_state.y + scrollpane_state.last_dy
-	end
 	local dy = friction * (scrollpane_state.ty - scrollpane_state.y)
 
 	-- Apply the translation change
@@ -228,6 +252,10 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	scrollpane_state.last_dx = dx
 	scrollpane_state.last_dy = dy
 
+	-- This layout always fills the available space
+	state.layout.adv_x = state.layout.max_w
+	state.layout.adv_y = state.layout.max_h
+	Layout.finish(state)
 end
 
 return Scrollpane
