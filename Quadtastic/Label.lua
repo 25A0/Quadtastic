@@ -5,7 +5,7 @@ local Label = {}
 -- Displays the passed in label. Returns, in this order, whether the label
 -- is active (i.e. getting clicked on), and whether the mouse is over this
 -- label.
-Label.draw = function(state, x, y, w, h, label)
+Label.draw = function(state, x, y, w, h, label, options)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
 
@@ -13,6 +13,19 @@ Label.draw = function(state, x, y, w, h, label)
   local textwidth = state.style.font and state.style.font:getWidth(label)
   w = w or math.max(32, 2*margin_x + (textwidth or 32))
   h = h or 18
+
+  if options then
+    -- center alignment
+    if options.alignment == ":" then
+      x = x + w/2 - textwidth /2 - margin_x
+
+    -- right alignment
+    elseif options.alignment == ">" then
+      x = x + w - textwidth - 2 * margin_x
+
+    end
+
+  end
 
   state.layout.adv_x = w
   state.layout.adv_y = h
