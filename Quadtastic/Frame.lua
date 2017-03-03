@@ -22,9 +22,9 @@ Frame.start = function(state, x, y, w, h)
 end
 
 Frame.finish = function(state, w, h)
+  state.layout.adv_x = w or state.layout.max_w + 4
+  state.layout.adv_y = h or state.layout.max_h + 4
   Layout.finish(state)
-  state.layout.adv_x = w or state.layout.max_w
-  state.layout.adv_y = h or state.layout.max_h
 
 end
 
