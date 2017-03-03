@@ -39,6 +39,16 @@ end
 -- Scaling factor
 local scale = 2
 
+local loadfile = function(state, file)
+  success, more = pcall(love.graphics.newImage, file)
+  if success then
+    state.image = more
+    state.filepath = file
+  else
+    print(more)
+  end
+end
+
 function love.load()
   -- Initialize the state
   state = {
@@ -95,12 +105,7 @@ function love.draw()
 
       local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Doggo!!")
       if pressed then 
-        success, more = pcall(love.graphics.newImage, state.filepath)
-        if success then
-          state.image = more
-        else
-          print(more)
-        end
+        loadfile(state, state.filepath)
       end
     Layout.finish(gui_state, "-")
 
@@ -157,6 +162,25 @@ function love.draw()
   Layout.finish(gui_state, "|")
 
   imgui.end_frame(gui_state)
+end
+
+function love.filedropped(file)
+  -- The love filesystem blocks access to all files outside certain directories
+  -- so we need a little workaround to use the dropped file.
+
+  if file:open('r') then
+    local data = file:read()
+    file:close()
+    success, img = pcall(function() 
+      return love.graphics.newImage(
+        love.image.newImageData(
+          love.filesystem.newFileData(data, 'img', 'file')))
+    end)
+    if success and img then
+      state.filepath = file:getFilename()
+      state.image = img
+    end
+  end
 end
 
 function love.mousepressed(x, y, button)
