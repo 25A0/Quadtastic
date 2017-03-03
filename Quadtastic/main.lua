@@ -138,6 +138,9 @@ function love.draw()
           mx, my = math.floor(mx - .5), math.floor(my - .5)
           love.graphics.rectangle("fill", mx, my, 1, 1)
         end
+
+        gui_state.layout.adv_x = img_w * state.display.zoom
+        gui_state.layout.adv_y = img_h * state.display.zoom
       Scrollpane.finish(gui_state, state.scrollpane_state)
     else
       -- Put a label in the center of the frame
