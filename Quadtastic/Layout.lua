@@ -13,6 +13,12 @@ Layout.start = function(state, x, y, w, h)
 
 	love.graphics.push("all")
 
+    do
+      local abs_x, abs_y = state.transform.project(x, y)
+      local abs_w, abs_h = state.transform.project_dimensions(w, h)
+      love.graphics.intersectScissor(abs_x, abs_y, abs_w, abs_h)
+    end
+
 	love.graphics.translate(x, y)
 end
 
