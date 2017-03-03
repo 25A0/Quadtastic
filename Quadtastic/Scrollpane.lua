@@ -117,6 +117,10 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 	-- Start a layout that encloses the viewport's content
 	Layout.start(state, 0, 0, inner_w, inner_h)
 
+	-- Update the scrollpane's viewport width and height
+	scrollpane_state.w = state.layout.max_w
+	scrollpane_state.h = state.layout.max_h
+
 	-- Apply focus if there is one
 	if scrollpane_state.focus then
 		apply_focus(state, scrollpane_state)
@@ -124,10 +128,6 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 
 	-- Note the flipped signs
 	love.graphics.translate(-scrollpane_state.x, -scrollpane_state.y)
-
-	-- Update the scrollpane's viewport width and height
-	scrollpane_state.w = state.layout.max_w
-	scrollpane_state.h = state.layout.max_h
 
 	return scrollpane_state
 end
