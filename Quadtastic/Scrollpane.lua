@@ -1,4 +1,5 @@
 local Layout = require("Layout")
+local Rectangle = require("Rectangle")
 
 local Scrollpane = {}
 
@@ -36,9 +37,11 @@ Scrollpane.set_focus = function(gui_state, bounds, scrollpane_state)
 	-- Try to center the scrollpane viewport on the given bounds, but without
 	-- exceeding the limits set in the scrollpane state
 
-	local center_bounds = Rectangle.center(bounds)
+	local center_bounds = {}
+	center_bounds.x, center_bounds.y = Rectangle.center(bounds)
 	-- This works because the scrollpane has x, y, w and h
-	local center_vp = Rectangle.center(scrollpane_state)
+	local center_vp = {}
+	center_vp.x, center_vp.y = Rectangle.center(scrollpane_state)
 
 	local dx, dy = center_bounds.x - center_vp.x, center_bounds.y - center_vp.y
 	scrollpane_state.x = scrollpane_state.x + dx
@@ -59,6 +62,11 @@ Scrollpane.init_scrollpane_state = function(x, y, min_x, min_y, max_x, max_y)
 		-- automatically
 		w = nil,
 		h = nil,
+
+		-- whether the scrollpane needed scrollbars in the last frame
+		had_vertical = false,
+		had_horizontal = false,
+
 		-- Scrolling behavior
 		tx = 0, -- target translate translation in x
     	ty = 0, -- target translate translation in y
@@ -82,10 +90,18 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 	Layout.start(state, x, y, w, h)
 	love.graphics.clear(76, 100, 117)
 
+	-- Calculate the dimension of the viewport, based on whether the viewport
+	-- needed a scrollbar in the last frame
+	local inner_w = w
+	if scrollpane_state.had_vertical then inner_w = inner_w - scrollbar_margin end
+	local inner_h = h
+	if scrollpane_state.had_horizontal then inner_h = inner_h - scrollbar_margin end
+
 	-- Start a layout that encloses the viewport's content
-	-- Note the flipped signs for the scrollpane's offset
-	Layout.start(state, 0, 0, w - scrollbar_margin, h - scrollbar_margin)
+	Layout.start(state, 0, 0, inner_w, inner_h)
+	-- Note the flipped signs
 	love.graphics.translate(-scrollpane_state.x, -scrollpane_state.y)
+
 	-- Update the scrollpane's viewport width and height
 	scrollpane_state.w = state.layout.max_w
 	scrollpane_state.h = state.layout.max_h
@@ -94,6 +110,11 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 end
 
 Scrollpane.finish = function(state, scrollpane_state)
+	-- If the content defined advance values in x and y, we can detect whether
+	-- we need to draw scroll bars at all.
+	local content_w = state.layout.adv_x
+	local content_h = state.layout.adv_y
+
 	-- Finish the layout that encloses the viewport's content
 	Layout.finish(state)
 
@@ -102,27 +123,44 @@ Scrollpane.finish = function(state, scrollpane_state)
 	local w = state.layout.max_w
 	local h = state.layout.max_h
 
-	-- Render the vertical scrollbar
-	love.graphics.draw(state.style.stylesheet, quads.up_button,
-		               x + w - scrollbar_margin, y)
-	love.graphics.draw(state.style.stylesheet, quads.background,
-		               x + w - scrollbar_margin, y + scrollbar_margin,
-		               0, 7, h - 3*scrollbar_margin)
-	love.graphics.draw(state.style.stylesheet, quads.down_button,
-		               x + w - scrollbar_margin, y + h - 2*scrollbar_margin)
+	local has_vertical = content_h > state.layout.max_h - scrollbar_margin
+	local has_horizontal = content_w > state.layout.max_w - scrollbar_margin
 
-	-- Render the horizontal scrollbar
-	love.graphics.draw(state.style.stylesheet, quads.left_button,
-		               x, y + h - scrollbar_margin)
-	love.graphics.draw(state.style.stylesheet, quads.background,
-		               x + scrollbar_margin, y + h - scrollbar_margin,
-		               0, w - 3*scrollbar_margin, 7)
-	love.graphics.draw(state.style.stylesheet, quads.right_button,
-		               x + w - 2 * scrollbar_margin, y + h - scrollbar_margin)
+	-- Render the vertical scrollbar if necessary
+	if has_vertical then
+		local height = h
+		if has_horizontal then height = height - scrollbar_margin end
+		love.graphics.draw(state.style.stylesheet, quads.up_button,
+			               x + w - scrollbar_margin, y)
+		love.graphics.draw(state.style.stylesheet, quads.background,
+			               x + w - scrollbar_margin, y + scrollbar_margin,
+			               0, 7, height - 2*scrollbar_margin)
+		love.graphics.draw(state.style.stylesheet, quads.down_button,
+			               x + w - scrollbar_margin, y + height - scrollbar_margin)
+	end
 
-	-- Render the little corner
-	love.graphics.draw(state.style.stylesheet, quads.corner,
-		               x + w - scrollbar_margin, y + h - scrollbar_margin)
+	-- Render the horizontal scrollbar if necessary
+	if has_horizontal then
+		local width = w
+		if has_vertical then width = width - scrollbar_margin end
+		love.graphics.draw(state.style.stylesheet, quads.left_button,
+			               x, y + h - scrollbar_margin)
+		love.graphics.draw(state.style.stylesheet, quads.background,
+			               x + scrollbar_margin, y + h - scrollbar_margin,
+			               0, width - 2*scrollbar_margin, 7)
+		love.graphics.draw(state.style.stylesheet, quads.right_button,
+			               x + width - scrollbar_margin, y + h - scrollbar_margin)
+	end
+
+	-- Render the little corner if we have both a vertical and horizontal
+	-- scrollbar
+	if has_vertical and has_horizontal then
+		love.graphics.draw(state.style.stylesheet, quads.corner,
+			               x + w - scrollbar_margin, y + h - scrollbar_margin)
+	end
+
+	scrollpane_state.had_vertical = has_vertical
+	scrollpane_state.had_horizontal = has_horizontal
 
 	-- This layout always fills the available space
 	state.layout.adv_x = state.layout.max_w
