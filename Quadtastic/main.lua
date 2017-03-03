@@ -50,8 +50,14 @@ local set_opened_file = function(state, filename_or_data, filepath)
 end
 
 local reset_view = function(state)
-  state.scrollpane_state = nil
+  state.scrollpane_state = Scrollpane.init_scrollpane_state()
   state.display.zoom = 1
+  if state.image then
+    Scrollpane.set_focus(state.scrollpane_state, {
+      x = 0, y = 0, 
+      w = state.image:getWidth(), h = state.image:getHeight()
+    })
+  end
 end
 
 function love.load()
@@ -62,7 +68,7 @@ function love.load()
     display = {
       zoom = 1, -- additional zoom factor for the displayed image
     },
-    scrollpane_state,
+    scrollpane_state = nil,
   }
 
   love.window.setMode(800, 600, {resizable=true, minwidth=400, minheight=300})

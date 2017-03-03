@@ -25,10 +25,12 @@ local quads = {
 -- (i.e. when moving to the first item, it will not center the viewport on
 -- that item, but rather have the viewport's upper bound line up with the upper
 -- bound of that item.)
-Scrollpane.set_focus = function(gui_state, bounds, scrollpane_state)
+local apply_focus = function(gui_state, scrollpane_state)
 	assert(gui_state)
-	assert(bounds)
 	assert(scrollpane_state)
+	assert(scrollpane_state.focus)
+
+	local bounds = scrollpane_state.focus
 
 	-- We cannot focus on a specific element if we don't know the viewport's
 	-- dimensions
@@ -46,6 +48,19 @@ Scrollpane.set_focus = function(gui_state, bounds, scrollpane_state)
 	local dx, dy = center_bounds.x - center_vp.x, center_bounds.y - center_vp.y
 	scrollpane_state.x = scrollpane_state.x + dx
 	scrollpane_state.y = scrollpane_state.y + dy
+	scrollpane_state.tx = scrollpane_state.x
+	scrollpane_state.ty = scrollpane_state.y
+
+	scrollpane_state.focus = nil
+end
+
+Scrollpane.set_focus = function(scrollpane_state, bounds)
+	scrollpane_state.focus = {
+		x = bounds.x,
+		y = bounds.y,
+		w = bounds.w,
+		h = bounds.h,
+	}
 end
 
 Scrollpane.init_scrollpane_state = function(x, y, min_x, min_y, max_x, max_y)
@@ -73,6 +88,8 @@ Scrollpane.init_scrollpane_state = function(x, y, min_x, min_y, max_x, max_y)
     	last_dx = 0, -- last translate speed in x
 	    last_dy = 0, -- last translate speed in y
 
+	    -- Focus, will be applied on the next frame
+	    focus = nil,
 	}
 end
 
@@ -99,6 +116,12 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 
 	-- Start a layout that encloses the viewport's content
 	Layout.start(state, 0, 0, inner_w, inner_h)
+
+	-- Apply focus if there is one
+	if scrollpane_state.focus then
+		apply_focus(state, scrollpane_state)
+	end
+
 	-- Note the flipped signs
 	love.graphics.translate(-scrollpane_state.x, -scrollpane_state.y)
 
