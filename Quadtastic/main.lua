@@ -107,24 +107,31 @@ function love.draw()
     Layout.next(gui_state, "|", 2)
 
     Frame.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 30)
-    state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
-      nil, state.scrollpane_state
-    )
-      love.graphics.scale(state.display.zoom, state.display.zoom)
-      backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
-      love.graphics.draw(backgroundcanvas, backgroundquad)
-      if state.image then
+    if state.image then
+      state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
+        nil, state.scrollpane_state
+      )
+        love.graphics.scale(state.display.zoom, state.display.zoom)
+        backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
+        love.graphics.draw(backgroundcanvas, backgroundquad)
+        if state.image then
+          love.graphics.setColor(255, 255, 255, 255)
+          love.graphics.draw(state.image)
+        end
+        -- Draw a bright pixel where the mouse is
         love.graphics.setColor(255, 255, 255, 255)
-        love.graphics.draw(state.image)
-      end
-      -- Draw a bright pixel where the mouse is
-      love.graphics.setColor(255, 255, 255, 255)
-      do
-        local mx, my = gui_state.transform.unproject(gui_state.mouse.x, gui_state.mouse.y)
-        mx, my = math.floor(mx - .5), math.floor(my - .5)
-        love.graphics.rectangle("fill", mx, my, 1, 1)
-      end
-    Scrollpane.finish(gui_state, state.scrollpane_state)
+        do
+          local mx, my = gui_state.transform.unproject(gui_state.mouse.x, gui_state.mouse.y)
+          mx, my = math.floor(mx - .5), math.floor(my - .5)
+          love.graphics.rectangle("fill", mx, my, 1, 1)
+        end
+      Scrollpane.finish(gui_state, state.scrollpane_state)
+    else
+      -- Put a label in the center of the frame
+      local y = gui_state.layout.max_h / 2 - gui_state.style.font:getHeight()
+      Label.draw(gui_state, nil, y, gui_state.layout.max_w, nil,
+                 "no image :(", {alignment = ":"})
+    end
     Frame.finish(gui_state)
 
     Layout.next(gui_state, "|", 2)
