@@ -132,11 +132,11 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 	return scrollpane_state
 end
 
-Scrollpane.finish = function(state, scrollpane_state)
+Scrollpane.finish = function(state, scrollpane_state, w, h)
 	-- If the content defined advance values in x and y, we can detect whether
 	-- we need to draw scroll bars at all.
-	local content_w = state.layout.adv_x
-	local content_h = state.layout.adv_y
+	local content_w = w or state.layout.adv_x
+	local content_h = h or state.layout.adv_y
 
 	-- Finish the layout that encloses the viewport's content
 	Layout.finish(state)
