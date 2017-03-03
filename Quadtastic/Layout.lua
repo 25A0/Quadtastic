@@ -36,7 +36,7 @@ local function update_state(state, orientation, spacing)
 	if orientation == "-" then
 		state.layout.acc_adv_x = state.layout.acc_adv_x + state.layout.adv_x
 		-- Decrease the remaining width by the advance in x
-		state.layout.max_w = math.max(0, state.layout.max_w - state.layout.adv_x)
+		state.layout.max_w = math.max(0, state.layout.max_w - state.layout.adv_x - spacing)
     	state.layout.acc_adv_y = math.max(state.layout.acc_adv_y, state.layout.adv_y)
 
     	state.layout.next_x = state.layout.next_x + state.layout.adv_x + spacing
@@ -44,7 +44,7 @@ local function update_state(state, orientation, spacing)
     	state.layout.acc_adv_x = math.max(state.layout.acc_adv_x, state.layout.adv_x)
     	state.layout.acc_adv_y = state.layout.acc_adv_y + state.layout.adv_y
 		-- Decrease the remaining height by the advance in y
-		state.layout.max_h = math.max(0, state.layout.max_h - state.layout.adv_y)
+		state.layout.max_h = math.max(0, state.layout.max_h - state.layout.adv_y - spacing)
 
     	state.layout.next_y = state.layout.next_y + state.layout.adv_y + spacing
 	end
