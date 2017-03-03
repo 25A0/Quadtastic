@@ -39,14 +39,19 @@ end
 -- Scaling factor
 local scale = 2
 
-local loadfile = function(state, file)
-  success, more = pcall(love.graphics.newImage, file)
+local set_opened_file = function(state, filename_or_data, filepath)
+  success, more = pcall(love.graphics.newImage, filename_or_data)
   if success then
     state.image = more
-    state.filepath = file
+    state.filepath = filepath or filename_or_data
   else
     print(more)
   end
+end
+
+local reset_view = function(state)
+  state.scrollpane_state = nil
+  state.display.zoom = 1
 end
 
 function love.load()
@@ -105,7 +110,8 @@ function love.draw()
 
       local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Doggo!!")
       if pressed then 
-        loadfile(state, state.filepath)
+        set_opened_file(state, state.filepath)
+        reset_view(state)
       end
     Layout.finish(gui_state, "-")
 
@@ -171,14 +177,13 @@ function love.filedropped(file)
   if file:open('r') then
     local data = file:read()
     file:close()
-    success, img = pcall(function() 
-      return love.graphics.newImage(
-        love.image.newImageData(
-          love.filesystem.newFileData(data, 'img', 'file')))
+    success, data = pcall(function() 
+      return love.image.newImageData(
+        love.filesystem.newFileData(data, 'img', 'file'))
     end)
-    if success and img then
-      state.filepath = file:getFilename()
-      state.image = img
+    if success and data then
+      set_opened_file(state, data, file:getFilename())
+      reset_view(state)
     end
   end
 end
