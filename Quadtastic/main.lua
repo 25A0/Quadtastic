@@ -111,13 +111,15 @@ function love.draw()
       state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
         nil, state.scrollpane_state
       )
+        love.graphics.setColor(255, 255, 255, 255)
         love.graphics.scale(state.display.zoom, state.display.zoom)
-        backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
+
+        -- Draw background pattern
+        local img_w, img_h = state.image:getDimensions()
+        backgroundquad = love.graphics.newQuad(0, 0, img_w, img_h, 8, 8)
         love.graphics.draw(backgroundcanvas, backgroundquad)
-        if state.image then
-          love.graphics.setColor(255, 255, 255, 255)
-          love.graphics.draw(state.image)
-        end
+
+        love.graphics.draw(state.image)
         -- Draw a bright pixel where the mouse is
         love.graphics.setColor(255, 255, 255, 255)
         do
