@@ -59,6 +59,12 @@ Scrollpane.init_scrollpane_state = function(x, y, min_x, min_y, max_x, max_y)
 		-- automatically
 		w = nil,
 		h = nil,
+		-- Scrolling behavior
+		tx = 0, -- target translate translation in x
+    	ty = 0, -- target translate translation in y
+    	last_dx = 0, -- last translate speed in x
+	    last_dy = 0, -- last translate speed in y
+
 	}
 end
 
@@ -82,9 +88,11 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 	-- Update the scrollpane's viewport width and height
 	scrollpane_state.w = state.layout.max_w
 	scrollpane_state.h = state.layout.max_h
+
+	return scrollpane_state
 end
 
-Scrollpane.finish = function(state)
+Scrollpane.finish = function(state, scrollpane_state)
 	-- Finish the layout that encloses the viewport's content
 	Layout.finish(state)
 
@@ -119,6 +127,32 @@ Scrollpane.finish = function(state)
 	state.layout.adv_x = state.layout.max_w
 	state.layout.adv_y = state.layout.max_h
 	Layout.finish(state)
+
+	-- Image panning
+
+	local friction = 0.5
+	local threshold = 3
+
+	if state.mouse.wheel_dx ~= 0 then
+		scrollpane_state.tx = scrollpane_state.x - 4*state.mouse.wheel_dx
+	elseif math.abs(scrollpane_state.last_dx) > threshold then
+		scrollpane_state.tx = scrollpane_state.x + scrollpane_state.last_dx
+	end
+	local dx = friction * (scrollpane_state.tx - scrollpane_state.x)
+
+	if state.mouse.wheel_dy ~= 0 then
+		scrollpane_state.ty = scrollpane_state.y + 4*state.mouse.wheel_dy
+	elseif math.abs(scrollpane_state.last_dy) > threshold then
+		scrollpane_state.ty = scrollpane_state.y + scrollpane_state.last_dy
+	end
+	local dy = friction * (scrollpane_state.ty - scrollpane_state.y)
+
+	-- Apply the translation change
+	scrollpane_state.x = scrollpane_state.x + dx
+	scrollpane_state.y = scrollpane_state.y + dy
+	-- Remember the last delta to possibly trigger floating in the next frame
+	scrollpane_state.last_dx = dx
+	scrollpane_state.last_dy = dy
 
 end
 

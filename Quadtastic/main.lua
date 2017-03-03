@@ -45,12 +45,6 @@ function love.load()
     filepath = "res/style.png", -- the path to the file that we want to edit
     image = nil, -- the loaded image
     display = {
-      x = 0, -- the x offset where the image should start, in screen coords
-      y = 0, -- the y offset where the image should start, in screen coords
-      tx = 0, -- target translate translation in x
-      ty = 0, -- target translate translation in y
-      last_dx = 0, -- last translate speed in x
-      last_dy = 0, -- last translate speed in y
       zoom = 1, -- additional zoom factor for the displayed image
     },
     scrollpane_state,
@@ -112,7 +106,9 @@ function love.draw()
 
     Layout.next(gui_state, "|", 2)
 
-    Scrollpane.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 30, state.scrollpane_state)
+    state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
+      gui_state.layout.max_h - 30, state.scrollpane_state
+    )
       love.graphics.scale(state.display.zoom, state.display.zoom)
       backgroundquad = love.graphics.newQuad(0, 0, 400, 300, 8, 8)
       love.graphics.draw(backgroundcanvas, backgroundquad)
@@ -127,7 +123,7 @@ function love.draw()
         mx, my = math.floor(mx - .5), math.floor(my - .5)
         love.graphics.rectangle("fill", mx, my, 1, 1)
       end
-    Scrollpane.finish(gui_state, scrollpane_state)
+    Scrollpane.finish(gui_state, state.scrollpane_state)
 
     Layout.next(gui_state, "|", 2)
 
@@ -148,32 +144,6 @@ function love.draw()
     Layout.finish(gui_state, "-")
 
   Layout.finish(gui_state, "|")
-
-  -- Image panning
-
-  local friction = 0.5
-  local threshold = 3
-
-  if gui_state.mouse.wheel_dx ~= 0 then
-    state.display.tx = state.display.x - 4*gui_state.mouse.wheel_dx
-  elseif math.abs(state.display.last_dx) > threshold then
-    state.display.tx = state.display.x + state.display.last_dx
-  end
-  local dx = friction * (state.display.tx - state.display.x)
-
-  if gui_state.mouse.wheel_dy ~= 0 then
-    state.display.ty = state.display.y + 4*gui_state.mouse.wheel_dy
-  elseif math.abs(state.display.last_dy) > threshold then
-    state.display.ty = state.display.y + state.display.last_dy
-  end
-  local dy = friction * (state.display.ty - state.display.y)
-
-  -- Apply the translation change
-  state.display.x = state.display.x + dx
-  state.display.y = state.display.y + dy
-  -- Remember the last delta to possibly trigger floating in the next frame
-  state.display.last_dx = dx
-  state.display.last_dy = dy
 
   imgui.end_frame(gui_state)
 end
