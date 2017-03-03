@@ -56,7 +56,7 @@ local reset_view = function(state)
     Scrollpane.set_focus(state.scrollpane_state, {
       x = 0, y = 0, 
       w = state.image:getWidth(), h = state.image:getHeight()
-    })
+    }, "immediate")
   end
 end
 

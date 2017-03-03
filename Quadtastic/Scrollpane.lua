@@ -46,20 +46,30 @@ local apply_focus = function(gui_state, scrollpane_state)
 	center_vp.x, center_vp.y = Rectangle.center(scrollpane_state)
 
 	local dx, dy = center_bounds.x - center_vp.x, center_bounds.y - center_vp.y
-	scrollpane_state.x = scrollpane_state.x + dx
-	scrollpane_state.y = scrollpane_state.y + dy
-	scrollpane_state.tx = scrollpane_state.x
-	scrollpane_state.ty = scrollpane_state.y
+	local x, y = scrollpane_state.x + dx, scrollpane_state.y + dy
+
+	-- In immediate mode both the current and the target location are changed
+	if bounds.mode == "immediate" then
+		scrollpane_state.x = x
+		scrollpane_state.y = y
+	end
+	-- Otherwise only the target position is changed
+	scrollpane_state.tx = x
+	scrollpane_state.ty = y
 
 	scrollpane_state.focus = nil
 end
 
-Scrollpane.set_focus = function(scrollpane_state, bounds)
+-- Mode can be either "immediate" or "transition". Immediate makes the viewport
+-- jump to the target position on the next frame, while transition causes a
+-- smoother transition.
+Scrollpane.set_focus = function(scrollpane_state, bounds, mode)
 	scrollpane_state.focus = {
 		x = bounds.x,
 		y = bounds.y,
 		w = bounds.w,
 		h = bounds.h,
+		mode = mode,
 	}
 end
 
