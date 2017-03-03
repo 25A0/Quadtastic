@@ -26,8 +26,8 @@ function transform.origin()
 end
 
 function transform.push(...)
-	table.insert(transform_stack, matrix)
-	table.insert(scale_stack, scale)
+	table.insert(transform_stack, affine.clone(matrix))
+	table.insert(scale_stack, {scale[1], scale[2]})
 	lgpush(...)
 end
 
