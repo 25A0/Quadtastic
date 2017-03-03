@@ -84,7 +84,8 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 
 	-- Start a layout that encloses the viewport's content
 	-- Note the flipped signs for the scrollpane's offset
-	Layout.start(state, -scrollpane_state.x, -scrollpane_state.y, w - scrollbar_margin, h - scrollbar_margin)
+	Layout.start(state, 0, 0, w - scrollbar_margin, h - scrollbar_margin)
+	love.graphics.translate(-scrollpane_state.x, -scrollpane_state.y)
 	-- Update the scrollpane's viewport width and height
 	scrollpane_state.w = state.layout.max_w
 	scrollpane_state.h = state.layout.max_h
