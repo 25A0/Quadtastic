@@ -176,6 +176,12 @@ function love.draw()
             mx, my = gui_state.transform.unproject(mx, my)
             from_x, from_y = gui_state.transform.unproject(from_x, from_y)
 
+            -- Restrict coordinates
+            mx = math.max(0, math.min(img_w - 1, mx))
+            my = math.max(0, math.min(img_h - 1, my))
+            from_x = math.max(0, math.min(img_w - 1, from_x))
+            from_y = math.max(0, math.min(img_h - 1, from_y))
+
             -- Round coordinates
             local rmx, rmy = math.floor(mx), math.floor(my)            
             local rfx, rfy = math.floor(from_x), math.floor(from_y)
