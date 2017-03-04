@@ -1,6 +1,6 @@
 local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
-local Label = require("Label")
+local Text = require("Text")
 
 local Button = {}
 
@@ -23,11 +23,10 @@ Button.draw = function(state, x, y, w, h, label, options)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
 
-  w = w or Label.min_width(state, label)
+  local margin_x = 4
+  local margin_y = 1
+  w = w or (Text.min_width(state, label) + 2 * margin_x)
   h = h or 18
-
-  state.layout.adv_x = w
-  state.layout.adv_y = h
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
@@ -38,7 +37,10 @@ Button.draw = function(state, x, y, w, h, label, options)
   if not options.font_color then
     options.font_color = {255, 255, 255, 255}
   end
-  Label.draw(state, x, y, w, h, label, options)
+  Text.draw(state, x + margin_x, y + margin_y, w - 2*margin_x, h - 2*margin_y, label, options)
+
+  state.layout.adv_x = w
+  state.layout.adv_y = h
 
   -- Highlight if mouse is over button
   if state and state.mouse and 

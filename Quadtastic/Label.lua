@@ -1,14 +1,7 @@
 local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
+local Text = require("Text")
 local Label = {}
-
-unpack = unpack or table.unpack
-
-local margin_x = 4
-
-Label.min_width = function(state, text)
-  return state.style.font and state.style.font:getWidth(text)
-end
 
 -- Displays the passed in label. Returns, in this order, whether the label
 -- is active (i.e. getting clicked on), and whether the mouse is over this
@@ -17,31 +10,15 @@ Label.draw = function(state, x, y, w, h, label, options)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
 
-  local textwidth = Label.min_width(state, label)
-  w = w or textwidth
+  local textwidth = Text.min_width(state, label)
+  local margin_x = 4
+  w = w or (textwidth + 2 * margin_x)
   h = h or 18
-
-  if options then
-    -- center alignment
-    if options.alignment == ":" then
-      x = x + w/2 - textwidth /2 - margin_x
-
-    -- right alignment
-    elseif options.alignment == ">" then
-      x = x + w - textwidth - 2 * margin_x
-
-    end
-
-  end
-
-  state.layout.adv_x = w
-  state.layout.adv_y = h
 
   -- Print label
   local fontcolor = options and options.font_color or {32, 63, 73, 255}
-  love.graphics.setColor(unpack(fontcolor))
-  local margin_y = (h - 16) / 2
-  love.graphics.print(label or "", x + margin_x, y + margin_y)
+  local margin_y = 2
+  Text.draw(state, x + margin_x, y + margin_y, w - 2*margin_x, h - 2*margin_y, label, options)
 
   local active, hover = false, false
   -- Highlight if mouse is over button
@@ -53,6 +30,10 @@ Label.draw = function(state, x, y, w, h, label, options)
       active = true
     end
   end
+
+  state.layout.adv_x = w
+  state.layout.adv_y = h
+
   return active, hover
 end
 
