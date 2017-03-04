@@ -1,5 +1,6 @@
 local Layout = require("Layout")
 local Rectangle = require("Rectangle")
+local affine = require("lib/affine")
 
 local Scrollpane = {}
 
@@ -19,6 +20,28 @@ local quads = {
 	background =     love.graphics.newQuad(89, 9, 1, 1, 128, 128),
 	corner =         love.graphics.newQuad(105, 9, 7, 7, 128, 128),
 }
+
+-- Moves the viewport's focus as far to the given coordinates as possible
+-- without violating the bounds set in the scrollpane state
+local move_viewport_within_bounds = function(sp_state, x, y)
+	local new_x, new_y = x, y
+
+	if sp_state.min_x then 
+		new_x = math.max(sp_state.min_x, new_x)
+	end
+	if sp_state.min_y then 
+		new_y = math.max(sp_state.min_y, new_y)
+	end
+	if sp_state.max_x then 
+		new_x = math.min(sp_state.max_x - sp_state.w, new_x)
+	end
+	if sp_state.max_y then 
+		new_y = math.min(sp_state.max_y - sp_state.h, new_y)
+	end
+
+	sp_state.x = new_x
+	sp_state.y = new_y
+end
 
 -- Move the scrollpane to focus on the given bounds.
 -- Might be restricted by the inner bounds in the scrollpane_state
@@ -50,8 +73,7 @@ local apply_focus = function(gui_state, scrollpane_state)
 
 	-- In immediate mode both the current and the target location are changed
 	if bounds.mode == "immediate" then
-		scrollpane_state.x = x
-		scrollpane_state.y = y
+		move_viewport_within_bounds(scrollpane_state, x, y)
 	end
 	-- Otherwise only the target position is changed
 	scrollpane_state.tx = x
@@ -75,7 +97,7 @@ end
 
 Scrollpane.is_mouse_inside_widget = function(gui_state, scrollpane_state, mx, my)
 	-- We cannot check this until the scrollpane was drawn once
-	if not (scrollpane_state.transform and scrollpane_state.w and 
+	if not (scrollpane_state.matrix and scrollpane_state.w and 
 		    scrollpane_state.h)
 	then 
 		return false
@@ -85,9 +107,9 @@ Scrollpane.is_mouse_inside_widget = function(gui_state, scrollpane_state, mx, my
 	mx = mx or gui_state.mouse.x
 	my = my or gui_state.mouse.y
 
-	-- Transform to local coordinates. We use the cached transform here since we
+	-- Transform to local coordinates. We use the cached matrix here since we
 	-- cannot know which transforms were applied since then.
-	local x, y = scrollpane_state.transform.unproject(mx, my)
+	local x, y = affine.inverse(scrollpane_state.matrix)(mx, my)
 
 	-- Now we can just check whether the mouse is within the viewport's dimensions
 	return x >= 0 and x < scrollpane_state.w and y >= 0 and y < scrollpane_state.h
@@ -107,9 +129,9 @@ Scrollpane.init_scrollpane_state = function(x, y, min_x, min_y, max_x, max_y)
 		-- automatically
 		w = nil,
 		h = nil,
-		-- We need a reference to the transform that is being used when the
-		-- scrollpane starts.
-		transform = nil,
+		-- We need a reference to the transformation matrix that is being used
+		-- when the scrollpane starts.
+		matrix = nil,
 
 		-- whether the scrollpane needed scrollbars in the last frame
 		had_vertical = false,
@@ -153,8 +175,9 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 	-- Update the scrollpane's viewport width and height
 	scrollpane_state.w = state.layout.max_w
 	scrollpane_state.h = state.layout.max_h
-	-- Update the scrollpane's transform
-	scrollpane_state.transform = state.transform
+
+	-- Update the scrollpane's transform matrix
+	scrollpane_state.matrix = affine.clone(state.transform.get_matrix())
 
 	-- Apply focus if there is one
 	if scrollpane_state.focus then
@@ -246,8 +269,10 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	local dy = friction * (scrollpane_state.ty - scrollpane_state.y)
 
 	-- Apply the translation change
-	scrollpane_state.x = scrollpane_state.x + dx
-	scrollpane_state.y = scrollpane_state.y + dy
+	move_viewport_within_bounds(scrollpane_state, 
+		                        scrollpane_state.x + dx,
+		                        scrollpane_state.y + dy)
+
 	-- Remember the last delta to possibly trigger floating in the next frame
 	scrollpane_state.last_dx = dx
 	scrollpane_state.last_dy = dy

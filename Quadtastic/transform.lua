@@ -83,4 +83,6 @@ function transform.unproject_dimensions(w, h)
 	return w / scale[1], h / scale[2]
 end
 
+function transform.get_matrix() return matrix end
+
 return transform
