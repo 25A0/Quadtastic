@@ -14,8 +14,8 @@ imgui.init_layout_state = function(
     max_h = max_h or (parent_layout and parent_layout.max_h),
     adv_x = 0, -- the advance in x and y of the last drawn element
     adv_y = 0,
-    acc_adv_x = 0, -- the accumulative advance in x and y
-    acc_adv_y = 0,
+    acc_adv_x = next_x or 0, -- the accumulative advance in x and y
+    acc_adv_y = next_y or 0,
     parent_layout = parent_layout, -- the layout that contains this layout,
                                    -- or nil if this is the root layout.
   }
