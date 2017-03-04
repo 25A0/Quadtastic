@@ -302,7 +302,7 @@ function love.draw()
 
         Layout.next(gui_state, "|")
 
-        Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT")
+        Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", {alignment = ":"})
       end Layout.finish(gui_state, "|")
     end Layout.finish(gui_state, "-")
 
