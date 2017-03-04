@@ -88,8 +88,9 @@ function love.load()
 
   love.graphics.setDefaultFilter("nearest", "nearest")
 
-  font = love.graphics.newFont("res/m5x7.ttf", 16)
-  love.graphics.setFont(font)
+  local med_font = love.graphics.newFont("res/m5x7.ttf", 16)
+  local smol_font = love.graphics.newFont("res/m3x6.ttf", 16)
+  love.graphics.setFont(med_font)
 
   local stylesheet = love.graphics.newImage("res/style.png")
 
@@ -105,7 +106,8 @@ function love.load()
 
   love.keyboard.setKeyRepeat(true)
   gui_state = imgui.init_state(transform)
-  gui_state.style.font = font
+  gui_state.style.font = med_font
+  gui_state.style.small_font = smol_font
   gui_state.style.stylesheet = stylesheet
   gui_state.style.rowbackground = {
     top    = love.graphics.newQuad(0, 32, 1, 2, 128, 128),
