@@ -7,8 +7,7 @@ unpack = unpack or table.unpack
 local margin_x = 4
 
 Label.min_width = function(state, text)
-  local textwidth = state.style.font and state.style.font:getWidth(text)
-  return math.max(32, 2*margin_x + (textwidth or 32))
+  return state.style.font and state.style.font:getWidth(text)
 end
 
 -- Displays the passed in label. Returns, in this order, whether the label
