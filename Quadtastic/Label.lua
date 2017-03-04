@@ -2,6 +2,15 @@ local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
 local Label = {}
 
+unpack = unpack or table.unpack
+
+local margin_x = 4
+
+Label.min_width = function(state, text)
+  local textwidth = state.style.font and state.style.font:getWidth(text)
+  return math.max(32, 2*margin_x + (textwidth or 32))
+end
+
 -- Displays the passed in label. Returns, in this order, whether the label
 -- is active (i.e. getting clicked on), and whether the mouse is over this
 -- label.
@@ -9,9 +18,8 @@ Label.draw = function(state, x, y, w, h, label, options)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
 
-  local margin_x = 4
-  local textwidth = state.style.font and state.style.font:getWidth(label)
-  w = w or math.max(32, 2*margin_x + (textwidth or 32))
+  local textwidth = Label.min_width(state, label)
+  w = w or textwidth
   h = h or 18
 
   if options then
@@ -31,7 +39,8 @@ Label.draw = function(state, x, y, w, h, label, options)
   state.layout.adv_y = h
 
   -- Print label
-  love.graphics.setColor(32, 63, 73, 255)
+  local fontcolor = options and options.font_color or {32, 63, 73, 255}
+  love.graphics.setColor(unpack(fontcolor))
   local margin_y = (h - 16) / 2
   love.graphics.print(label or "", x + margin_x, y + margin_y)
 

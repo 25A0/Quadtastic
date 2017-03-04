@@ -1,5 +1,6 @@
 local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
+local Label = require("Label")
 
 local Button = {}
 
@@ -18,13 +19,11 @@ local buttonquads = {
 -- Draws a button at the indicated position. Returns, in this, order, whether
 -- it was just triggered, whether it is active, and whether the mouse is inside
 -- the button's bounding box.
-Button.draw = function(state, x, y, w, h, label)
+Button.draw = function(state, x, y, w, h, label, options)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
 
-  local margin_x = 4
-  local textwidth = state.style.font and state.style.font:getWidth(label)
-  w = w or math.max(32, 2*margin_x + (textwidth or 32))
+  w = w or Label.min_width(state, label)
   h = h or 18
 
   state.layout.adv_x = w
@@ -35,8 +34,9 @@ Button.draw = function(state, x, y, w, h, label)
   renderutils.draw_border(state.style.stylesheet, buttonquads, x, y, w, h, 3)
 
   -- Print label
-  local margin_y = (h - 16) / 2
-  love.graphics.print(label, x + margin_x, y + margin_y)
+  if not options then options = {} end
+  options.font_color = {255, 255, 255, 255}
+  Label.draw(state, x, y, w, h, label, options)
 
   -- Highlight if mouse is over button
   if state and state.mouse and 
