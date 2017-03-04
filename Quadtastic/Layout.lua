@@ -3,7 +3,7 @@ local imgui = require("imgui")
 local Layout = {}
 
 -- Orientation should be "|" for vertical or "-" for horizontal
-Layout.start = function(state, x, y, w, h)
+Layout.start = function(state, x, y, w, h, options)
 	x = x or state.layout.next_x
 	y = y or state.layout.next_y
 	w = w or state.layout.max_w
@@ -13,7 +13,7 @@ Layout.start = function(state, x, y, w, h)
 
 	love.graphics.push("all")
 
-    do
+	if not options or not options.noscissor then
       local abs_x, abs_y = state.transform.project(x, y)
       local abs_w, abs_h = state.transform.project_dimensions(w, h)
       love.graphics.intersectScissor(abs_x, abs_y, abs_w, abs_h)
