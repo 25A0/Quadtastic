@@ -39,14 +39,25 @@ end
 -- Scaling factor
 local scale = 2
 
-local set_opened_file = function(state, filename_or_data, filepath)
-  success, more = pcall(love.graphics.newImage, filename_or_data)
+local load_image_from_path = function(filepath)
+  local success, more = pcall(function()
+    local filehandle, err = io.open(filepath, "rb")
+    if err then print(err); return false end
+    local data = filehandle:read("*a")
+    filehandle:close()
+    local imagedata = love.image.newImageData(
+      love.filesystem.newFileData(data, 'img', 'file'))
+    return love.graphics.newImage(imagedata)
+  end)
+
+  -- success, more = pcall(love.graphics.newImage, data)
   if success then
     state.image = more
-    state.filepath = filepath or filename_or_data
+    state.filepath = filepath
   else
     print(more)
   end
+  return success
 end
 
 local reset_view = function(state)
@@ -115,8 +126,7 @@ function love.draw()
       Layout.next(gui_state, "-", 2)
 
       local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Doggo!!")
-      if pressed then 
-        set_opened_file(state, state.filepath)
+      if pressed and load_image_from_path(state.filepath) then 
         reset_view(state)
       end
     Layout.finish(gui_state, "-")
@@ -180,20 +190,8 @@ function love.draw()
 end
 
 function love.filedropped(file)
-  -- The love filesystem blocks access to all files outside certain directories
-  -- so we need a little workaround to use the dropped file.
-
-  if file:open('r') then
-    local data = file:read()
-    file:close()
-    success, data = pcall(function() 
-      return love.image.newImageData(
-        love.filesystem.newFileData(data, 'img', 'file'))
-    end)
-    if success and data then
-      set_opened_file(state, data, file:getFilename())
-      reset_view(state)
-    end
+  if load_image_from_path(file:getFilename()) then
+    reset_view(state)
   end
 end
 
