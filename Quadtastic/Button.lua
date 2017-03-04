@@ -35,7 +35,9 @@ Button.draw = function(state, x, y, w, h, label, options)
 
   -- Print label
   if not options then options = {} end
-  options.font_color = {255, 255, 255, 255}
+  if not options.font_color then
+    options.font_color = {255, 255, 255, 255}
+  end
   Label.draw(state, x, y, w, h, label, options)
 
   -- Highlight if mouse is over button
