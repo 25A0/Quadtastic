@@ -80,6 +80,8 @@ function love.load()
       zoom = 1, -- additional zoom factor for the displayed image
     },
     scrollpane_state = nil,
+    quad_scrollpane_state = nil,
+    quads = {},
   }
 
   love.window.setMode(800, 600, {resizable=true, minwidth=400, minheight=300})
@@ -89,7 +91,7 @@ function love.load()
   font = love.graphics.newFont("res/m5x7.ttf", 16)
   love.graphics.setFont(font)
 
-  local stylesprite = love.graphics.newImage("res/style.png")
+  local stylesheet = love.graphics.newImage("res/style.png")
 
   backgroundcanvas = love.graphics.newCanvas(8, 8)
   do
@@ -97,14 +99,19 @@ function love.load()
     backgroundquad = love.graphics.newQuad(48, 16, 8, 8, 128, 128)
     backgroundcanvas:setWrap("repeat", "repeat")
     backgroundcanvas:renderTo(function()
-      love.graphics.draw(stylesprite, backgroundquad)
+      love.graphics.draw(stylesheet, backgroundquad)
     end)
   end
 
   love.keyboard.setKeyRepeat(true)
   gui_state = imgui.init_state(transform)
   gui_state.style.font = font
-  gui_state.style.stylesheet = stylesprite
+  gui_state.style.stylesheet = stylesheet
+  gui_state.style.rowbackground = {
+    top    = love.graphics.newQuad(0, 32, 1, 2, 128, 128),
+    center = love.graphics.newQuad(0, 34, 1, 1, 128, 128),
+    bottom = love.graphics.newQuad(0, 46, 1, 2, 128, 128),
+  }
 end
 
 local count = 0
@@ -133,7 +140,8 @@ function love.draw()
 
     Layout.next(gui_state, "|", 2)
 
-    Frame.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 30)
+    Layout.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 30)
+    Frame.start(gui_state, nil, nil, gui_state.layout.max_w - 100, nil)
     if state.image then
       state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
         nil, state.scrollpane_state
@@ -151,8 +159,87 @@ function love.draw()
         love.graphics.setColor(255, 255, 255, 255)
         do
           local mx, my = gui_state.transform.unproject(gui_state.mouse.x, gui_state.mouse.y)
-          mx, my = math.floor(mx - .5), math.floor(my - .5)
+          mx, my = math.floor(mx), math.floor(my)
           love.graphics.rectangle("fill", mx, my, 1, 1)
+        end
+
+        local get_dragged_rect = function(gui_state, sp_state)
+          -- Absolute mouse coordinates
+          local mx, my = gui_state.mouse.x, gui_state.mouse.y
+          local from_x = gui_state.mouse.buttons[1].at_x
+          local from_y = gui_state.mouse.buttons[1].at_y
+          -- Now check if the mouse coordinates were inside the scrollpane
+          if Scrollpane.is_mouse_inside_widget(
+              gui_state, state.scrollpane_state, mx, my)
+            and Scrollpane.is_mouse_inside_widget(
+              gui_state, state.scrollpane_state, from_x, from_y) then
+            mx, my = gui_state.transform.unproject(mx, my)
+            from_x, from_y = gui_state.transform.unproject(from_x, from_y)
+
+            -- Round coordinates
+            local rmx, rmy = math.floor(mx), math.floor(my)            
+            local rfx, rfy = math.floor(from_x), math.floor(from_y)
+
+            local x = math.min(rmx, rfx)
+            local y = math.min(rmy, rfy)
+            local w = math.abs(rmx - rfx) + 1
+            local h = math.abs(rmy - rfy) + 1
+
+            return {x = x, y = y, w = w, h = h}
+          else
+            return nil
+          end
+        end
+
+        local show_quad = function(quad)
+          if type(quad) == "table" and
+            quad.x and quad.y and quad.w and quad.h
+          then
+            love.graphics.setColor(255, 255, 255, 255)
+            -- We'll draw the quads differently if the viewport is zoomed out
+            -- all the way
+            if state.display.zoom == 1 then
+              if quad.w > 1 and quad.h > 1 then
+                love.graphics.rectangle("line", quad.x + .5, quad.y + .5, quad.w - 1, quad.h - 1)
+              elseif quad.w > 1 or quad.h > 1 then
+                love.graphics.rectangle("fill", quad.x, quad.y, quad.w, quad.h)
+              else
+                love.graphics.rectangle("fill", quad.x, quad.y, 1, 1)
+              end
+            else
+              love.graphics.push("all")
+              love.graphics.setLineWidth(1/state.display.zoom)
+              love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
+              love.graphics.pop()
+            end
+          end
+        end
+
+        -- Draw a rectangle at the mouse's dragged area
+        do
+          if gui_state.mouse.buttons[1] and gui_state.mouse.buttons[1].pressed then
+            local rect =get_dragged_rect(gui_state, scrollpane_state)
+            if rect then
+              show_quad(rect)
+            end
+          end
+        end
+
+        -- If the mouse was dragged and released in this scrollpane then add a
+        -- new quad
+        do
+          -- Check if the lmb was released
+          if gui_state.mouse.buttons[1] and gui_state.mouse.buttons[1].releases > 0 then
+            local rect =get_dragged_rect(gui_state, scrollpane_state)
+            if rect and rect.w > 0 and rect.h > 0 then
+              table.insert(state.quads, rect)
+            end
+          end
+        end
+
+        -- Draw the outlines of all quads
+        for _, quad in pairs(state.quads) do
+          show_quad(quad)
         end
 
         local content_w = img_w * state.display.zoom
@@ -165,6 +252,48 @@ function love.draw()
                  "no image :(", {alignment = ":"})
     end
     Frame.finish(gui_state)
+    Layout.next(gui_state, "-", 2)
+    -- Draw the list of quads
+    Frame.start(gui_state)
+      state.quad_scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, state.quad_scrollpane_state)
+        if Scrollpane.is_mouse_inside_widget(gui_state, state.quad_scrollpane_state) then
+          love.graphics.clear(90, 150, 110)
+        end
+        Layout.start(gui_state)
+        local i = 1
+        for name,quad in pairs(state.quads) do
+          love.graphics.setColor(255, 255, 255)
+          -- Draw row background
+          love.graphics.draw( -- top
+            gui_state.style.stylesheet, gui_state.style.rowbackground.top,
+            gui_state.layout.next_x, gui_state.layout.next_y, 
+            0, gui_state.layout.max_w, 1)
+          love.graphics.draw( -- center
+            gui_state.style.stylesheet, gui_state.style.rowbackground.center,
+            gui_state.layout.next_x, gui_state.layout.next_y + 2, 
+            0, gui_state.layout.max_w, 18)
+          love.graphics.draw( -- bottom
+            gui_state.style.stylesheet, gui_state.style.rowbackground.bottom,
+            gui_state.layout.next_x, gui_state.layout.next_y + 18, 
+            0, gui_state.layout.max_w, 1)
+
+          Label.draw(gui_state, nil, nil, gui_state.layout.max_w, nil,
+            string.format("%d: x%d y%d  %dx%d", i, quad.x, quad.y, quad.w, quad.h))
+          gui_state.layout.adv_x = gui_state.layout.max_w
+          gui_state.layout.adv_y = 20
+          Layout.next(gui_state, "|")
+          i = i + 1
+        end
+        Layout.finish(gui_state, "|")
+        -- Restrict the viewport's position to the visible content as good as
+        -- possible
+        state.quad_scrollpane_state.min_x = 0
+        state.quad_scrollpane_state.min_y = 0
+        state.quad_scrollpane_state.max_x = gui_state.layout.adv_x
+        state.quad_scrollpane_state.max_y = math.max(gui_state.layout.adv_y, gui_state.layout.max_h)
+      Scrollpane.finish(gui_state, state.quad_scrollpane_state)
+    Frame.finish(gui_state)
+    Layout.finish(gui_state, "-")
 
     Layout.next(gui_state, "|", 2)
 
@@ -182,6 +311,7 @@ function love.draw()
           state.display.zoom = math.max(1, state.display.zoom - 1)
         end
       end
+
     Layout.finish(gui_state, "-")
 
   Layout.finish(gui_state, "|")
