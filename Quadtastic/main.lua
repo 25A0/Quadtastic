@@ -112,6 +112,10 @@ function love.load()
     center = love.graphics.newQuad(0, 34, 1, 1, 128, 128),
     bottom = love.graphics.newQuad(0, 46, 1, 2, 128, 128),
   }
+  gui_state.style.buttonicons = {
+    plus  = love.graphics.newQuad(64, 0, 5, 5, 128, 128),
+    minus = love.graphics.newQuad(69, 0, 5, 5, 128, 128),
+  }
 end
 
 local count = 0
@@ -302,7 +306,7 @@ function love.draw()
 
         Layout.next(gui_state, "|")
 
-        Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", {alignment = ":"})
+        Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment = ":"})
       end Layout.finish(gui_state, "|")
     end Layout.finish(gui_state, "-")
 
@@ -310,14 +314,16 @@ function love.draw()
 
     do Layout.start(gui_state)
       do
-        local pressed = Button.draw(gui_state, nil, nil, 13, 14, "+")
+        local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
+          gui_state.style.buttonicons.plus)
         if pressed then
           state.display.zoom = math.min(12, state.display.zoom + 1)
         end
       end
       Layout.next(gui_state, "-")
       do
-        local pressed = Button.draw(gui_state, nil, nil, 13, 14, "-")
+        local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
+          gui_state.style.buttonicons.minus)
         if pressed then
           state.display.zoom = math.max(1, state.display.zoom - 1)
         end

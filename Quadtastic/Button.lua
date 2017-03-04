@@ -19,14 +19,25 @@ local buttonquads = {
 -- Draws a button at the indicated position. Returns, in this, order, whether
 -- it was just triggered, whether it is active, and whether the mouse is inside
 -- the button's bounding box.
-Button.draw = function(state, x, y, w, h, label, options)
+Button.draw = function(state, x, y, w, h, label, iconquad, options)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
 
+  local _, _, iconwidth, iconheight = unpack(iconquad and {iconquad:getViewport()} or {})
+
   local margin_x = 4
   local margin_y = 1
-  w = w or (Text.min_width(state, label) + 2 * margin_x)
-  h = h or 18
+  if not w then
+    w = (label and (Text.min_width(state, label) + margin_x) or 0) +
+        (iconquad and iconwidth + 3 or 0) +
+        (not label and 3 or not iconquad and margin_x or 0)
+  end
+  if not h then
+    h = math.max(label and 18 or 0, iconquad and iconheight + 6 or 0)
+  end
+  -- Also, the button cannot be smaller than the area covered by the border
+  w = math.max(w, 6)
+  h = math.max(h, 6)
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
@@ -37,7 +48,16 @@ Button.draw = function(state, x, y, w, h, label, options)
   if not options.font_color then
     options.font_color = {255, 255, 255, 255}
   end
-  Text.draw(state, x + margin_x, y + margin_y, w - 2*margin_x, h - 2*margin_y, label, options)
+  local next_x = x
+  if iconquad then
+    love.graphics.setColor(255, 255, 255, 255)
+    local margin_y = (h - iconheight) / 2
+    love.graphics.draw(state.style.stylesheet, iconquad, x + 3, y + margin_y)
+    next_x = next_x + iconwidth
+  end
+  if label then
+    Text.draw(state, next_x + margin_x, y + margin_y, w - 2*margin_x, h - 2*margin_y, label, options)
+  end
 
   state.layout.adv_x = w
   state.layout.adv_y = h
