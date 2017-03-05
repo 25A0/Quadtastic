@@ -32,7 +32,7 @@ local show_tooltip = function(gui_state, x, y, w, h, label, options)
     -- Draw tooltip border
     Renderutils.draw_border(gui_state.style.stylesheet, border_quads, ttx, tty, ttw, tth, 2)
     -- Draw tooltip tip
-    love.graphics.draw(gui_state.style.stylesheet, tip_quad_up, x + w/2, y+h)
+    love.graphics.draw(gui_state.style.stylesheet, tip_quad_up, x + w/2 - 5/2, y+h)
     if not options then options = {} end
     if not options.font_color then
       options.font_color = {202, 222, 227}
