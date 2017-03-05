@@ -60,6 +60,7 @@ imgui.init_state = function(transform)
     },
     layout = imgui.init_layout_state(nil), -- the current layout
     transform = transform, -- the current transform
+    tooltip_time = 0, -- the time that the mouse has spent on a widget
   }
   return state
 end

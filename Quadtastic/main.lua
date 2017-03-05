@@ -16,6 +16,7 @@ local Frame = require("Frame")
 local Layout = require("Layout")
 local Window = require("Window")
 local Scrollpane = require("Scrollpane")
+local Tooltip = require("Tooltip")
 
 -- Make the state variables local unless we are in debug mode
 if not _DEBUG then
@@ -144,6 +145,7 @@ function love.draw()
       if pressed and load_image_from_path(state.filepath) then 
         reset_view(state)
       end
+      Tooltip.draw(gui_state, "Who's a good boy??")
     end Layout.finish(gui_state, "-")
 
     Layout.next(gui_state, "|", 2)
