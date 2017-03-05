@@ -21,7 +21,7 @@ local find_tooltip_position = function(gui_state, x, y, w, h, label, options)
   local below = gui_state.window_bounds.h - (h + y)
 
   local tty, tip_y, orientation
-  local tooltip_height = 16
+  local tooltip_height = 12
   if above > below then
     tty = y - (3 + tooltip_height) -- move tooltip above the frame
     tip_y = y - 3
@@ -84,7 +84,7 @@ local show_tooltip = function(gui_state, x, y, w, h, label, options)
     if not options.font_color then
       options.font_color = {202, 222, 227}
     end
-    Text.draw(gui_state, ttx + 2, tty, ttw, tth, label, options)
+    Text.draw(gui_state, ttx + 2, tty - 2, ttw, tth, label, options)
 
     imgui.pop_style(gui_state, "font")
 
@@ -105,8 +105,6 @@ Tooltip.draw = function(gui_state, label, x, y, w, h, options)
   y = y or gui_state.layout.next_y
   w = w or gui_state.layout.adv_x
   h = h or gui_state.layout.adv_y
-
-  -- love.graphics.rectangle("line", x, y, w, h)
 
   local old_mouse_x = gui_state.mouse.old_x
   local old_mouse_y = gui_state.mouse.old_y
