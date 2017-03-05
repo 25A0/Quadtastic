@@ -381,5 +381,5 @@ function love.textinput(text)
 end
 
 function love.update(dt)
-  imgui.update(state, dt)
+  imgui.update(gui_state, dt)
 end
