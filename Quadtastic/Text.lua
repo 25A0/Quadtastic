@@ -31,6 +31,7 @@ Text.draw = function(state, x, y, w, h, text, options)
   state.layout.adv_x = w
   state.layout.adv_y = h
 
+  love.graphics.setFont(state.style.font)
   -- Print Text
   if options and options.font_color then
     love.graphics.setColor(unpack(options.font_color))
