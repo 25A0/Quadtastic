@@ -109,8 +109,9 @@ function love.load()
 
   love.keyboard.setKeyRepeat(true)
   gui_state = imgui.init_state(transform)
-  gui_state.style.font = med_font
   gui_state.style.small_font = smol_font
+  gui_state.style.med_font = med_font
+  gui_state.style.font = med_font
   gui_state.style.stylesheet = stylesheet
   gui_state.style.rowbackground = {
     top    = love.graphics.newQuad(0, 32, 1, 2, 128, 128),
@@ -121,12 +122,15 @@ function love.load()
     plus  = love.graphics.newQuad(64, 0, 5, 5, 128, 128),
     minus = love.graphics.newQuad(69, 0, 5, 5, 128, 128),
   }
+  gui_state.overlay_canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 local count = 0
 function love.draw()
   imgui.begin_frame(gui_state)
   love.graphics.scale(scale, scale)
+
+  gui_state.overlay_canvas:renderTo(function() love.graphics.clear() end)
 
   love.graphics.clear(203, 222, 227)
   local w, h = gui_state.transform:unproject_dimensions(
@@ -339,6 +343,9 @@ function love.draw()
 
   end Window.finish(gui_state)
 
+  love.graphics.origin()
+  love.graphics.draw(gui_state.overlay_canvas)
+
   imgui.end_frame(gui_state)
 end
 
@@ -382,4 +389,8 @@ end
 
 function love.update(dt)
   imgui.update(gui_state, dt)
+end
+
+function love.resize(new_w, new_h)
+  gui_state.overlay_canvas = love.graphics.newCanvas(new_w, new_h)
 end

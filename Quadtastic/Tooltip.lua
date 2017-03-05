@@ -18,25 +18,33 @@ local find_tooltip_position = function(gui_state, x, y, w, h, label, options)
 end
 
 local show_tooltip = function(gui_state, x, y, w, h, label, options)
-   	-- Remember and remove the current scissor
-   	local old_scissor = {love.graphics.getScissor()}
-   	love.graphics.setScissor()
+   	gui_state.overlay_canvas:renderTo(function()
+	   	-- Remember and remove the current scissor
+	   	local old_scissor = {love.graphics.getScissor()}
+	   	love.graphics.setScissor()
 
-   	local ttx, tty, ttw, tth = find_tooltip_position(gui_state, x, y, w, h, label, options)
+	   	-- Use the small font for the tooltip label
+	   	imgui.push_style(gui_state, "font", gui_state.style.small_font)
 
-   	love.graphics.setColor(255, 255, 255, 255)
-   	-- Draw tooltip tip
-   	love.graphics.draw(gui_state.style.stylesheet, tip_quad_up, x + w/2, y+h)
-   	-- Draw tooltip border
-   	Renderutils.draw_border(gui_state.style.stylesheet, border_quads, ttx, tty, ttw, tth, 2)
-   	if not options then options = {} end
-   	if not options.font_color then
-   		options.font_color = {202, 222, 227}
-   	end
-   	Text.draw(gui_state, ttx + 2, tty, ttw, tth, label, options)
+	   	local ttx, tty, ttw, tth = find_tooltip_position(gui_state, x, y, w, h, label, options)
 
-   	-- Restore the old scissor
-   	love.graphics.setScissor(unpack(old_scissor))
+	   	love.graphics.setColor(255, 255, 255, 255)
+	   	-- Draw tooltip border
+	   	Renderutils.draw_border(gui_state.style.stylesheet, border_quads, ttx, tty, ttw, tth, 2)
+	   	-- Draw tooltip tip
+	   	love.graphics.draw(gui_state.style.stylesheet, tip_quad_up, x + w/2, y+h)
+	   	if not options then options = {} end
+	   	if not options.font_color then
+	   		options.font_color = {202, 222, 227}
+	   	end
+	   	Text.draw(gui_state, ttx + 2, tty, ttw, tth, label, options)
+
+	   	imgui.pop_style(gui_state, "font")
+
+	   	-- Restore the old scissor
+	   	love.graphics.setScissor(unpack(old_scissor))
+
+	end)
 end
 
 -- A tooltip ignores the current layout's bounds but uses the current layout
