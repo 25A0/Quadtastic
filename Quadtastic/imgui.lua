@@ -38,6 +38,8 @@ imgui.init_state = function(transform)
       buttons = {}, -- Holds information about which buttons are pressed
       x = 0, -- current mouse x position
       y = 0, -- current mouse y position
+      old_x = 0, -- mouse position in the previous frame
+      old_y = 0,
       dx = 0, -- mouse movement in x since the last update
       dy = 0, -- mouse movement in y since the last update
       wheel_dx = 0, -- horizontal mouse wheel movement since the last update
@@ -70,6 +72,8 @@ imgui.end_frame = function(state)
   -- Reset mouse deltas
   state.mouse.dx = 0
   state.mouse.dy = 0
+  state.mouse.old_x = state.mouse.x
+  state.mouse.old_y = state.mouse.y
   state.mouse.wheel_dx = 0
   state.mouse.wheel_dy = 0
   -- Reset mouse button clicks
