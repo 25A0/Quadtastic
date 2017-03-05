@@ -278,6 +278,7 @@ function love.draw()
       do Layout.start(gui_state)
         -- Draw the list of quads
         do Frame.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 19)
+          imgui.push_style(gui_state, "font", gui_state.style.small_font)
           do state.quad_scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, state.quad_scrollpane_state)
             do Layout.start(gui_state, nil, nil, nil, nil, {noscissor = true})
               local i = 1
@@ -312,6 +313,7 @@ function love.draw()
             state.quad_scrollpane_state.max_x = gui_state.layout.adv_x
             state.quad_scrollpane_state.max_y = math.max(gui_state.layout.adv_y, gui_state.layout.max_h)
           end Scrollpane.finish(gui_state, state.quad_scrollpane_state)
+          imgui.pop_style(gui_state, "font")
         end Frame.finish(gui_state)
 
         Layout.next(gui_state, "|")
