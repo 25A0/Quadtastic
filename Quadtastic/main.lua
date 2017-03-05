@@ -77,7 +77,7 @@ end
 function love.load()
   -- Initialize the state
   state = {
-    filepath = "res/style.png", -- the path to the file that we want to edit
+    filepath = "Quadtastic/res/style.png", -- the path to the file that we want to edit
     image = nil, -- the loaded image
     display = {
       zoom = 1, -- additional zoom factor for the displayed image
@@ -121,6 +121,11 @@ function love.load()
   gui_state.style.buttonicons = {
     plus  = love.graphics.newQuad(64, 0, 5, 5, 128, 128),
     minus = love.graphics.newQuad(69, 0, 5, 5, 128, 128),
+    rename = love.graphics.newQuad(48, 64, 13, 13, 128, 128),
+    delete = love.graphics.newQuad(96, 64, 13, 13, 128, 128),
+    sort = love.graphics.newQuad(112, 64, 13, 13, 128, 128),
+    group = love.graphics.newQuad(96, 48, 13, 13, 128, 128),
+    ungroup = love.graphics.newQuad(112, 48, 13, 13, 128, 128),
   }
   gui_state.overlay_canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
 end
@@ -155,7 +160,7 @@ function love.draw()
     Layout.next(gui_state, "|", 2)
 
     do Layout.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 30)
-      do Frame.start(gui_state, nil, nil, gui_state.layout.max_w - 100, nil)
+      do Frame.start(gui_state, nil, nil, gui_state.layout.max_w - 160, nil)
         if state.image then
           do state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
             nil, state.scrollpane_state
@@ -275,7 +280,7 @@ function love.draw()
 
       Layout.next(gui_state, "-", 2)
 
-      do Layout.start(gui_state)
+      do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 21)
         -- Draw the list of quads
         do Frame.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 19)
           imgui.push_style(gui_state, "font", gui_state.style.small_font)
@@ -319,6 +324,26 @@ function love.draw()
         Layout.next(gui_state, "|")
 
         Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment = ":"})
+      end Layout.finish(gui_state, "|")
+
+      Layout.next(gui_state, "-", 2)
+
+      -- Draw button column
+      do Layout.start(gui_state)
+        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.rename)
+        Tooltip.draw(gui_state, "Rename")
+        Layout.next(gui_state, "|")
+        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.delete)
+        Tooltip.draw(gui_state, "Delete")
+        Layout.next(gui_state, "|")
+        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.sort)
+        Tooltip.draw(gui_state, "Sort unnamed quads from top to bottom, left to right")
+        Layout.next(gui_state, "|")
+        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.group)
+        Tooltip.draw(gui_state, "Group selected quads")
+        Layout.next(gui_state, "|")
+        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.ungroup)
+        Tooltip.draw(gui_state, "Ungroup selected quads")
       end Layout.finish(gui_state, "|")
     end Layout.finish(gui_state, "-")
 

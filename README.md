@@ -53,7 +53,8 @@ its rgb value.
  - [x] Load the image
  - [x] Display the image
  - [x] zoom and move the image around
- - [ ] Define quads
+ - [x] Define quads
+ - [ ] Name quads
  - [ ] Delete and modify existing quads
  - [ ] Name quads
  - [ ] Export defined quads as lua code
