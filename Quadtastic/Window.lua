@@ -5,6 +5,7 @@ local Window = {}
 Window.start = function(gui_state, x, y, w, h, options)
 	-- Store the window's bounds in the gui state
 	gui_state.window_bounds = {x = x, y = y, w = w, h = h}
+	gui_state.window_transform = gui_state.transform.get_matrix()
 
 	local margin = options and options.margin or 0
 	-- Enclose the window's content in a Layout
@@ -16,6 +17,7 @@ Window.finish = function(gui_state)
 	Layout.finish(gui_state)
 	-- Remove the window bounds
 	gui_state.window_bounds = nil
+	gui_state.window_transform = nil
 end
 
 return Window
