@@ -14,6 +14,7 @@ local Inputfield = require("Inputfield")
 local Label = require("Label")
 local Frame = require("Frame")
 local Layout = require("Layout")
+local Window = require("Window")
 local Scrollpane = require("Scrollpane")
 
 -- Make the state variables local unless we are in debug mode
@@ -129,7 +130,7 @@ function love.draw()
   local w, h = gui_state.transform.unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
-  do Layout.start(gui_state, 2, 2, w - 4, h - 4)
+  do Window.start(gui_state, 0, 0, w, h, {margin = 2})
 
     do Layout.start(gui_state)
       Label.draw(gui_state, nil, nil, nil, nil, "File:")
@@ -333,7 +334,7 @@ function love.draw()
 
     end Layout.finish(gui_state, "-")
 
-  end Layout.finish(gui_state, "|")
+  end Window.finish(gui_state)
 
   imgui.end_frame(gui_state)
 end
