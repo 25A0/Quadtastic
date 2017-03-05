@@ -31,6 +31,22 @@ imgui.pop_layout_state = function(state)
   state.layout = state.layout.parent_layout
 end
 
+imgui.push_style = function(state, type, new_value)
+  if not state.style[type.."_stack"] then
+    state.style[type.."_stack"] = {state.style[type]}
+  else
+    table.insert(state.style[type.."_stack"], state.style[type])
+  end
+  state.style[type] = new_value
+end
+
+imgui.pop_style = function(state, type)
+  if not state.style[type.."_stack"] then
+    error("There was no push stack for type "..type)
+  end
+  state.style[type] = table.remove(state.style[type.."_stack"])
+end
+
 imgui.init_state = function(transform)
   -- Initialize the state
   local state = {
