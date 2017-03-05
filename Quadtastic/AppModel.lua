@@ -18,4 +18,12 @@ setmetatable(AppModel, {
   end
 })
 
+AppModel.zoom_in = function(self)
+  self.display.zoom = math.min(12, self.display.zoom + 1)
+end
+
+AppModel.zoom_out = function(self)
+  self.display.zoom = math.max(1, self.display.zoom - 1)
+end
+
 return AppModel

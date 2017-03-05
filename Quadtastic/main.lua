@@ -204,7 +204,7 @@ function love.draw()
         local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
           gui_state.style.buttonicons.plus)
         if pressed then
-          state.display.zoom = math.min(12, state.display.zoom + 1)
+          state:zoom_in()
         end
         Tooltip.draw(gui_state, "Zoom in")
       end
@@ -213,7 +213,7 @@ function love.draw()
         local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
           gui_state.style.buttonicons.minus)
         if pressed then
-          state.display.zoom = math.max(1, state.display.zoom - 1)
+          state:zoom_out()
         end
         Tooltip.draw(gui_state, "Zoom out")
       end
