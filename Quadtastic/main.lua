@@ -23,18 +23,19 @@ if not _DEBUG then
   local state
 end
 
-local transform = require('Quadtastic/transform')
+local Transform = require('Transform')
+local transform = Transform()
 
 -- Cover love transformation functions
 do
   local lg = love.graphics
-  lg.translate = transform.translate
-  lg.rotate = transform.rotate
-  lg.scale = transform.scale
-  lg.shear = transform.shear
-  lg.origin = transform.origin
-  lg.push = transform.push
-  lg.pop = transform.pop
+  lg.translate = function(...) transform:translate(...) end
+  lg.rotate = function(...) transform:rotate(...) end
+  lg.scale = function(...) transform:scale(...) end
+  lg.shear = function(...) transform:shear(...) end
+  lg.origin = function(...) transform:origin(...) end
+  lg.push = function(...) transform:push(...) end
+  lg.pop = function(...) transform:pop(...) end
 end
 
 -- Scaling factor
@@ -127,7 +128,7 @@ function love.draw()
   love.graphics.scale(scale, scale)
 
   love.graphics.clear(203, 222, 227)
-  local w, h = gui_state.transform.unproject_dimensions(
+  local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
   do Window.start(gui_state, 0, 0, w, h, {margin = 2})
@@ -165,7 +166,7 @@ function love.draw()
             -- Draw a bright pixel where the mouse is
             love.graphics.setColor(255, 255, 255, 255)
             do
-              local mx, my = gui_state.transform.unproject(gui_state.mouse.x, gui_state.mouse.y)
+              local mx, my = gui_state.transform:unproject(gui_state.mouse.x, gui_state.mouse.y)
               mx, my = math.floor(mx), math.floor(my)
               love.graphics.rectangle("fill", mx, my, 1, 1)
             end
@@ -180,8 +181,8 @@ function love.draw()
                   gui_state, state.scrollpane_state, mx, my)
                 and Scrollpane.is_mouse_inside_widget(
                   gui_state, state.scrollpane_state, from_x, from_y) then
-                mx, my = gui_state.transform.unproject(mx, my)
-                from_x, from_y = gui_state.transform.unproject(from_x, from_y)
+                mx, my = gui_state.transform:unproject(mx, my)
+                from_x, from_y = gui_state.transform:unproject(from_x, from_y)
 
                 -- Restrict coordinates
                 mx = math.max(0, math.min(img_w - 1, mx))

@@ -12,77 +12,86 @@ local lgpop = love.graphics.pop
 -- local lgsetscissor = love.graphics.setScissor
 -- local lgintersectscissor = love.graphics.intersectScissor
 
-local transform = {}
+local Transform = {}
 
-local matrix = affine.id()
-local scale = {1, 1}
-local transform_stack = {}
-local scale_stack = {}
+setmetatable(Transform,
+	{
+		__call = function(_, matrix, scale_tbl)
+			local transform = setmetatable({}, {__index = Transform})
+			transform.matrix = matrix or affine.id()
+			transform.scale_tbl = scale_tbl or {1, 1}
+			transform.transform_stack = {}
+			transform.scale_stack = {}
+			return transform
+		end,
+	})
 
-function transform.origin()
-	matrix = affine.id()
-	scale = {1, 1}
+function Transform.origin(self)
+	self.matrix = affine.id()
+	self.scale_tbl = {1, 1}
 	lgorigin()
 end
 
-function transform.push(...)
-	table.insert(transform_stack, affine.clone(matrix))
-	table.insert(scale_stack, {scale[1], scale[2]})
+function Transform.push(self, ...)
+	table.insert(self.transform_stack, affine.clone(self.matrix))
+	table.insert(self.scale_stack, {self.scale_tbl[1], self.scale_tbl[2]})
 	lgpush(...)
 end
 
-function transform.pop()
-	matrix = table.remove(transform_stack)
-	scale = table.remove(scale_stack)
+function Transform.pop(self)
+	self.matrix = table.remove(self.transform_stack)
+	self.scale_tbl = table.remove(self.scale_stack)
 	lgpop()
 end
 
--- function transform.setScissor()
+-- function Transform.setScissor()
 -- end
 
--- function transform.getScissor()
+-- function Transform.getScissor()
 -- end
 
--- function transform.intersectScissor()
+-- function Transform.intersectScissor()
 -- end
 
-function transform.translate(dx, dy)
-	matrix = matrix * affine.trans(dx, dy)
+function Transform.translate(self, dx, dy)
+	self.matrix = self.matrix * affine.trans(dx, dy)
 	lgtranslate(dx, dy)
 end
 
-function transform.rotate(theta)
-	matrix = matrix * affine.rotate(theta)
+function Transform.rotate(self, theta)
+	self.matrix = self.matrix * affine.rotate(theta)
 	lgrotate(theta)
 end
 
-function transform.scale(sx, sy)
-	matrix = matrix * affine.scale(sx, sy)
-	scale[1], scale[2] = scale[1] * sx, scale[2] * sy
+function Transform.scale(self, sx, sy)
+	self.matrix = self.matrix * affine.scale(sx, sy)
+	self.scale_tbl[1], self.scale_tbl[2] = self.scale_tbl[1] * sx, self.scale_tbl[2] * sy
 	lgscale(sx, sy)
 end
 
-function transform.shear(kx, ky)
-	matrix = matrix * affine.shear(kx, ky)
+function Transform.shear(self, kx, ky)
+	self.matrix = self.matrix * affine.shear(kx, ky)
 	lgshear(kx, ky)
 end
 
-function transform.project(x, y)
-	return matrix(x, y)
+function Transform.project(self, x, y)
+	return self.matrix(x, y)
 end
 
-function transform.unproject(x, y)
-	return (affine.inverse(matrix))(x, y)
+function Transform.unproject(self, x, y)
+	return (affine.inverse(self.matrix))(x, y)
 end
 
-function transform.project_dimensions(w, h)
-	return w * scale[1], h * scale[2]
+function Transform.project_dimensions(self, w, h)
+	return w * self.scale_tbl[1], h * self.scale_tbl[2]
 end
 
-function transform.unproject_dimensions(w, h)
-	return w / scale[1], h / scale[2]
+function Transform.unproject_dimensions(self, w, h)
+	return w / self.scale_tbl[1], h / self.scale_tbl[2]
 end
 
-function transform.get_matrix() return matrix end
+function Transform.clone(self)
+	return Transform(self.matrix, self.scale_tbl)
+end
 
-return transform
+return Transform

@@ -3,8 +3,6 @@ local renderutils = require("Renderutils")
 local Layout = require("Layout")
 local Frame = {}
 
-local transform = require("transform")
-
 local quads = renderutils.border_quads(48, 0, 16, 16, 128, 128, 2)
 
 Frame.start = function(state, x, y, w, h)

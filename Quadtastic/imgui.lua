@@ -61,7 +61,7 @@ imgui.init_state = function(transform)
 end
 
 imgui.begin_frame = function(state)
-  state.transform.origin()
+  love.graphics.origin()
 end
 
 imgui.end_frame = function(state)

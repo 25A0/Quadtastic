@@ -37,8 +37,8 @@ Inputfield.draw = function(state, x, y, w, h, content)
 
   -- Restrict printing to the encolsed area
   do
-    local abs_x, abs_y = state.transform.project(x + 2, y + 2)
-    local abs_w, abs_h = state.transform.project_dimensions(w - 4, h - 4)
+    local abs_x, abs_y = state.transform:project(x + 2, y + 2)
+    local abs_w, abs_h = state.transform:project_dimensions(w - 4, h - 4)
     love.graphics.setScissor(abs_x, abs_y, abs_w, abs_h)
   end
 
@@ -55,7 +55,7 @@ Inputfield.draw = function(state, x, y, w, h, content)
 
   -- Highlight if mouse is over button
   if state and state.mouse and 
-    Rectangle(x, y, w, h):contains(state.transform.unproject(state.mouse.x, state.mouse.y))
+    Rectangle(x, y, w, h):contains(state.transform:unproject(state.mouse.x, state.mouse.y))
   then
     love.graphics.setColor(255, 255, 255, 70)
     love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)

@@ -97,7 +97,7 @@ end
 
 Scrollpane.is_mouse_inside_widget = function(gui_state, scrollpane_state, mx, my)
 	-- We cannot check this until the scrollpane was drawn once
-	if not (scrollpane_state.matrix and scrollpane_state.w and 
+	if not (scrollpane_state.transform and scrollpane_state.w and 
 		    scrollpane_state.h)
 	then 
 		return false
@@ -107,9 +107,9 @@ Scrollpane.is_mouse_inside_widget = function(gui_state, scrollpane_state, mx, my
 	mx = mx or gui_state.mouse.x
 	my = my or gui_state.mouse.y
 
-	-- Transform to local coordinates. We use the cached matrix here since we
+	-- Transform to local coordinates. We use the cached transform here since we
 	-- cannot know which transforms were applied since then.
-	local x, y = affine.inverse(scrollpane_state.matrix)(mx, my)
+	local x, y = scrollpane_state.transform:unproject(mx, my)
 
 	-- Now we can just check whether the mouse is within the viewport's dimensions
 	return x >= 0 and x < scrollpane_state.w and y >= 0 and y < scrollpane_state.h
@@ -129,9 +129,9 @@ Scrollpane.init_scrollpane_state = function(x, y, min_x, min_y, max_x, max_y)
 		-- automatically
 		w = nil,
 		h = nil,
-		-- We need a reference to the transformation matrix that is being used
+		-- We need a reference to the transformation transform that is being used
 		-- when the scrollpane starts.
-		matrix = nil,
+		transform = nil,
 
 		-- whether the scrollpane needed scrollbars in the last frame
 		had_vertical = false,
@@ -176,8 +176,8 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 	scrollpane_state.w = state.layout.max_w
 	scrollpane_state.h = state.layout.max_h
 
-	-- Update the scrollpane's transform matrix
-	scrollpane_state.matrix = affine.clone(state.transform.get_matrix())
+	-- Update the scrollpane's transform transform
+	scrollpane_state.transform = state.transform:clone()
 
 	-- Apply focus if there is one
 	if scrollpane_state.focus then
