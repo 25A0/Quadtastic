@@ -1,6 +1,7 @@
 local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
 local Text = require("Text")
+local imgui = require("imgui")
 
 local Button = {}
 
@@ -63,9 +64,7 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
   state.layout.adv_y = h
 
   -- Highlight if mouse is over button
-  if state and state.mouse and 
-    Rectangle(x, y, w, h):contains(state.transform:unproject(state.mouse.x, state.mouse.y))
-  then
+  if state and state.mouse and imgui.is_mouse_in_rect(state, x, y, w, h) then
     local active
     if state.mouse.buttons[1] and state.mouse.buttons[1].pressed then
       love.graphics.setColor(0, 0, 0, 70)

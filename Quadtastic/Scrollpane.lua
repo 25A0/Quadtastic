@@ -1,6 +1,7 @@
 local Layout = require("Layout")
 local Rectangle = require("Rectangle")
 local affine = require("lib/affine")
+local imgui = require("imgui")
 
 local Scrollpane = {}
 
@@ -103,16 +104,10 @@ Scrollpane.is_mouse_inside_widget = function(gui_state, scrollpane_state, mx, my
 		return false
 	end
 
-	-- If no specific coordinates are given, use the current mouse coords
-	mx = mx or gui_state.mouse.x
-	my = my or gui_state.mouse.y
+	return imgui.is_mouse_in_rect(gui_state, 0, 0, 
+		scrollpane_state.w, scrollpane_state.h, mx, my, 
+		scrollpane_state.transform)
 
-	-- Transform to local coordinates. We use the cached transform here since we
-	-- cannot know which transforms were applied since then.
-	local x, y = scrollpane_state.transform:unproject(mx, my)
-
-	-- Now we can just check whether the mouse is within the viewport's dimensions
-	return x >= 0 and x < scrollpane_state.w and y >= 0 and y < scrollpane_state.h
 end
 
 Scrollpane.init_scrollpane_state = function(x, y, min_x, min_y, max_x, max_y)

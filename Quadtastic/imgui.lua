@@ -1,3 +1,5 @@
+local Rectangle = require("Rectangle")
+
 local imgui = {}
 
 imgui.init_layout_state = function(
@@ -186,6 +188,20 @@ end
 
 imgui.update = function(state, dt)
   state.dt = dt
+end
+
+-- -------------------------------------------------------------------------- --
+-- Helper functions
+-- -------------------------------------------------------------------------- --
+
+-- Returns whether the given mouse coordinates were in the given rectangle.
+-- If no mouse coordinates are given then the current mouse position is used.
+imgui.is_mouse_in_rect = function(state, x, y, w, h, mx, my, transform)
+  mx = mx or state.mouse.x
+  my = my or state.mouse.y
+  transform = transform or state.transform
+  return Rectangle.contains({x = x, y = y, w = w, h = h}, 
+                            transform:unproject(mx, my))
 end
 
 return imgui
