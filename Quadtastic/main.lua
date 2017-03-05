@@ -19,6 +19,7 @@ local Scrollpane = require("Scrollpane")
 local Tooltip = require("Tooltip")
 local ImageEditor = require("ImageEditor")
 local QuadList = require("QuadList")
+local AppModel = require("AppModel")
 
 -- Make the state variables local unless we are in debug mode
 if not _DEBUG then
@@ -78,16 +79,7 @@ end
 
 function love.load()
   -- Initialize the state
-  state = {
-    filepath = "Quadtastic/res/style.png", -- the path to the file that we want to edit
-    image = nil, -- the loaded image
-    display = {
-      zoom = 1, -- additional zoom factor for the displayed image
-    },
-    scrollpane_state = nil,
-    quad_scrollpane_state = nil,
-    quads = {},
-  }
+  state = AppModel()
 
   love.window.setMode(800, 600, {resizable=true, minwidth=400, minheight=300})
 
