@@ -329,6 +329,7 @@ function love.draw()
         if pressed then
           state.display.zoom = math.min(12, state.display.zoom + 1)
         end
+        Tooltip.draw(gui_state, "Zoom in")
       end
       Layout.next(gui_state, "-")
       do
@@ -337,6 +338,7 @@ function love.draw()
         if pressed then
           state.display.zoom = math.max(1, state.display.zoom - 1)
         end
+        Tooltip.draw(gui_state, "Zoom out")
       end
 
     end Layout.finish(gui_state, "-")

@@ -94,4 +94,12 @@ function Transform.clone(self)
 	return Transform(self.matrix, self.scale_tbl)
 end
 
+function Transform.getTranslate(self)
+	return self.matrix[1][3], self.matrix[2][3]
+end
+
+function Transform.getScale(self)
+	return self.matrix[1][1], self.matrix[2][2]
+end
+
 return Transform
