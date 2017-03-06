@@ -147,6 +147,14 @@ function love.draw()
       local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Doggo!!")
       if pressed and load_image_from_path(state.filepath) then 
         reset_view(state)
+        -- Try to read a quad file
+        local quadfilename = AppModel.find_lua_file(state.filepath)
+        print(quadfilename)
+        local filehandle, more = io.open(quadfilename, "r")
+        if filehandle then
+          filehandle:close()
+          state.quads = loadfile(quadfilename)()
+        end
       end
       Tooltip.draw(gui_state, "Who's a good boy??")
     end Layout.finish(gui_state, "-")
@@ -173,7 +181,9 @@ function love.draw()
 
         Layout.next(gui_state, "|")
 
-        Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment = ":"})
+        if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment = ":"}) then
+          state:export()
+        end
       end Layout.finish(gui_state, "|")
 
       Layout.next(gui_state, "-", 2)
