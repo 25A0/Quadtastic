@@ -27,7 +27,7 @@ Inputfield.draw = function(state, x, y, w, h, content)
   y = y or state.layout.next_y
 
   local margin_x = 4
-  local textwidth = state.style.font and state.style.font:getWidth(content)
+  local textwidth = Text.min_width(state, content)
   w = w or math.max(32, 2*margin_x + (textwidth or 32))
   h = h or 18
 
@@ -53,8 +53,11 @@ Inputfield.draw = function(state, x, y, w, h, content)
 
   -- Move text start to the left if text width is larger than field width
   local text_x = x + margin_x
-  if textwidth + 20 > w - 6 then
-    text_x = text_x - (textwidth + 20 - (w-6))
+  do
+    local cursor_text_width = Text.min_width(state, string.sub(content, 1, state.input_field.cursor_pos))
+    if cursor_text_width + 20 > w - 6 then
+      text_x = text_x - (cursor_text_width + 20 - (w-6))
+    end
   end
 
   love.graphics.print(content, text_x, y + margin_y)
