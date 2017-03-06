@@ -7,6 +7,9 @@ local Inputfield = {}
 
 local transform = require("transform")
 
+-- Cache ibeam cursor
+local i_beam_cursor = love.mouse.getSystemCursor("ibeam")
+
 local quads = {
   ul = love.graphics.newQuad( 0, 16, 3, 3, 128, 128),
    l = love.graphics.newQuad( 0, 19, 3, 1, 128, 128),
@@ -60,6 +63,8 @@ Inputfield.draw = function(state, x, y, w, h, content)
   if state and state.mouse and
     imgui.is_mouse_in_rect(state, x, y, w, h)
   then
+    -- Change cursor to indicate editable text
+    love.mouse.setCursor(i_beam_cursor)
     love.graphics.setColor(255, 255, 255, 70)
     love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
   end

@@ -85,8 +85,13 @@ imgui.init_state = function(transform)
   return state
 end
 
+local default_cursor = love.mouse.getSystemCursor("arrow")
+
+
 imgui.begin_frame = function(state)
   love.graphics.origin()
+  -- Reset cursor
+  love.mouse.setCursor(default_cursor)
 end
 
 imgui.end_frame = function(state)
