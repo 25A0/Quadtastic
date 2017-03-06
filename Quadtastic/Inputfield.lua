@@ -48,35 +48,32 @@ Inputfield.draw = function(state, x, y, w, h, content)
     love.graphics.setScissor(abs_x, abs_y, abs_w, abs_h)
   end
 
-  -- Print label
-  local margin_y = (h - 16) / 2
-
-  -- Move text start to the left if text width is larger than field width
-  local text_x = x + margin_x
-  do
-    local cursor_text_width = Text.min_width(state, string.sub(content, 1, state.input_field.cursor_pos))
-    if cursor_text_width + 20 > w - 6 then
-      text_x = text_x - (cursor_text_width + 20 - (w-6))
-    end
-  end
-
-  love.graphics.print(content, text_x, y + margin_y)
-
   -- Highlight if mouse is over button
   if state and state.mouse and
     imgui.is_mouse_in_rect(state, x, y, w, h)
   then
     -- Change cursor to indicate editable text
     love.mouse.setCursor(i_beam_cursor)
-    love.graphics.setColor(255, 255, 255, 70)
-    love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
   end
+
+  -- Label position
+  local text_x = x + margin_x
 
   if state and state.mouse and state.mouse.buttons[1] then
     local mx, my = state.mouse.buttons[1].at_x, state.mouse.buttons[1].at_y
     -- This widget has the keyboard focus if the last LMB click was inside this
     -- widget
     if imgui.is_mouse_in_rect(state, x, y, w, h, mx, my) then
+  
+      -- Calculate print offset based on state's cursor
+      do
+        -- Move text start to the left if text width is larger than field width
+        local cursor_text_width = Text.min_width(state, string.sub(content, 1, state.input_field.cursor_pos))
+        if cursor_text_width + 20 > w - 6 then
+          text_x = text_x - (cursor_text_width + 20 - (w-6))
+        end
+      end
+    
       -- If the LMB was pressed in the last frame, set the cursor position
       if state.mouse.buttons[1].presses > 0 then
         -- Set the cursor position
@@ -157,9 +154,17 @@ Inputfield.draw = function(state, x, y, w, h, content)
                 string.sub(content, state.input_field.cursor_pos + 1, -1)
       -- Advance the cursor position by the lenght of the added text
       state.input_field.cursor_pos = math.min(#content, state.input_field.cursor_pos + #newtext)
-
+    else
+      -- The widget does not have the keyboard focus
+      if textwidth + 20 > w - 6 then
+        text_x = text_x - (textwidth + 20 - (w-6))
+      end
     end
   end
+
+  local margin_y = (h - 16) / 2
+  love.graphics.print(content, text_x, y + margin_y)
+
   -- Restore state
   love.graphics.pop()
   return content
