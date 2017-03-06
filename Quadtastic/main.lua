@@ -131,7 +131,7 @@ function love.draw()
 
   gui_state.overlay_canvas:renderTo(function() love.graphics.clear() end)
 
-  love.graphics.clear(203, 222, 227)
+  love.graphics.clear(138, 179, 189)
   local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
