@@ -42,4 +42,20 @@ function table.find_key(tab, value)
   return nil
 end
 
+function table.keys(tab)
+  local keys = {}
+  for k, _ in pairs(tab) do
+    table.insert(keys, k)
+  end
+  return keys
+end
+
+function table.values(tab)
+  local values = {}
+  for _, v in pairs(tab) do
+    table.insert(values, v)
+  end
+  return values
+end
+
 return table
