@@ -2,19 +2,31 @@ local Scrollpane = require("Scrollpane")
 
 local ImageEditor = {}
 
-ImageEditor.draw = function(gui_state, state, x, y, w, h)
-  do state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
-    nil, state.scrollpane_state
-  )
+local function show_quad(quad)
+  if type(quad) == "table" and
+    quad.x and quad.y and quad.w and quad.h
+  then
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.scale(state.display.zoom, state.display.zoom)
+    -- We'll draw the quads differently if the viewport is zoomed out
+    -- all the way
+    if state.display.zoom == 1 then
+      if quad.w > 1 and quad.h > 1 then
+        love.graphics.rectangle("line", quad.x + .5, quad.y + .5, quad.w - 1, quad.h - 1)
+      elseif quad.w > 1 or quad.h > 1 then
+        love.graphics.rectangle("fill", quad.x, quad.y, quad.w, quad.h)
+      else
+        love.graphics.rectangle("fill", quad.x, quad.y, 1, 1)
+      end
+    else
+      love.graphics.push("all")
+      love.graphics.setLineWidth(1/state.display.zoom)
+      love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
+      love.graphics.pop()
+    end
+  end
+end
 
-    -- Draw background pattern
-    local img_w, img_h = state.image:getDimensions()
-    backgroundquad = love.graphics.newQuad(0, 0, img_w, img_h, 8, 8)
-    love.graphics.draw(backgroundcanvas, backgroundquad)
-
-    love.graphics.draw(state.image)
+local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
     -- Draw a bright pixel where the mouse is
     love.graphics.setColor(255, 255, 255, 255)
     if gui_state.input then
@@ -59,30 +71,6 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
       end
     end
 
-    local show_quad = function(quad)
-      if type(quad) == "table" and
-        quad.x and quad.y and quad.w and quad.h
-      then
-        love.graphics.setColor(255, 255, 255, 255)
-        -- We'll draw the quads differently if the viewport is zoomed out
-        -- all the way
-        if state.display.zoom == 1 then
-          if quad.w > 1 and quad.h > 1 then
-            love.graphics.rectangle("line", quad.x + .5, quad.y + .5, quad.w - 1, quad.h - 1)
-          elseif quad.w > 1 or quad.h > 1 then
-            love.graphics.rectangle("fill", quad.x, quad.y, quad.w, quad.h)
-          else
-            love.graphics.rectangle("fill", quad.x, quad.y, 1, 1)
-          end
-        else
-          love.graphics.push("all")
-          love.graphics.setLineWidth(1/state.display.zoom)
-          love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
-          love.graphics.pop()
-        end
-      end
-    end
-
     -- Draw a rectangle at the mouse's dragged area
     do
       if gui_state.input and gui_state.input.mouse.buttons[1] and 
@@ -107,6 +95,26 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
           table.insert(state.quads, rect)
         end
       end
+    end
+
+end
+
+ImageEditor.draw = function(gui_state, state, x, y, w, h)
+  do state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
+    nil, state.scrollpane_state
+  )
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.scale(state.display.zoom, state.display.zoom)
+
+    -- Draw background pattern
+    local img_w, img_h = state.image:getDimensions()
+    local backgroundquad = love.graphics.newQuad(0, 0, img_w, img_h, 8, 8)
+    love.graphics.draw(backgroundcanvas, backgroundquad)
+
+    love.graphics.draw(state.image)
+
+    if gui_state and gui_state.input then
+      handle_input(gui_state, state, x, y, w, h, img_w, img_h)
     end
 
     -- Draw the outlines of all quads

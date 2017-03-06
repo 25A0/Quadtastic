@@ -96,6 +96,33 @@ local show_tooltip = function(gui_state, x, y, w, h, label, options)
   end)
 end
 
+local function handle_input(gui_state, label, x, y, w, h, options)
+  local old_mouse_x = gui_state.input.mouse.old_x
+  local old_mouse_y = gui_state.input.mouse.old_y
+  if not old_mouse_x or not old_mouse_y then return end
+
+  -- Check if the mouse was in that area in the previous frame
+  local was_in_frame = imgui.is_mouse_in_rect(gui_state, x, y, w, h,
+    old_mouse_x, old_mouse_y)
+  -- Now check the current mouse position
+  local is_in_frame = imgui.is_mouse_in_rect(gui_state, x, y, w, h)
+
+  if was_in_frame and is_in_frame then
+    gui_state.tooltip_time = gui_state.tooltip_time + gui_state.dt
+  elseif is_in_frame then -- the mouse has just been moved into the frame
+    -- This is not super-accurate but will probably suffice
+    gui_state.tooltip_time = gui_state.dt
+  else -- the mouse is not in the frame.
+    return
+  end
+
+  -- The threshold after which the tooltip should be displayed. Default is 1s
+  local threshold = options and options.tooltip_threshold or 1
+
+  -- Returns true if the tooltip should be displayed
+  return gui_state.tooltip_time > threshold
+end
+
 -- A tooltip ignores the current layout's bounds but uses the current layout
 -- hints to determine where it should be drawn. It will be drawn at the bottom
 -- or the top of the previously drawn component
@@ -106,30 +133,8 @@ Tooltip.draw = function(gui_state, label, x, y, w, h, options)
   w = w or gui_state.layout.adv_x
   h = h or gui_state.layout.adv_y
 
-  if state.input then
-    local old_mouse_x = gui_state.input.mouse.old_x
-    local old_mouse_y = gui_state.input.mouse.old_y
-    if not old_mouse_x or not old_mouse_y then return end
-
-    -- Check if the mouse was in that area in the previous frame
-    local was_in_frame = imgui.is_mouse_in_rect(gui_state, x, y, w, h,
-      old_mouse_x, old_mouse_y)
-    -- Now check the current mouse position
-    local is_in_frame = imgui.is_mouse_in_rect(gui_state, x, y, w, h)
-  
-    if was_in_frame and is_in_frame then
-      gui_state.tooltip_time = gui_state.tooltip_time + gui_state.dt
-    elseif is_in_frame then -- the mouse has just been moved into the frame
-      -- This is not super-accurate but will probably suffice
-      gui_state.tooltip_time = gui_state.dt
-    else -- the mouse is not in the frame.
-      return
-    end
-  
-    -- The threshold after which the tooltip should be displayed. Default is 1s
-    local threshold = options and options.tooltip_threshold or 1
-  
-    if gui_state.tooltip_time > threshold then -- display the tooltip
+  if gui_state and gui_state.input then
+    if handle_input(gui_state, label, x, y, w, h, options) then -- display the tooltip
       show_tooltip(gui_state, x, y, w, h, label, options)
     end
   end

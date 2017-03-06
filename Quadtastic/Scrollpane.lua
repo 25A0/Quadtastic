@@ -22,6 +22,26 @@ local quads = {
 	corner =         love.graphics.newQuad(105, 9, 7, 7, 128, 128),
 }
 
+local function handle_input(state, scrollpane_state, w, h)
+	assert(state.input)
+
+	-- Only handle image panning if the mousewheel was triggered inside
+	-- this widget.
+	if Scrollpane.is_mouse_inside_widget(state, scrollpane_state) then
+    	local threshold = 3
+		if state.input.mouse.wheel_dx ~= 0 then
+			scrollpane_state.tx = scrollpane_state.x + 4*state.input.mouse.wheel_dx
+		elseif math.abs(scrollpane_state.last_dx) > threshold then
+			scrollpane_state.tx = scrollpane_state.x + scrollpane_state.last_dx
+		end
+		if state.input.mouse.wheel_dy ~= 0 then
+			scrollpane_state.ty = scrollpane_state.y - 4*state.input.mouse.wheel_dy
+		elseif math.abs(scrollpane_state.last_dy) > threshold then
+			scrollpane_state.ty = scrollpane_state.y + scrollpane_state.last_dy
+		end
+	end
+end
+
 -- Moves the viewport's focus as far to the given coordinates as possible
 -- without violating the bounds set in the scrollpane state
 local move_viewport_within_bounds = function(sp_state, x, y)
@@ -97,6 +117,7 @@ Scrollpane.set_focus = function(scrollpane_state, bounds, mode)
 end
 
 Scrollpane.is_mouse_inside_widget = function(gui_state, scrollpane_state, mx, my)
+	if not gui_state or not gui_state.input then return false end
 	-- We cannot check this until the scrollpane was drawn once
 	if not (scrollpane_state.transform and scrollpane_state.w and 
 		    scrollpane_state.h)
@@ -240,24 +261,12 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	scrollpane_state.had_vertical = has_vertical
 	scrollpane_state.had_horizontal = has_horizontal
 
+	if state and state.input then
+		handle_input(state, scrollpane_state, w, h)
+	end
+
 	-- Image panning
 	local friction = 0.5
-
-	-- Only handle image panning if the mousewheel was triggered inside
-	-- this widget.
-	if Scrollpane.is_mouse_inside_widget(state, scrollpane_state) then
-    	local threshold = 3
-		if state.input.mouse.wheel_dx ~= 0 then
-			scrollpane_state.tx = scrollpane_state.x + 4*state.input.mouse.wheel_dx
-		elseif math.abs(scrollpane_state.last_dx) > threshold then
-			scrollpane_state.tx = scrollpane_state.x + scrollpane_state.last_dx
-		end
-		if state.input.mouse.wheel_dy ~= 0 then
-			scrollpane_state.ty = scrollpane_state.y - 4*state.input.mouse.wheel_dy
-		elseif math.abs(scrollpane_state.last_dy) > threshold then
-			scrollpane_state.ty = scrollpane_state.y + scrollpane_state.last_dy
-		end
-	end
 
 	-- Gently pan to target position
 	local dx = friction * (scrollpane_state.tx - scrollpane_state.x)

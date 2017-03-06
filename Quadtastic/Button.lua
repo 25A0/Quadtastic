@@ -17,6 +17,25 @@ local buttonquads = {
    c = love.graphics.newQuad( 3,  3, 1, 1, 128, 128),
 }
 
+local function handle_input(state, x, y, w, h, label, iconquad, options)
+  assert(state.input)
+  if imgui.is_mouse_in_rect(state, x, y, w, h) then
+    local active
+    if state.input.mouse.buttons[1] and state.input.mouse.buttons[1].pressed then
+      love.graphics.setColor(0, 0, 0, 70)
+      active = true
+    else
+      love.graphics.setColor(255, 255, 255, 70)
+      active = false
+    end
+    love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
+    -- We consider this button clicked when the mouse is in the button's area
+    -- and the left mouse button was just clicked
+    return state.input.mouse.buttons[1] and state.input.mouse.buttons[1].presses > 0,
+      active, true
+  end
+end
+
 -- Draws a button at the indicated position. Returns, in this, order, whether
 -- it was just triggered, whether it is active, and whether the mouse is inside
 -- the button's bounding box.
@@ -64,22 +83,11 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
   state.layout.adv_y = h
 
   -- Highlight if mouse is over button
-  if state and state.input and imgui.is_mouse_in_rect(state, x, y, w, h) then
-    local active
-    if state.input.mouse.buttons[1] and state.input.mouse.buttons[1].pressed then
-      love.graphics.setColor(0, 0, 0, 70)
-      active = true
-    else
-      love.graphics.setColor(255, 255, 255, 70)
-      active = false
-    end
-    love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
-    -- We consider this button clicked when the mouse is in the button's area
-    -- and the left mouse button was just clicked
-    return state.input.mouse.buttons[1] and state.input.mouse.buttons[1].presses > 0,
-      active, true
+  if state and state.input then
+    return handle_input(state, x, y, w, h, label, iconquad, options)
+  else
+    return false
   end
-  return false
 end
 
 setmetatable(Button, {
