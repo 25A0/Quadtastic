@@ -26,4 +26,19 @@ function table.set(tab, value, key, ...)
   end
 end
 
+-- Tries to find the list of keys that point to a specific value.
+-- Performs a depth-first-search through the given table.
+-- Therefore matching items that are nested deeper in the table might be
+-- returned even though matching items on higher levels exist.
+function table.find_key(tab, value)
+  for k,v in pairs(tab) do
+    if v == value then return k
+    elseif type(v) == "table" then -- search recursively
+      -- Return a list of keys
+      return k, table.find_key(v, value)
+    end
+  end
+  return nil
+end
+
 return table

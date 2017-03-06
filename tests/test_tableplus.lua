@@ -18,5 +18,23 @@ do
   -- Replace existing value
   table.set(t, 43, "foo", "bar", "boo", "fud")
   assert(table.get(t, "foo", "bar", "boo", "fud") == 43)
+end
 
+do
+  local t = {
+    foo = {
+      bar = {
+        boo = {
+          fud = 42,
+        }
+      }
+    }
+  }
+  local expected = {"foo", "bar", "boo", "fud"}
+  local found = {table.find_key(t, 42)}
+  assert(#expected == #found)
+  for i=1,#expected do
+    assert(expected[i] == found[i])
+  end
+  assert(table.get(t, table.find_key(t, 42)) == 42)
 end
