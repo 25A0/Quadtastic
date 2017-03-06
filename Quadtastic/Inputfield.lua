@@ -74,6 +74,9 @@ Inputfield.draw = function(state, x, y, w, h, content)
         end
       end
     
+      -- Track whether the cursor was moved. In that case we will always display it
+      local cursor_moved = false
+
       -- If the LMB was pressed in the last frame, set the cursor position
       if state.mouse.buttons[1].presses > 0 then
         -- Set the cursor position
@@ -101,21 +104,28 @@ Inputfield.draw = function(state, x, y, w, h, content)
         -- Round the cursor position
         if actual_width - delta > .5 * last_letter_width then cursor_pos = cursor_pos - 1 end
         cursor_pos = math.floor(cursor_pos + .5)
+        if cursor_pos ~= state.input_field.cursor_pos then
+          cursor_moved = true
+        end
         state.input_field.cursor_pos = math.max(0, math.min(#content, cursor_pos))
       end
 
       -- Change the cursor position based on special key presses
       if imgui.was_key_pressed(state, "left") then
         state.input_field.cursor_pos = math.max(0, state.input_field.cursor_pos - 1)
+        cursor_moved = true
       end
       if imgui.was_key_pressed(state, "right") then
         state.input_field.cursor_pos = math.min(#content, state.input_field.cursor_pos + 1)
+        cursor_moved = true
       end
       if imgui.was_key_pressed(state, "home") then
         state.input_field.cursor_pos = 0
+        cursor_moved = true
       end
       if imgui.was_key_pressed(state, "end") then
         state.input_field.cursor_pos = #content
+        cursor_moved = true
       end
 
       -- Remove character to the left of the cursor
@@ -141,7 +151,10 @@ Inputfield.draw = function(state, x, y, w, h, content)
       if state.input_field.cursor_dt > 1 then
         state.input_field.cursor_dt = state.input_field.cursor_dt - 1
       end
-      if state.input_field.cursor_dt > .5 then
+      if cursor_moved then
+        state.input_field.cursor_dt = 0
+      end
+      if state.input_field.cursor_dt < .5 then
         local width = Text.min_width(state, string.sub(
           content, 1, state.input_field.cursor_pos))
         love.graphics.setColor(255, 255, 255, 255)
