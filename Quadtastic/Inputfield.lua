@@ -41,7 +41,7 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
   -- Push state
   love.graphics.push("all")
 
-  -- Restrict printing to the encolsed area
+  -- Restrict printing to the enclosed area
   do
     local abs_x, abs_y = state.transform:project(x + 2, y + 2)
     local abs_w, abs_h = state.transform:project_dimensions(w - 4, h - 4)
@@ -64,51 +64,8 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
     -- This widget has the keyboard focus if the last LMB click was inside this
     -- widget
     if imgui.is_mouse_in_rect(state, x, y, w, h, mx, my) then
-  
-      -- Calculate print offset based on state's cursor
-      do
-        -- Move text start to the left if text width is larger than field width
-        local cursor_text_width = Text.min_width(state, string.sub(content, 1, state.input_field.cursor_pos))
-        if cursor_text_width + 20 > w - 6 then
-          text_x = text_x - (cursor_text_width + 20 - (w-6))
-        end
-      end
-    
       -- Track whether the cursor was moved. In that case we will always display it
       local cursor_moved = false
-
-      -- If the LMB was pressed in the last frame, set the cursor position
-      if state.mouse.buttons[1].presses > 0 then
-        -- Set the cursor position
-        local delta = state.transform:unproject(mx, my) - text_x
-        -- Find the max. length of characters that fit in delta
-        local m_width = Text.min_width(state, "m")
-        -- Assume that the text is just a ton of ms
-        local cursor_pos = math.floor(delta / m_width)
-        local actual_width = Text.min_width(state, string.sub(content, 1, cursor_pos))
-        local last_letter_width = 0
-        -- Make sure that we didn't mess up the estimation
-        while actual_width > delta and not (cursor_pos <= 0) do
-          cursor_pos = cursor_pos - 1
-          local new_width = Text.min_width(state, string.sub(content, 1, cursor_pos))
-          last_letter_width = math.abs(actual_width - new_width)
-          actual_width = new_width
-        end
-        -- And then search in the opposite direction
-        while actual_width < delta and not (cursor_pos >= #content) do
-          cursor_pos = cursor_pos + 1
-          local new_width = Text.min_width(state, string.sub(content, 1, cursor_pos))
-          last_letter_width = math.abs(actual_width - new_width)
-          actual_width = new_width
-        end
-        -- Round the cursor position
-        if actual_width - delta > .5 * last_letter_width then cursor_pos = cursor_pos - 1 end
-        cursor_pos = math.floor(cursor_pos + .5)
-        if cursor_pos ~= state.input_field.cursor_pos then
-          cursor_moved = true
-        end
-        state.input_field.cursor_pos = math.max(0, math.min(#content, cursor_pos))
-      end
 
       -- Change the cursor position based on special key presses
       if imgui.was_key_pressed(state, "left") then
@@ -146,6 +103,22 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
         end
       end
 
+      local newtext = state.keyboard.text or ""
+      content = string.sub(content, 1 , state.input_field.cursor_pos) ..
+                newtext .. 
+                string.sub(content, state.input_field.cursor_pos + 1, -1)
+      -- Advance the cursor position by the lenght of the added text
+      state.input_field.cursor_pos = math.min(#content, state.input_field.cursor_pos + #newtext)
+
+      do
+        -- Move text start to the left if text width is larger than field width
+        local cursor_text_width = Text.min_width(state, 
+          string.sub(content, 1, state.input_field.cursor_pos))
+        if cursor_text_width + 20 > w - 6 then
+          text_x = text_x - (cursor_text_width + 20 - (w-6))
+        end
+      end
+    
       -- Display the cursor
       state.input_field.cursor_dt = state.input_field.cursor_dt + state.dt
       if state.input_field.cursor_dt > 1 then
@@ -161,12 +134,39 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
         love.graphics.line(text_x + width, y + 4, text_x + width, y + h - 4)
       end
 
-      local newtext = state.keyboard.text or ""
-      content = string.sub(content, 1 , state.input_field.cursor_pos) ..
-                newtext .. 
-                string.sub(content, state.input_field.cursor_pos + 1, -1)
-      -- Advance the cursor position by the lenght of the added text
-      state.input_field.cursor_pos = math.min(#content, state.input_field.cursor_pos + #newtext)
+      -- Calculate print offset based on state's cursor
+      -- If the LMB was pressed in the last frame, set the cursor position
+      if state.mouse.buttons[1].presses > 0 then
+        -- Set the cursor position
+        local delta = state.transform:unproject(mx, my) - text_x
+        -- Find the max. length of characters that fit in delta
+        local m_width = Text.min_width(state, "m")
+        -- Assume that the text is just a ton of ms
+        local cursor_pos = math.floor(delta / m_width)
+        local actual_width = Text.min_width(state, string.sub(content, 1, cursor_pos))
+        local last_letter_width = 0
+        -- Make sure that we didn't mess up the estimation
+        while actual_width > delta and not (cursor_pos <= 0) do
+          cursor_pos = cursor_pos - 1
+          local new_width = Text.min_width(state, string.sub(content, 1, cursor_pos))
+          last_letter_width = math.abs(actual_width - new_width)
+          actual_width = new_width
+        end
+        -- And then search in the opposite direction
+        while actual_width < delta and not (cursor_pos >= #content) do
+          cursor_pos = cursor_pos + 1
+          local new_width = Text.min_width(state, string.sub(content, 1, cursor_pos))
+          last_letter_width = math.abs(actual_width - new_width)
+          actual_width = new_width
+        end
+        -- Round the cursor position
+        if actual_width - delta > .5 * last_letter_width then cursor_pos = cursor_pos - 1 end
+        cursor_pos = math.floor(cursor_pos + .5)
+        if cursor_pos ~= state.input_field.cursor_pos then
+          cursor_moved = true
+        end
+        state.input_field.cursor_pos = math.max(0, math.min(#content, cursor_pos))
+      end
     else
       -- The widget does not have the keyboard focus
       if textwidth + 20 > w - 6 then
