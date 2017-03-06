@@ -1,3 +1,6 @@
 [submodule "lovedebug"]
 	path = lib/lovedebug
 	url = ../Ridge/lib/lovedebug
+[submodule "luafilesystem"]
+	path = lib/luafilesystem
+	url = git@github.com:keplerproject/luafilesystem.git
