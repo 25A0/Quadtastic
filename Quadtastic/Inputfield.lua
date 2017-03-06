@@ -1,5 +1,8 @@
 local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
+local imgui = require("imgui")
+local Text = require("Text")
+
 local Inputfield = {}
 
 local transform = require("transform")
@@ -54,13 +57,77 @@ Inputfield.draw = function(state, x, y, w, h, content)
   love.graphics.print(content, text_x, y + margin_y)
 
   -- Highlight if mouse is over button
-  if state and state.mouse and 
-    Rectangle(x, y, w, h):contains(state.transform:unproject(state.mouse.x, state.mouse.y))
+  if state and state.mouse and
+    imgui.is_mouse_in_rect(state, x, y, w, h)
   then
     love.graphics.setColor(255, 255, 255, 70)
     love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
   end
-  content = content .. (state.keyboard.text or "")
+
+  if state and state.mouse and state.mouse.buttons[1] then
+    local mx, my = state.mouse.buttons[1].at_x, state.mouse.buttons[1].at_y
+    -- This widget has the keyboard focus if the last LMB click was inside this
+    -- widget
+    if imgui.is_mouse_in_rect(state, x, y, w, h, mx, my) then
+      -- If the LMB was pressed in the last frame, set the cursor position
+      if state.mouse.buttons[1].presses > 0 then
+        -- Set the cursor position
+        -- NYI
+      end
+
+      -- Change the cursor position based on special key presses
+      if imgui.was_key_pressed(state, "left") then
+        state.input_field.cursor_pos = math.max(0, state.input_field.cursor_pos - 1)
+      end
+      if imgui.was_key_pressed(state, "right") then
+        state.input_field.cursor_pos = math.min(#content, state.input_field.cursor_pos + 1)
+      end
+      if imgui.was_key_pressed(state, "home") then
+        state.input_field.cursor_pos = 0
+      end
+      if imgui.was_key_pressed(state, "end") then
+        state.input_field.cursor_pos = #content
+      end
+
+      -- Remove character to the left of the cursor
+      if imgui.was_key_pressed(state, "backspace") then
+        if state.input_field.cursor_pos > 0 then
+          content = string.sub(content, 1 , state.input_field.cursor_pos - 1) ..
+                    string.sub(content, state.input_field.cursor_pos + 1, -1)
+          -- Reduce cursor position by 1
+          state.input_field.cursor_pos = math.max(0, state.input_field.cursor_pos - 1)
+        end
+      end
+      -- Remove character to the right of the cursor
+      if imgui.was_key_pressed(state, "delete") then
+        if state.input_field.cursor_pos < #content then
+          content = string.sub(content, 1 , state.input_field.cursor_pos) ..
+                    string.sub(content, state.input_field.cursor_pos + 2, -1)
+          -- The cursor position does not change in this case
+        end
+      end
+
+      -- Display the cursor
+      state.input_field.cursor_dt = state.input_field.cursor_dt + state.dt
+      if state.input_field.cursor_dt > 1 then
+        state.input_field.cursor_dt = state.input_field.cursor_dt - 1
+      end
+      if state.input_field.cursor_dt > .5 then
+        local width = Text.min_width(state, string.sub(
+          content, 1, state.input_field.cursor_pos))
+        love.graphics.setColor(255, 255, 255, 255)
+        love.graphics.line(text_x + width, y + 4, text_x + width, y + h - 4)
+      end
+
+      local newtext = state.keyboard.text or ""
+      content = string.sub(content, 1 , state.input_field.cursor_pos) ..
+                newtext .. 
+                string.sub(content, state.input_field.cursor_pos + 1, -1)
+      -- Advance the cursor position by the lenght of the added text
+      state.input_field.cursor_pos = math.min(#content, state.input_field.cursor_pos + #newtext)
+
+    end
+  end
   -- Restore state
   love.graphics.pop()
   return content

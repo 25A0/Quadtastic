@@ -69,6 +69,10 @@ imgui.init_state = function(transform)
       -- times it has been typed since the last update.
       text = nil, -- Text that has been typed since last update
     },
+    input_field = {
+      cursor_pos = 0,
+      cursor_dt = 0,
+    },
     dt = 0, -- Time since last update
     style = {
       font = nil, -- The font that is being used
@@ -223,6 +227,10 @@ imgui.is_mouse_in_rect = function(state, x, y, w, h, mx, my, transform)
   transform = transform or state.transform
   return Rectangle.contains({x = x, y = y, w = w, h = h}, 
                             transform:unproject(mx, my))
+end
+
+imgui.was_key_pressed = function(state, key)
+  return state.keyboard.keys[key] and state.keyboard.keys[key].presses > 0
 end
 
 return imgui
