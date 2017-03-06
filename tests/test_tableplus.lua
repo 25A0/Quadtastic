@@ -24,6 +24,9 @@ do
   local t = {
     foo = {
       bar = {
+        {
+          deadend = 1234
+        },
         boo = {
           fud = 42,
         }

@@ -35,7 +35,8 @@ function table.find_key(tab, value)
     if v == value then return k
     elseif type(v) == "table" then -- search recursively
       -- Return a list of keys
-      return k, table.find_key(v, value)
+      local result = {table.find_key(v, value)}
+      if #result > 0 then return k, unpack(result) end
     end
   end
   return nil
