@@ -22,7 +22,7 @@ local quads = {
    c = love.graphics.newQuad( 3, 19, 1, 1, 128, 128),
 }
 
-Inputfield.draw = function(state, x, y, w, h, content)
+Inputfield.draw = function(state, x, y, w, h, content, options)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
 
@@ -176,7 +176,12 @@ Inputfield.draw = function(state, x, y, w, h, content)
   end
 
   local margin_y = (h - 16) / 2
-  love.graphics.print(content, text_x, y + margin_y)
+  local text = content
+  if #content == 0 and options and options.ghost_text then
+    text = options.ghost_text
+    options.font_color = {255, 255, 255, 128}
+  end
+  Text.draw(state, text_x, y + margin_y, nil, nil, text, options)
 
   -- Restore state
   love.graphics.pop()
