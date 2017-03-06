@@ -14,9 +14,9 @@ This is a little LÖVE tool to handle sprite atlases while keeping your sanity.
 
 ```lua
 	return {
-		"head" = {x = 3, y = 3, w = 16, h = 16},
-		"body" = {x = 2, y = 22, w = 16, h = 32},
-		"legs" = {x = 3, y = 58, w = 16, h = 16},
+		head = {x = 3, y = 3, w = 16, h = 16},
+		body = {x = 2, y = 22, w = 16, h = 32},
+		legs = {x = 3, y = 58, w = 16, h = 16},
 	}
 ```
 
