@@ -77,7 +77,31 @@ Inputfield.draw = function(state, x, y, w, h, content)
       -- If the LMB was pressed in the last frame, set the cursor position
       if state.mouse.buttons[1].presses > 0 then
         -- Set the cursor position
-        -- NYI
+        local delta = state.transform:unproject(mx, my) - text_x
+        -- Find the max. length of characters that fit in delta
+        local m_width = Text.min_width(state, "m")
+        -- Assume that the text is just a ton of ms
+        local cursor_pos = math.floor(delta / m_width)
+        local actual_width = Text.min_width(state, string.sub(content, 1, cursor_pos))
+        local last_letter_width = 0
+        -- Make sure that we didn't mess up the estimation
+        while actual_width > delta and not (cursor_pos <= 0) do
+          cursor_pos = cursor_pos - 1
+          local new_width = Text.min_width(state, string.sub(content, 1, cursor_pos))
+          last_letter_width = math.abs(actual_width - new_width)
+          actual_width = new_width
+        end
+        -- And then search in the opposite direction
+        while actual_width < delta and not (cursor_pos >= #content) do
+          cursor_pos = cursor_pos + 1
+          local new_width = Text.min_width(state, string.sub(content, 1, cursor_pos))
+          last_letter_width = math.abs(actual_width - new_width)
+          actual_width = new_width
+        end
+        -- Round the cursor position
+        if actual_width - delta > .5 * last_letter_width then cursor_pos = cursor_pos - 1 end
+        cursor_pos = math.floor(cursor_pos + .5)
+        state.input_field.cursor_pos = math.max(0, math.min(#content, cursor_pos))
       end
 
       -- Change the cursor position based on special key presses
