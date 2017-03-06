@@ -247,13 +247,13 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	-- this widget.
 	if Scrollpane.is_mouse_inside_widget(state, scrollpane_state) then
     	local threshold = 3
-		if state.mouse.wheel_dx ~= 0 then
-			scrollpane_state.tx = scrollpane_state.x + 4*state.mouse.wheel_dx
+		if state.input.mouse.wheel_dx ~= 0 then
+			scrollpane_state.tx = scrollpane_state.x + 4*state.input.mouse.wheel_dx
 		elseif math.abs(scrollpane_state.last_dx) > threshold then
 			scrollpane_state.tx = scrollpane_state.x + scrollpane_state.last_dx
 		end
-		if state.mouse.wheel_dy ~= 0 then
-			scrollpane_state.ty = scrollpane_state.y - 4*state.mouse.wheel_dy
+		if state.input.mouse.wheel_dy ~= 0 then
+			scrollpane_state.ty = scrollpane_state.y - 4*state.input.mouse.wheel_dy
 		elseif math.abs(scrollpane_state.last_dy) > threshold then
 			scrollpane_state.ty = scrollpane_state.y + scrollpane_state.last_dy
 		end

@@ -22,11 +22,11 @@ Label.draw = function(state, x, y, w, h, label, options)
 
   local active, hover = false, false
   -- Highlight if mouse is over button
-  if state and state.mouse and 
-    Rectangle(x, y, w, h):contains(state.transform:unproject(state.mouse.x, state.mouse.y))
+  if state and state.input and 
+    Rectangle(x, y, w, h):contains(state.transform:unproject(state.input.mouse.x, state.input.mouse.y))
   then
     hover = true
-    if state.mouse.buttons[1] and state.mouse.buttons[1].pressed then
+    if state.input.mouse.buttons[1] and state.input.mouse.buttons[1].pressed then
       active = true
     end
   end

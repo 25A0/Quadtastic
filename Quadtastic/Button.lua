@@ -64,9 +64,9 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
   state.layout.adv_y = h
 
   -- Highlight if mouse is over button
-  if state and state.mouse and imgui.is_mouse_in_rect(state, x, y, w, h) then
+  if state and state.input and imgui.is_mouse_in_rect(state, x, y, w, h) then
     local active
-    if state.mouse.buttons[1] and state.mouse.buttons[1].pressed then
+    if state.input.mouse.buttons[1] and state.input.mouse.buttons[1].pressed then
       love.graphics.setColor(0, 0, 0, 70)
       active = true
     else
@@ -76,7 +76,7 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
     love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
     -- We consider this button clicked when the mouse is in the button's area
     -- and the left mouse button was just clicked
-    return state.mouse.buttons[1] and state.mouse.buttons[1].presses > 0,
+    return state.input.mouse.buttons[1] and state.input.mouse.buttons[1].presses > 0,
       active, true
   end
   return false

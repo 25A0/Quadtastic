@@ -17,17 +17,19 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
     love.graphics.draw(state.image)
     -- Draw a bright pixel where the mouse is
     love.graphics.setColor(255, 255, 255, 255)
-    do
-      local mx, my = gui_state.transform:unproject(gui_state.mouse.x, gui_state.mouse.y)
+    if gui_state.input then
+      local mx, my = gui_state.transform:unproject(
+        gui_state.input.mouse.x, gui_state.input.mouse.y)
       mx, my = math.floor(mx), math.floor(my)
       love.graphics.rectangle("fill", mx, my, 1, 1)
     end
 
     local get_dragged_rect = function(gui_state, sp_state)
+      assert(gui_state.input)
       -- Absolute mouse coordinates
-      local mx, my = gui_state.mouse.x, gui_state.mouse.y
-      local from_x = gui_state.mouse.buttons[1].at_x
-      local from_y = gui_state.mouse.buttons[1].at_y
+      local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
+      local from_x = gui_state.input.mouse.buttons[1].at_x
+      local from_y = gui_state.input.mouse.buttons[1].at_y
       -- Now check if the mouse coordinates were inside the scrollpane
       if Scrollpane.is_mouse_inside_widget(
           gui_state, state.scrollpane_state, mx, my)
@@ -83,8 +85,10 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
 
     -- Draw a rectangle at the mouse's dragged area
     do
-      if gui_state.mouse.buttons[1] and gui_state.mouse.buttons[1].pressed then
-        local rect =get_dragged_rect(gui_state, scrollpane_state)
+      if gui_state.input and gui_state.input.mouse.buttons[1] and 
+        gui_state.input.mouse.buttons[1].pressed
+      then
+        local rect = get_dragged_rect(gui_state, scrollpane_state)
         if rect then
           show_quad(rect)
         end
@@ -95,8 +99,10 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
     -- new quad
     do
       -- Check if the lmb was released
-      if gui_state.mouse.buttons[1] and gui_state.mouse.buttons[1].releases > 0 then
-        local rect =get_dragged_rect(gui_state, scrollpane_state)
+      if gui_state.input and gui_state.input.mouse.buttons[1] and
+        gui_state.input.mouse.buttons[1].releases > 0
+      then
+        local rect = get_dragged_rect(gui_state, scrollpane_state)
         if rect and rect.w > 0 and rect.h > 0 then
           table.insert(state.quads, rect)
         end

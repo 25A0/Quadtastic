@@ -49,7 +49,7 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
   end
 
   -- Highlight if mouse is over button
-  if state and state.mouse and
+  if state and state.input and
     imgui.is_mouse_in_rect(state, x, y, w, h)
   then
     -- Change cursor to indicate editable text
@@ -59,8 +59,9 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
   -- Label position
   local text_x = x + margin_x
 
-  if state and state.mouse and state.mouse.buttons[1] then
-    local mx, my = state.mouse.buttons[1].at_x, state.mouse.buttons[1].at_y
+  if state and state.input and state.input.mouse.buttons[1] then
+    local mx = state.input.mouse.buttons[1].at_x
+    local my = state.input.mouse.buttons[1].at_y
     -- This widget has the keyboard focus if the last LMB click was inside this
     -- widget
     if imgui.is_mouse_in_rect(state, x, y, w, h, mx, my) then
@@ -103,7 +104,7 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
         end
       end
 
-      local newtext = state.keyboard.text or ""
+      local newtext = state.input.keyboard.text or ""
       content = string.sub(content, 1 , state.input_field.cursor_pos) ..
                 newtext .. 
                 string.sub(content, state.input_field.cursor_pos + 1, -1)
@@ -136,7 +137,7 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
 
       -- Calculate print offset based on state's cursor
       -- If the LMB was pressed in the last frame, set the cursor position
-      if state.mouse.buttons[1].presses > 0 then
+      if state.input.mouse.buttons[1].presses > 0 then
         -- Set the cursor position
         local delta = state.transform:unproject(mx, my) - text_x
         -- Find the max. length of characters that fit in delta
