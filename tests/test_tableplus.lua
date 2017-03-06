@@ -41,3 +41,29 @@ do
   end
   assert(table.get(t, table.find_key(t, 42)) == 42)
 end
+
+-- Test mixed numeric and string keys
+do
+  local t = {
+    foo = {
+      {
+        boo = {
+          fud = 43,
+        }
+      },
+      {
+        boo = {
+          fud = 42,
+        }
+      }
+    }
+  }
+  local expected = {"foo", 2, "boo", "fud"}
+  local found = {table.find_key(t, 42)}
+  assert(#expected == #found)
+  for i=1,#expected do
+    assert(expected[i] == found[i])
+  end
+  table.set(t, 45, table.find_key(t, 43))
+  assert(table.get(t, table.find_key(t, 45)) == 45)
+end
