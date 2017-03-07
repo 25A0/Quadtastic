@@ -58,7 +58,6 @@ its rgb value.
  - [x] Define quads
  - [ ] Name quads
  - [ ] Delete and modify existing quads
- - [ ] Name quads
  - [ ] Export defined quads as lua code
  - [ ] Detect and import existing quad definitions
  - [ ] Group quads
@@ -66,14 +65,18 @@ its rgb value.
 	 - [ ] Automatically reload image when it changes on disk
 	 - [ ] Automatically export new quad file whenever quads are changed
 
-# Credits and tool used
+# Credits and tools used
 
- - [m5x7](https://managore.itch.io/m5x7) and [m3x6](https://managore.itch.io/m3x6) fonts by Daniel Linssen 
- - aseprite by David Kapello https://www.aseprite.org/.
-   Oh, also, the pixelated Quadtastic UI is my lousy attempt to mimic the gorgeous UI in aseprite.
+ - [LÖVE](https://love2d.org/), obviously
+ - The [m5x7](https://managore.itch.io/m5x7) and [m3x6](https://managore.itch.io/m3x6)
+   fonts by Daniel Linssen
+ - [aseprite](https://www.aseprite.org/) by David Kapello.
+   Oh, also, the pixelated Quadtastic UI is my lousy attempt to create something
+   similar to the gorgeous UI in aseprite.
  - [luafilesystem](https://github.com/keplerproject/luafilesystem)
- - lovedebug by kalle2990, maintained by Ranguna https://github.com/Ranguna/LOVEDEBUG
- - Nuklear for guidance on how to write IMGUI https://github.com/vurtun/nuklear
- - inspect.lua by kikito http://github.com/kikito/inspect.lua
+ - [lovedebug](https://github.com/Ranguna/LOVEDEBUG) by kalle2990, maintained by Ranguna
+ - [Nuklear](https://github.com/vurtun/nuklear) for guidance on how to write IMGUI
+ - [inspect.lua](http://github.com/kikito/inspect.lua) by kikito
  - affine for reverse transformation by [Minh Ngo](https://github.com/markandgo/simple-transform)
- - xform for practical ideas related to reverse transformation [pgimeno](https://love2d.org/forums/viewtopic.php?p=201884#p201884)
+ - xform by [pgimeno](https://love2d.org/forums/viewtopic.php?p=201884#p201884)
+   for practical ideas related to reverse transformation
