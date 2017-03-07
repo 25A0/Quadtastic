@@ -1,4 +1,4 @@
-local Rectangle = require("Rectangle")
+local Rectangle = require("Quadtastic/Rectangle")
 
 local imgui = {}
 

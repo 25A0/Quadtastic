@@ -1,5 +1,5 @@
-local Rectangle = require("Rectangle")
-local renderutils = require("Renderutils")
+local Rectangle = require("Quadtastic/Rectangle")
+local renderutils = require("Quadtastic/Renderutils")
 local Text = {}
 
 unpack = unpack or table.unpack

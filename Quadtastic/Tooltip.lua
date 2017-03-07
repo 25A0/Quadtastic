@@ -1,7 +1,7 @@
-local Text = require("Text")
-local imgui = require("imgui")
+local Text = require("Quadtastic/Text")
+local imgui = require("Quadtastic/imgui")
 
-local Renderutils = require("Renderutils")
+local Renderutils = require("Quadtastic/Renderutils")
 
 local Tooltip = {}
 

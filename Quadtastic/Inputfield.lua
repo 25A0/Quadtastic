@@ -1,11 +1,11 @@
-local Rectangle = require("Rectangle")
-local renderutils = require("Renderutils")
-local imgui = require("imgui")
-local Text = require("Text")
+local Rectangle = require("Quadtastic/Rectangle")
+local renderutils = require("Quadtastic/Renderutils")
+local imgui = require("Quadtastic/imgui")
+local Text = require("Quadtastic/Text")
 
 local Inputfield = {}
 
-local transform = require("transform")
+local transform = require("Quadtastic/transform")
 
 -- Cache ibeam cursor
 local i_beam_cursor = love.mouse.getSystemCursor("ibeam")

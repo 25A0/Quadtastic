@@ -1,7 +1,7 @@
-local Rectangle = require("Rectangle")
-local renderutils = require("Renderutils")
-local Text = require("Text")
-local imgui = require("imgui")
+local Rectangle = require("Quadtastic/Rectangle")
+local renderutils = require("Quadtastic/Renderutils")
+local Text = require("Quadtastic/Text")
+local imgui = require("Quadtastic/imgui")
 
 local Button = {}
 

@@ -1,4 +1,4 @@
-local Scrollpane = require("Scrollpane")
+local Scrollpane = require("Quadtastic/Scrollpane")
 
 local ImageEditor = {}
 

@@ -3,7 +3,7 @@ local inspect = require("lib/inspect")
 unpack = unpack or table.unpack
 
 if os.getenv("DEBUG") then
-  require("lib/lovedebug/lovedebug")
+  -- require("lib/lovedebug/lovedebug")
   require("debugconfig")
 end
 

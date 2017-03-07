@@ -1,8 +1,8 @@
-local Frame = require("Frame")
-local Layout = require("Layout")
-local Label = require("Label")
-local Scrollpane = require("Scrollpane")
-local imgui = require("imgui")
+local Frame = require("Quadtastic/Frame")
+local Layout = require("Quadtastic/Layout")
+local Label = require("Quadtastic/Label")
+local Scrollpane = require("Quadtastic/Scrollpane")
+local imgui = require("Quadtastic/imgui")
 
 local QuadList = {}
 

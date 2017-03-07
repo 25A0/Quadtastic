@@ -1,6 +1,6 @@
-local Rectangle = require("Rectangle")
-local renderutils = require("Renderutils")
-local Layout = require("Layout")
+local Rectangle = require("Quadtastic/Rectangle")
+local renderutils = require("Quadtastic/Renderutils")
+local Layout = require("Quadtastic/Layout")
 local Frame = {}
 
 local quads = renderutils.border_quads(48, 0, 16, 16, 128, 128, 2)

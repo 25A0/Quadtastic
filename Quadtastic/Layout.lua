@@ -1,4 +1,4 @@
-local imgui = require("imgui")
+local imgui = require("Quadtastic/imgui")
 
 local Layout = {}
 

@@ -1,4 +1,4 @@
-local Layout = require("Layout")
+local Layout = require("Quadtastic/Layout")
 
 local Window = {}
 
