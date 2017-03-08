@@ -100,7 +100,7 @@ function AppLogic.pop_state(self, ...)
   if self._state.coroutine and 
      coroutine.status(self._state.coroutine) == "suspended"
   then
-    coroutine.resume(self._state.coroutine, ...)
+    run(self, nil, ...)
   end
   -- Catch up on events that happened for that state while we were in a
   -- different state, but make sure that states haven't changed since.
