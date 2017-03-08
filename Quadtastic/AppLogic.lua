@@ -31,7 +31,7 @@ local function run(self, f, ...)
     -- next state higher up in the state stack.
     -- If this is the only state, then the app will exit with the
     -- returned integer as exit code.
-    if #ret > 0 then
+    if #ret > 1 then
       if #self._state_stack > 0 then
         self:pop_state(select(2, unpack(ret)))
       else
