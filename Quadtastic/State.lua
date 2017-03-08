@@ -10,6 +10,7 @@ setmetatable(State, {
     state.data = {}
 
     return state
-  })
+  end
+})
 
 return State

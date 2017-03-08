@@ -37,11 +37,11 @@ setmetatable(AppLogic, {
     local application = {}
     application._state = initial_state
     application._state_stack = {}
-    applications._event_queue = {}
+    application._event_queue = {}
 
     setmetatable(application, {
       __index = function(self, key)
-        if self[key] then return self[key]
+        if rawget(AppLogic, key) then return rawget(AppLogic, key)
         -- If this is a call for the current state, return that state
         elseif key == self._state.name then
           -- return a function that executes the command in a subroutine,
@@ -56,10 +56,12 @@ setmetatable(AppLogic, {
             table.insert(self._event_queue[key], ...)
           end
         else
-          error("There is no state %s in the current application." % key)
+          error(string.format("There is no state %s in the current application.", key))
         end
+      end
     })
     return application
+  end
 })
 
 function AppLogic.push_state(self, new_state)
