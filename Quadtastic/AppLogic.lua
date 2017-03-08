@@ -94,7 +94,7 @@ function AppLogic.pop_state(self, ...)
   end
   -- Catch up on events that happened for that state while we were in a
   -- different state
-  for _,event_bundle in ipairs(self._event_queue[self.state.name]) do
+  for _,event_bundle in ipairs(self._event_queue[self._state.name]) do
     local f = event_bundle[1]
     f(self._state.data, unpack(event_bundle[2]))
   end
