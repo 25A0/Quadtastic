@@ -5,9 +5,15 @@ local quit = love.event.quit or os.exit
 local AppLogic = {}
 
 local function run(self, f, ...)
-  assert(type(f) == "function")
-  local co = coroutine.create(f)
-  local ret = {coroutine.resume(co, self._state.data, ...)}
+  assert(type(f) == "function" or self._state.coroutine)
+  local co, ret
+  if self._state.coroutine then
+    co = self._state.coroutine
+    ret = {coroutine.resume(co, ...)}
+  else
+    co = coroutine.create(f)
+    ret = {coroutine.resume(co, self._state.data, ...)}
+  end
   -- Print errors if there are any
   assert(ret[1], ret[2])
   -- If the coroutine yielded then we will issue a state switch based
