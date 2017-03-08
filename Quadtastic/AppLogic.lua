@@ -4,14 +4,16 @@ local quit = love.event.quit or os.exit
 
 local AppLogic = {}
 
-local function run(app, f, ...)
+local function run(self, f, ...)
   assert(type(f) == "function")
   local co = coroutine.create(f)
-  local ret = {co.resume(self._state.data, ...)}
+  local ret = {coroutine.resume(co, self._state.data, ...)}
+  -- Print errors if there are any
+  assert(ret[1], ret[2])
   -- If the coroutine yielded then we will issue a state switch based
   -- on the returned values.
   if coroutine.status(co) == "suspended" then
-    local new_state = ret[1]
+    local new_state = ret[2]
     -- Save the coroutine so that it can be resumed later
     self._state.coroutine = co
     self:push_state(new_state)
@@ -23,7 +25,7 @@ local function run(app, f, ...)
     -- returned integer as exit code.
     if #ret > 0 then
       if #self._state_stack > 0 then
-        self:pop_state(unpack(ret))
+        self:pop_state(select(2, unpack(ret)))
       else
         quit(ret[1])
       end
