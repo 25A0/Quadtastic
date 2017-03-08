@@ -75,7 +75,7 @@ function AppLogic.push_state(self, new_state)
   -- Push the current state onto the state stack
   table.insert(self._state_stack, self._state)
   -- Create a new event queue for the pushed state
-  event_queue[self._state] = {}
+  self._event_queue[self._state.name] = {}
   -- Switch states
   self._state = new_state
 end
@@ -91,7 +91,7 @@ function AppLogic.pop_state(self, ...)
   end
   -- Catch up on events that happened for that state while we were in a
   -- different state
-  for _,event_bundle in ipairs(event_queue[self.state]) do
+  for _,event_bundle in ipairs(self._event_queue[self.state.name]) do
     local event = event_bundle[1]
     self._state.process(event, select(2, unpack(event_bundle)))
   end
