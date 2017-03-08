@@ -12,7 +12,7 @@ local function run(self, f, ...)
     ret = {coroutine.resume(co, ...)}
   else
     co = coroutine.create(f)
-    ret = {coroutine.resume(co, self._state.data, ...)}
+    ret = {coroutine.resume(co, self, self._state.data, ...)}
   end
   -- Print errors if there are any
   assert(ret[1], ret[2])
