@@ -135,7 +135,7 @@ function love.draw()
   local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
-  do Window.start(gui_state, 0, 0, w, h, true, {margin = 2})
+  do Window.start(gui_state, 0, 0, w, h, {margin = 2, active = true})
 
     do Layout.start(gui_state)
       Label.draw(gui_state, nil, nil, nil, nil, "Image:")
@@ -252,7 +252,7 @@ function love.draw()
       end
     end Layout.finish(gui_state, "-")
 
-  end Window.finish(gui_state, true)
+  end Window.finish(gui_state, {active = true})
 
   love.graphics.origin()
   love.graphics.draw(gui_state.overlay_canvas)
