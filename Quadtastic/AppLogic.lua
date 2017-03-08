@@ -56,9 +56,12 @@ setmetatable(AppLogic, {
           end})
         -- Otherwise queue that call for later if we have a queue for it
         elseif self._event_queue[key] then
-          return function(...)
-            table.insert(self._event_queue[key], ...)
-          end
+          return setmetatable({}, {__index = function(_, event)
+            local f = self._state.transitions[event]
+            return function(...)
+              table.insert(self._event_queue[key], {f, ...})
+            end
+          end})
         else
           error(string.format("There is no state %s in the current application.", key))
         end
@@ -92,8 +95,8 @@ function AppLogic.pop_state(self, ...)
   -- Catch up on events that happened for that state while we were in a
   -- different state
   for _,event_bundle in ipairs(self._event_queue[self.state.name]) do
-    local event = event_bundle[1]
-    self._state.process(event, select(2, unpack(event_bundle)))
+    local f = event_bundle[1]
+    f(self._state.data, unpack(event_bundle[2]))
   end
 end
 
