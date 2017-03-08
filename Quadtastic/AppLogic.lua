@@ -96,6 +96,8 @@ function AppLogic.get_states(self)
   for i,state in ipairs(self._state_stack) do
     states[i] = state
   end
+  -- Add the current state
+  table.insert(states, self._state)
   return states
 end
 
