@@ -19,7 +19,8 @@ local Scrollpane = require("Scrollpane")
 local Tooltip = require("Tooltip")
 local ImageEditor = require("ImageEditor")
 local QuadList = require("QuadList")
-local AppModel = require("AppModel")
+local AppLogic = require("AppLogic")
+local Quadtastic = require("Quadtastic")
 
 -- Make the state variables local unless we are in debug mode
 if not _DEBUG then
@@ -45,41 +46,11 @@ end
 -- Scaling factor
 local scale = 2
 
-local load_image_from_path = function(filepath)
-  local success, more = pcall(function()
-    local filehandle, err = io.open(filepath, "rb")
-    if err then print(err); return false end
-    local data = filehandle:read("*a")
-    filehandle:close()
-    local imagedata = love.image.newImageData(
-      love.filesystem.newFileData(data, 'img', 'file'))
-    return love.graphics.newImage(imagedata)
-  end)
-
-  -- success, more = pcall(love.graphics.newImage, data)
-  if success then
-    state.image = more
-    state.filepath = filepath
-  else
-    print(more)
-  end
-  return success
-end
-
-local reset_view = function(state)
-  state.scrollpane_state = Scrollpane.init_scrollpane_state()
-  state.display.zoom = 1
-  if state.image then
-    Scrollpane.set_focus(state.scrollpane_state, {
-      x = 0, y = 0, 
-      w = state.image:getWidth(), h = state.image:getHeight()
-    }, "immediate")
-  end
-end
+local app
 
 function love.load()
   -- Initialize the state
-  state = AppModel()
+  app = AppLogic(Quadtastic)
 
   love.window.setMode(800, 600, {resizable=true, minwidth=400, minheight=300})
 
@@ -132,128 +103,28 @@ function love.draw()
   gui_state.overlay_canvas:renderTo(function() love.graphics.clear() end)
 
   love.graphics.clear(138, 179, 189)
+
   local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
-  do Window.start(gui_state, 0, 0, w, h, {margin = 2, active = true, borderless = true})
-
-    do Layout.start(gui_state)
-      Label.draw(gui_state, nil, nil, nil, nil, "Image:")
-      Layout.next(gui_state, "-", 2)
-
-      state.filepath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.filepath)
-      Layout.next(gui_state, "-", 2)
-
-      local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Load")
-      if pressed and load_image_from_path(state.filepath) then 
-        reset_view(state)
-        -- Try to read a quad file
-        local quadfilename = AppModel.find_lua_file(state.filepath)
-        local filehandle, more = io.open(quadfilename, "r")
-        if filehandle then
-          filehandle:close()
-          state.quads = loadfile(quadfilename)()
-          state.quadpath = quadfilename
-        end
-      end
-      Tooltip.draw(gui_state, "Who's a good boy??")
-    end Layout.finish(gui_state, "-")
-
-    Layout.next(gui_state, "|", 2)
-
-    do Layout.start(gui_state)
-      Label.draw(gui_state, nil, nil, nil, nil, "Quads:")
-      Layout.next(gui_state, "-", 2)
-
-      state.quadpath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.quadpath)
-      Layout.next(gui_state, "-", 2)
-
-      local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Load")
-      if pressed then 
-        reset_view(state)
-        -- Try to read a quad file
-        local quadfilename = AppModel.find_lua_file(state.filepath)
-        local filehandle, more = io.open(quadfilename, "r")
-        if filehandle then
-          filehandle:close()
-          state.quads = loadfile(quadfilename)()
-        end
-      end
-      Tooltip.draw(gui_state, "Who's a good boy??")
-    end Layout.finish(gui_state, "-")
-
-    Layout.next(gui_state, "|", 2)
-
-    do Layout.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 30)
-      do Frame.start(gui_state, nil, nil, gui_state.layout.max_w - 160, nil)
-        if state.image then
-          ImageEditor.draw(gui_state, state)
-        else
-          -- Put a label in the center of the frame
-          local y = gui_state.layout.max_h / 2 - gui_state.style.font:getHeight()
-          Label.draw(gui_state, nil, y, gui_state.layout.max_w, nil,
-                     "no image :(", {alignment = ":"})
-        end
-      end Frame.finish(gui_state)
-
-      Layout.next(gui_state, "-", 2)
-
-      do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 21)
-        -- Draw the list of quads
-        QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 19)
-
-        Layout.next(gui_state, "|")
-
-        if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment = ":"}) then
-          state:export()
-        end
-      end Layout.finish(gui_state, "|")
-
-      Layout.next(gui_state, "-", 2)
-
-      -- Draw button column
-      do Layout.start(gui_state)
-        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.rename)
-        Tooltip.draw(gui_state, "Rename")
-        Layout.next(gui_state, "|")
-        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.delete)
-        Tooltip.draw(gui_state, "Delete")
-        Layout.next(gui_state, "|")
-        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.sort)
-        Tooltip.draw(gui_state, "Sort unnamed quads from top to bottom, left to right")
-        Layout.next(gui_state, "|")
-        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.group)
-        Tooltip.draw(gui_state, "Group selected quads")
-        Layout.next(gui_state, "|")
-        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.ungroup)
-        Tooltip.draw(gui_state, "Ungroup selected quads")
-      end Layout.finish(gui_state, "|")
-    end Layout.finish(gui_state, "-")
-
-    Layout.next(gui_state, "|", 2)
-
-    do Layout.start(gui_state)
-      do
-        local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
-          gui_state.style.buttonicons.plus)
-        if pressed then
-          state:zoom_in()
-        end
-        Tooltip.draw(gui_state, "Zoom in")
-      end
-      Layout.next(gui_state, "-")
-      do
-        local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
-          gui_state.style.buttonicons.minus)
-        if pressed then
-          state:zoom_out()
-        end
-        Tooltip.draw(gui_state, "Zoom out")
-      end
-    end Layout.finish(gui_state, "-")
-
-  end Window.finish(gui_state, {active = true, borderless = true})
-
+  for _, statebundle in ipairs(app:get_states()) do
+  local state, is_active = statebundle[1], statebundle[2]
+    if not state.draw then 
+      print(string.format("Don't know how to display %s", state.name))
+    else
+      if not is_active then imgui.cover_input(gui_state) end
+      local f = state.draw
+      -- Draw that state with the draw function
+      love.graphics.setColor(138, 179, 189, 60)
+      love.graphics.rectangle("fill", 0, 0, w, h)
+      love.graphics.setColor(255, 255, 255, 255)
+      do Window.start(gui_state, 0, 0, w, h, {margin = 2})
+        f(app, state.data, gui_state)
+      end Window.finish(gui_state)
+      if not is_active then imgui.uncover_input(gui_state) end
+    end
+  end
+  
   love.graphics.origin()
   love.graphics.draw(gui_state.overlay_canvas)
 
@@ -261,9 +132,7 @@ function love.draw()
 end
 
 function love.filedropped(file)
-  if load_image_from_path(file:getFilename()) then
-    reset_view(state)
-  end
+  app.quadtastic.load_image_from_path(file:getFilename())
 end
 
 function love.mousepressed(x, y, button)
