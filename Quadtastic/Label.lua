@@ -32,7 +32,7 @@ Label.draw = function(state, x, y, w, h, label, options)
 
   -- Print label
   local fontcolor = options and options.font_color or {32, 63, 73, 255}
-  local margin_y = 2
+  local margin_y = (h - 16) / 2
   Text.draw(state, x + margin_x, y + margin_y, w - 2*margin_x, h - 2*margin_y, label, options)
 
   state.layout.adv_x = w
