@@ -8,6 +8,7 @@ setmetatable(AppModel, {
 	__call = function(_)
     local state = {}
     state.filepath = "Quadtastic/res/style.png" -- the path to the file that we want to edit
+    state.quadpath = "" -- path to the file containing the quad definitions
     state.image = nil -- the loaded image
     state.display = {
       zoom = 1, -- additional zoom factor for the displayed image

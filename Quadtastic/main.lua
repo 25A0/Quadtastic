@@ -138,18 +138,41 @@ function love.draw()
   do Window.start(gui_state, 0, 0, w, h, {margin = 2})
 
     do Layout.start(gui_state)
-      Label.draw(gui_state, nil, nil, nil, nil, "File:")
+      Label.draw(gui_state, nil, nil, nil, nil, "Image:")
       Layout.next(gui_state, "-", 2)
 
-      state.filepath = Inputfield.draw(gui_state, nil, nil, 160, nil, state.filepath)
+      state.filepath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.filepath)
       Layout.next(gui_state, "-", 2)
 
-      local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Doggo!!")
+      local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Load")
       if pressed and load_image_from_path(state.filepath) then 
         reset_view(state)
         -- Try to read a quad file
         local quadfilename = AppModel.find_lua_file(state.filepath)
-        print(quadfilename)
+        local filehandle, more = io.open(quadfilename, "r")
+        if filehandle then
+          filehandle:close()
+          state.quads = loadfile(quadfilename)()
+          state.quadpath = quadfilename
+        end
+      end
+      Tooltip.draw(gui_state, "Who's a good boy??")
+    end Layout.finish(gui_state, "-")
+
+    Layout.next(gui_state, "|", 2)
+
+    do Layout.start(gui_state)
+      Label.draw(gui_state, nil, nil, nil, nil, "Quads:")
+      Layout.next(gui_state, "-", 2)
+
+      state.quadpath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.quadpath)
+      Layout.next(gui_state, "-", 2)
+
+      local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Load")
+      if pressed then 
+        reset_view(state)
+        -- Try to read a quad file
+        local quadfilename = AppModel.find_lua_file(state.filepath)
         local filehandle, more = io.open(quadfilename, "r")
         if filehandle then
           filehandle:close()
@@ -227,7 +250,6 @@ function love.draw()
         end
         Tooltip.draw(gui_state, "Zoom out")
       end
-
     end Layout.finish(gui_state, "-")
 
   end Window.finish(gui_state)
