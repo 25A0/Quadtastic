@@ -117,10 +117,10 @@ end
 function AppLogic.get_states(self)
   local states = {}
   for i,state in ipairs(self._state_stack) do
-    states[i] = state
+    states[i] = {state, false}
   end
   -- Add the current state
-  table.insert(states, self._state)
+  table.insert(states, {self._state, true})
   return states
 end
 
