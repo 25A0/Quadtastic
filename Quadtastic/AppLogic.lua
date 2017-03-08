@@ -65,9 +65,8 @@ setmetatable(AppLogic, {
         -- Otherwise queue that call for later if we have a queue for it
         elseif self._event_queue[key] then
           return setmetatable({}, {__index = function(_, event)
-            local f = self._state.transitions[event]
             return function(...)
-              table.insert(self._event_queue[key], {f, ...})
+              table.insert(self._event_queue[key], {event, {...}})
             end
           end})
         else
@@ -85,8 +84,10 @@ function AppLogic.push_state(self, new_state)
 
   -- Push the current state onto the state stack
   table.insert(self._state_stack, self._state)
-  -- Create a new event queue for the pushed state
-  self._event_queue[self._state.name] = {}
+  -- Create a new event queue for the pushed state if there isn't one already
+  if not self._event_queue[self._state.name] then
+    self._event_queue[self._state.name] = {}
+  end
   -- Switch states
   self._state = new_state
 end
@@ -94,6 +95,7 @@ end
 function AppLogic.pop_state(self, ...)
   -- Return to previous state
   self._state = table.remove(self._state_stack)
+  local statename = self._state.name
   -- Resume state's current coroutine with the passed event
   if self._state.coroutine and 
      coroutine.status(self._state.coroutine) == "suspended"
@@ -101,10 +103,14 @@ function AppLogic.pop_state(self, ...)
     coroutine.resume(self._state.coroutine, ...)
   end
   -- Catch up on events that happened for that state while we were in a
-  -- different state
-  for _,event_bundle in ipairs(self._event_queue[self._state.name]) do
-    local f = event_bundle[1]
-    f(self._state.data, unpack(event_bundle[2]))
+  -- different state, but make sure that states haven't changed since.
+  if self._state.name == statename then
+    for _,event_bundle in ipairs(self._event_queue[statename]) do
+      local f = self._state.transitions[event_bundle[1]]
+      run(self, f, unpack(event_bundle[2]))
+    end
+    self._event_queue[statename] = nil
+  else
   end
 end
 
