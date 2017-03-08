@@ -48,10 +48,12 @@ setmetatable(AppLogic, {
         elseif key == self._state.name then
           -- return a function that executes the command in a subroutine,
           -- and captures the function's return values
-          return function(event, ...)
+          return setmetatable({}, {__index = function(_, event)
             local f = self._state.transitions[event]
-            run(self, f, ...)
-          end
+            return function(...)
+              run(self, f, ...)
+            end
+          end})
         -- Otherwise queue that call for later if we have a queue for it
         elseif self._event_queue[key] then
           return function(...)
