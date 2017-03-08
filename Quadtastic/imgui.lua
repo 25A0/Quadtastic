@@ -89,6 +89,32 @@ end
 
 local default_cursor = love.mouse.getSystemCursor("arrow")
 
+imgui.cover_input = function(state)
+  if not state.cover_count or state.cover_count == 0 then
+    -- cover input field
+    state._input = state.input
+    state.input = nil
+    state.cover_count = 1
+  else
+    -- cover the input deeper.
+    state.cover_count = state.cover_count + 1
+  end
+end
+
+imgui.uncover_input = function(state)
+  if not state.cover_count or state.cover_count == 0 then
+    error("Cannot uncover input if it's not covered")
+  elseif state.cover_count == 1 then
+    -- actually uncover input
+    assert(state._input)
+    state.input = state._input
+    state._input = nil
+    state.cover_count = 0
+  else
+    -- decrease cover count
+    state.cover_count = state.cover_count - 1
+  end
+end
 
 imgui.begin_frame = function(state)
   love.graphics.origin()
