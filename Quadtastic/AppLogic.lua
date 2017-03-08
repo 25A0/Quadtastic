@@ -25,6 +25,8 @@ local function run(self, f, ...)
     self:push_state(new_state)
   else
     assert(coroutine.status(co) == "dead")
+    -- Remove dead coroutine
+    self._state.coroutine = nil
     -- If values were returned, then they will be returned to the
     -- next state higher up in the state stack.
     -- If this is the only state, then the app will exit with the
