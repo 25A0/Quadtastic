@@ -1,3 +1,5 @@
+package.cpath = package.cpath .. ';./lib/luafilesystem/src/?.so'
+
 local inspect = require("lib/inspect")
 
 unpack = unpack or table.unpack

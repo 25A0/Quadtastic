@@ -13,6 +13,8 @@ local Tooltip = require("Quadtastic/Tooltip")
 local ImageEditor = require("Quadtastic/ImageEditor")
 local QuadList = require("Quadtastic/QuadList")
 
+local lfs = require("lfs")
+
 local function find_lua_file(filepath)
   return string.gsub(filepath, "%.(%w+)$", ".lua")
 end
@@ -143,6 +145,29 @@ Quadtastic.transitions = {
   zoom_out = function(app, data)
     data.display.zoom = math.max(1, data.display.zoom - 1)
   end,
+
+  load_quads_from_path = function(app, data, filepath)
+    local success, more = pcall(function()
+      local filehandle, err = io.open(filepath, "r")
+      if err then 
+        error(err)
+      end
+  
+      if filehandle then
+        filehandle:close()
+        local quads = loadfile(filepath)()
+        local quadpath = filepath
+        return {quads, quadpath}
+      end
+    end)
+  
+    if success then
+      data.quads, data.quadpath = unpack(more)
+    else
+      Dialog.show_dialog(string.format("Could not load image: %s", more))
+    end
+
+  end,
     
   load_image_from_path = function(app, data, filepath)
     local success, more = pcall(function()
@@ -164,11 +189,11 @@ Quadtastic.transitions = {
       data.filepath = filepath
       -- Try to read a quad file
       local quadfilename = find_lua_file(data.filepath)
-      local filehandle, more = io.open(quadfilename, "r")
-      if filehandle then
-        filehandle:close()
-        data.quads = loadfile(quadfilename)()
-        data.quadpath = quadfilename
+      if lfs.attributes(quadfilename) then
+        local should_load = Dialog.show_dialog(string.format("We found a quad file in %s. Would you like to load it?", quadfilename), {"Yes", "No"})
+        if should_load == "Yes" then
+          app.quadtastic.load_quads_from_path(quadfilename)
+        end
       end
     else
       Dialog.show_dialog(string.format("Could not load image: %s", more))
@@ -195,8 +220,8 @@ Quadtastic.draw = function(app, state, gui_state)
       Layout.next(gui_state, "-", 2)
 
       local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Load")
-      if pressed and app.quadtastic.load_image_from_path(state.filepath) then 
-        reset_view(state)
+      if pressed then
+        app.quadtastic.load_image_from_path(state.filepath)
       end
       Tooltip.draw(gui_state, "Who's a good boy??")
     end Layout.finish(gui_state, "-")
@@ -207,12 +232,12 @@ Quadtastic.draw = function(app, state, gui_state)
       Label.draw(gui_state, nil, nil, nil, nil, "Quads:")
       Layout.next(gui_state, "-", 2)
 
-      state.quadpath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.quadpath)
+      state.quadpath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.quadpath or "")
       Layout.next(gui_state, "-", 2)
 
       local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Load")
       if pressed then
-        app.quadtastic.load_image_from_path(state.filepath)
+        app.quadtastic.load_quads_from_path(state.quadpath)
       end
       Tooltip.draw(gui_state, "Who's a good boy??")
     end Layout.finish(gui_state, "-")
