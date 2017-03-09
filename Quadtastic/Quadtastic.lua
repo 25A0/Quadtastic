@@ -147,7 +147,9 @@ Quadtastic.transitions = {
   load_image_from_path = function(app, data, filepath)
     local success, more = pcall(function()
       local filehandle, err = io.open(filepath, "rb")
-      if err then print(err); return false end
+      if err then 
+        error(err)
+      end
       local data = filehandle:read("*a")
       filehandle:close()
       local imagedata = love.image.newImageData(
