@@ -2,7 +2,7 @@ local Scrollpane = require("Quadtastic/Scrollpane")
 
 local ImageEditor = {}
 
-local function show_quad(quad)
+local function show_quad(state, quad)
   if type(quad) == "table" and
     quad.x and quad.y and quad.w and quad.h
   then
@@ -78,7 +78,7 @@ local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
       then
         local rect = get_dragged_rect(gui_state, scrollpane_state)
         if rect then
-          show_quad(rect)
+          show_quad(state, rect)
         end
       end
     end
@@ -119,7 +119,7 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
 
     -- Draw the outlines of all quads
     for _, quad in pairs(state.quads) do
-      show_quad(quad)
+      show_quad(state, quad)
     end
 
     local content_w = img_w * state.display.zoom
