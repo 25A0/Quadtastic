@@ -118,9 +118,7 @@ function love.draw()
       love.graphics.setColor(138, 179, 189, 60)
       love.graphics.rectangle("fill", 0, 0, w, h)
       love.graphics.setColor(255, 255, 255, 255)
-      do Window.start(gui_state, 0, 0, w, h, {margin = 2})
-        f(app, state.data, gui_state)
-      end Window.finish(gui_state)
+      f(app, state.data, gui_state, w, h)
       if not is_active then imgui.uncover_input(gui_state) end
     end
   end
