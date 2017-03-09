@@ -182,6 +182,7 @@ Quadtastic.draw = function(app, state, gui_state)
 	local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
+  love.graphics.clear(138, 179, 189)
   do Window.start(gui_state, 0, 0, w, h, {margin = 2, active = true, borderless = true})
 
     do Layout.start(gui_state)
