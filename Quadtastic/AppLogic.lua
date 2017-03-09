@@ -48,6 +48,7 @@ setmetatable(AppLogic, {
     application._state = initial_state
     application._state_stack = {}
     application._event_queue = {}
+    application._has_active_state_changed = false
 
     setmetatable(application, {
       __index = function(self, key)
@@ -90,11 +91,13 @@ function AppLogic.push_state(self, new_state)
   end
   -- Switch states
   self._state = new_state
+  self._has_active_state_changed = true
 end
 
 function AppLogic.pop_state(self, ...)
   -- Return to previous state
   self._state = table.remove(self._state_stack)
+  self._has_active_state_changed = true
   local statename = self._state.name
   -- Resume state's current coroutine with the passed event
   if self._state.coroutine and 
@@ -126,6 +129,13 @@ end
 
 function AppLogic.get_current_state(self)
   return self._state.name
+end
+
+-- Will return true once after each time the active state has changed.
+function AppLogic.has_active_state_changed(self)
+  local has_changed = self._has_active_state_changed
+  self._has_active_state_changed = false
+  return has_changed
 end
 
 return AppLogic

@@ -47,30 +47,38 @@ imgui.pop_style = function(state, type)
   state.style[type] = table.remove(state.style[type.."_stack"])
 end
 
+local function init_input()
+  return { -- all data related to input. will be hidden on inactive windows
+    mouse = {
+      buttons = {}, -- Holds information about which buttons are pressed
+      x = 0, -- current mouse x position
+      y = 0, -- current mouse y position
+      old_x = 0, -- mouse position in the previous frame
+      old_y = 0,
+      dx = 0, -- mouse movement in x since the last update
+      dy = 0, -- mouse movement in y since the last update
+      wheel_dx = 0, -- horizontal mouse wheel movement since the last update
+      wheel_dy = 0, -- vertical mouse wheel movement since the last update
+    },
+    keyboard = {
+      keys = {}, -- List of all keys. Might not be complete
+      scancodes = {}, -- List of all scancodes. Might not be complete
+      -- Both lists contain key states for keys that have been pressed.
+      -- Each keystate contains whether the key is pressed, and how many
+      -- times it has been typed since the last update.
+      text = nil, -- Text that has been typed since last update
+    },
+  }
+end
+
+imgui.reset_input = function(gui_state)
+  gui_state.input = init_input()
+end
+
 imgui.init_state = function(transform)
   -- Initialize the state
   local state = {
-    input = { -- all data related to input. will be hidden on inactive windows
-      mouse = {
-        buttons = {}, -- Holds information about which buttons are pressed
-        x = 0, -- current mouse x position
-        y = 0, -- current mouse y position
-        old_x = 0, -- mouse position in the previous frame
-        old_y = 0,
-        dx = 0, -- mouse movement in x since the last update
-        dy = 0, -- mouse movement in y since the last update
-        wheel_dx = 0, -- horizontal mouse wheel movement since the last update
-        wheel_dy = 0, -- vertical mouse wheel movement since the last update
-      },
-      keyboard = {
-        keys = {}, -- List of all keys. Might not be complete
-        scancodes = {}, -- List of all scancodes. Might not be complete
-        -- Both lists contain key states for keys that have been pressed.
-        -- Each keystate contains whether the key is pressed, and how many
-        -- times it has been typed since the last update.
-        text = nil, -- Text that has been typed since last update
-      },
-    },
+    input = init_input(),
     input_field = {
       cursor_pos = 0,
       cursor_dt = 0,

@@ -105,8 +105,11 @@ function love.draw()
   local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
+  if app:has_active_state_changed() then
+    imgui.reset_input(gui_state)
+  end
   for _, statebundle in ipairs(app:get_states()) do
-  local state, is_active = statebundle[1], statebundle[2]
+    local state, is_active = statebundle[1], statebundle[2]
     if not state.draw then 
       print(string.format("Don't know how to display %s", state.name))
     else
