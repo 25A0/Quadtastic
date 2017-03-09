@@ -34,7 +34,7 @@ function Dialog.show_dialog(message, buttons)
   
 	assert(coroutine.running(), "This function must be run in a coroutine.")
 	local transitions = {
-		respond = function(data, response)
+		respond = function(app, data, response)
 			return response
 		end,
 	}
@@ -69,7 +69,7 @@ function Dialog.query(message, input, buttons)
   
   assert(coroutine.running(), "This function must be run in a coroutine.")
   local transitions = {
-    respond = function(data, input, response)
+    respond = function(app, data, input, response)
       return response
     end,
   }
