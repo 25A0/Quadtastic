@@ -184,9 +184,9 @@ Quadtastic.transitions = {
   
     -- success, more = pcall(love.graphics.newImage, data)
     if success then
-      Quadtastic.reset_view(data)
       data.image = more
       data.filepath = filepath
+      Quadtastic.reset_view(data)
       -- Try to read a quad file
       local quadfilename = find_lua_file(data.filepath)
       if lfs.attributes(quadfilename) then
