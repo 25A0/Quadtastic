@@ -60,14 +60,7 @@ end
 -- Add the given quads or table of quads to the selection
 Quadtastic.select = function(self, quads)
   for _, v in ipairs(quads) do
-    print("Selecting ", v)
     self.selection[v] = true
-    if type(v) == "table" and not libquadtastic.is_quad(v) then
-      -- Add children
-      for _,vv in pairs(v) do
-        Quadtastic.select(self, {vv})
-      end
-    end
   end
 end
 
@@ -76,12 +69,6 @@ end
 -- removed from the selection.
 Quadtastic.deselect = function(self, quads)
   for _, v in ipairs(quads) do
-    if not libquadtastic.is_quad(v) and type(v) == "table" then -- might be a table of quads, or table of tables
-      -- Deselect its children
-      for _, c in pairs(v) do
-        Quadtastic.deselect(self, {c})
-      end
-    end
     self.selection[v] = nil
   end
 end
