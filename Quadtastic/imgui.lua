@@ -290,4 +290,8 @@ imgui.was_key_pressed = function(state, key)
   return state.input.keyboard.keys[key] and state.input.keyboard.keys[key].presses > 0
 end
 
+imgui.is_key_pressed = function(state, key)
+  return state.input.keyboard.keys[key] and state.input.keyboard.keys[key].pressed
+end
+
 return imgui

@@ -2,6 +2,7 @@ local State = require("Quadtastic/State")
 local Dialog = require("Quadtastic/Dialog")
 local QuadExport = require("Quadtastic/QuadExport")
 
+local imgui = require("Quadtastic/imgui")
 local Button = require("Quadtastic/Button")
 local Inputfield = require("Quadtastic/Inputfield")
 local Label = require("Quadtastic/Label")
@@ -267,7 +268,18 @@ Quadtastic.draw = function(app, state, gui_state)
           QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 19,
                         state.selection, state.hovered)
         if clicked then
-          Quadtastic.set_selection(state, {clicked})
+          if gui_state.input and 
+            (imgui.is_key_pressed(gui_state, "lctrl") or
+             imgui.is_key_pressed(gui_state, "rctrl"))
+          then
+            if Quadtastic.is_selected(state, clicked) then
+              Quadtastic.deselect(state, {clicked})
+            else
+              Quadtastic.select(state, {clicked})
+            end
+          else
+            Quadtastic.set_selection(state, {clicked})
+          end
         end
         state.hovered = hovered
 
