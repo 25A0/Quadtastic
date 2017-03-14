@@ -263,6 +263,7 @@ end
 -- Returns whether the given mouse coordinates were in the given rectangle.
 -- If no mouse coordinates are given then the current mouse position is used.
 imgui.is_mouse_in_rect = function(state, x, y, w, h, mx, my, transform)
+  if not state.input then return false end
   mx = mx or state.input.mouse.x
   my = my or state.input.mouse.y
   transform = transform or state.transform
