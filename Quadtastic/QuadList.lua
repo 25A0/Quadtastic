@@ -9,9 +9,10 @@ local QuadList = {}
 -- Draw the quads in the current state.
 -- active is a table that contains for each quad whether it is active.
 -- hovered is nil, or a single quad that the mouse hovers over.
-QuadList.draw = function(gui_state, state, x, y, w, h, active, hovered)
+QuadList.draw = function(gui_state, state, x, y, w, h, active, last_hovered)
   -- The quad that the user clicked on
   local clicked = nil
+  local hovered = nil
   do Frame.start(gui_state, x, y, w, h)
     imgui.push_style(gui_state, "font", gui_state.style.small_font)
     do state.quad_scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, state.quad_scrollpane_state)
@@ -21,7 +22,7 @@ QuadList.draw = function(gui_state, state, x, y, w, h, active, hovered)
           local background_quads
           if active[quad] then
             background_quads = gui_state.style.rowbackground.selected
-          elseif hovered == quad then
+          elseif last_hovered == quad then
             background_quads = gui_state.style.rowbackground.hovered
           else
             background_quads = gui_state.style.rowbackground.default

@@ -267,9 +267,7 @@ Quadtastic.draw = function(app, state, gui_state)
         if clicked then
           Quadtastic.set_selection(state, clicked)
         end
-        if hovered then
-          state.hovered = hovered
-        end
+        state.hovered = hovered
 
         Layout.next(gui_state, "|")
 
