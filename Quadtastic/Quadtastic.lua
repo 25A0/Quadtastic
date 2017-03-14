@@ -23,20 +23,20 @@ local function find_lua_file(filepath)
 end
 
 local Quadtastic = State("quadtastic",
-	nil,
-	-- initial data
-	{
-        filepath = "Quadtastic/res/style.png", -- the path to the file that we want to edit
-        quadpath = "", -- path to the file containing the quad definitions
-        image = nil, -- the loaded image
-        display = {
-          zoom = 1, -- additional zoom factor for the displayed image
-        },
-        scrollpane_state = nil,
-        quad_scrollpane_state = nil,
-        quads = {},
-        selection = {},
-	})
+  nil,
+  -- initial data
+  {
+    filepath = "Quadtastic/res/style.png", -- the path to the file that we want to edit
+    quadpath = "", -- path to the file containing the quad definitions
+    image = nil, -- the loaded image
+    display = {
+      zoom = 1, -- additional zoom factor for the displayed image
+    },
+    scrollpane_state = nil,
+    quad_scrollpane_state = nil,
+    quads = {},
+    selection = {},
+  })
 
 -- -------------------------------------------------------------------------- --
 -- Selection handling
@@ -99,21 +99,21 @@ end
 -- defined above.
 
 Quadtastic.transitions = {
-	export = function(app, data)
-		if not data.image then
-			Dialog.show_dialog("Load an image first")
-			return
-		elseif not data.quadpath or data.quadpath == "" then
-			local ret, path = Dialog.query(
-				"Where should the quad file be stored?", 
-				find_lua_file(data.filepath),
-				{"Cancel", "OK"})
-			if ret == "OK" then
-				data.quadpath = path
-			else return end
-		end
-		QuadExport.export(data.quads, data.quadpath)
-	end,
+  export = function(app, data)
+    if not data.image then
+      Dialog.show_dialog("Load an image first")
+      return
+    elseif not data.quadpath or data.quadpath == "" then
+      local ret, path = Dialog.query(
+        "Where should the quad file be stored?", 
+        find_lua_file(data.filepath),
+        {"Cancel", "OK"})
+      if ret == "OK" then
+        data.quadpath = path
+      else return end
+    end
+    QuadExport.export(data.quads, data.quadpath)
+  end,
 
   rename = function(app, data, quads)
     if #quads == 0 then return
@@ -142,19 +142,19 @@ Quadtastic.transitions = {
     end
   end,
 
-	remove = function(app, data, quads)
-		if #quads == 0 then
-			return
-		else
-			Quadtastic.deselect(data, quads)
-			for _,quad in ipairs(quads) do
-				local keys = {table.find_key(data.quads, quad)}
-				if #keys > 0 then
-					table.set(data.quads, nil, unpack(keys))
-				end
-			end
-		end
-	end,
+  remove = function(app, data, quads)
+    if #quads == 0 then
+      return
+    else
+      Quadtastic.deselect(data, quads)
+      for _,quad in ipairs(quads) do
+        local keys = {table.find_key(data.quads, quad)}
+        if #keys > 0 then
+          table.set(data.quads, nil, unpack(keys))
+        end
+      end
+    end
+  end,
 
   group = function(app, data, quads)
     if #quads == 0 then return end
@@ -261,7 +261,7 @@ Quadtastic.transitions = {
 --                           DRAWING
 -- -------------------------------------------------------------------------- --
 Quadtastic.draw = function(app, state, gui_state)
-	local w, h = gui_state.transform:unproject_dimensions(
+  local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
   love.graphics.clear(138, 179, 189)
