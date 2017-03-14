@@ -142,6 +142,43 @@ Quadtastic.transitions = {
 		end
 	end,
 
+  group = function(app, data, quads)
+    if #quads == 0 then return end
+    -- Find the shared parent of the selected quads.
+    local first_keys = {table.find_key(data.quads, quads[1])}
+    -- Remove the last element of the key list to get the shared key
+    table.remove(first_keys)
+    local shared_keys = first_keys
+    local shared_parent = table.get(data.quads, unpack(shared_keys))
+    local individual_keys = {}
+    for _,v in ipairs(quads) do
+      -- This is an N^2 search and it sucks, but it probably won't matter.
+      local key = table.find_key(shared_parent, v)
+      if not key then
+        Dialog.show_dialog("You cannot group quads across different groups")
+        return
+      else
+        individual_keys[v] = key
+      end
+    end
+
+    -- Do the second pass, this time with destructive actions
+    local new_group = {}
+    local num_index = 1 -- a counter for numeric indices
+    for _,v in ipairs(quads) do
+      local key = individual_keys[v]
+      -- Remove the element from the shared parent
+      shared_parent[key] = nil
+      -- No point in preserving a numeric key
+      if type(key) == "number" then 
+        key = num_index
+        num_index = num_index + 1
+      end
+      new_group[key] = v
+    end
+    table.insert(shared_parent, new_group)
+  end,
+
   zoom_in = function(app, data)
     data.display.zoom = math.min(12, data.display.zoom + 1)
   end,
@@ -355,7 +392,9 @@ Quadtastic.draw = function(app, state, gui_state)
         Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.sort)
         Tooltip.draw(gui_state, "Sort unnamed quads from top to bottom, left to right")
         Layout.next(gui_state, "|")
-        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.group)
+        if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.group) then
+          app.quadtastic.group(Quadtastic.get_selection(state))
+        end
         Tooltip.draw(gui_state, "Group selected quads")
         Layout.next(gui_state, "|")
         Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.ungroup)
