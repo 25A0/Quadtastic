@@ -13,6 +13,7 @@ local Tooltip = require("Quadtastic/Tooltip")
 local ImageEditor = require("Quadtastic/ImageEditor")
 local QuadList = require("Quadtastic/QuadList")
 local libquadtastic = require("Quadtastic/libquadtastic")
+local table = require("Quadtastic/tableplus")
 
 local lfs = require("lfs")
 
@@ -50,19 +51,20 @@ Quadtastic.clear_selection = function(self)
 end
 
 -- Repace the current selection by the given selection
-Quadtastic.set_selection = function(self, ...)
+Quadtastic.set_selection = function(self, quads)
   Quadtastic.clear_selection(self)
-  Quadtastic.select(self, ...)
+  Quadtastic.select(self, quads)
 end
 
 -- Add the given quads or table of quads to the selection
-Quadtastic.select = function(self, ...)
-  for _, v in ipairs({...}) do
+Quadtastic.select = function(self, quads)
+  for _, v in ipairs(quads) do
+    print("Selecting ", v)
     self.selection[v] = true
     if type(v) == "table" and not libquadtastic.is_quad(v) then
       -- Add children
       for _,vv in pairs(v) do
-        Quadtastic.select(self, vv)
+        Quadtastic.select(self, {vv})
       end
     end
   end
@@ -71,12 +73,12 @@ end
 -- Remove the given quads from the selection.
 -- If a table of quads is passed, the table and all contained quads will be
 -- removed from the selection.
-Quadtastic.deselect = function(self, ...)
-  for _, v in ipairs({...}) do
+Quadtastic.deselect = function(self, quads)
+  for _, v in ipairs(quads) do
     if not libquadtastic.is_quad(v) and type(v) == "table" then -- might be a table of quads, or table of tables
       -- Deselect its children
       for _, c in pairs(v) do
-        Quadtastic.deselect(self, c)
+        Quadtastic.deselect(self, {c})
       end
     end
     self.selection[v] = nil
@@ -125,15 +127,15 @@ Quadtastic.transitions = {
 		QuadExport.export(data.quads, data.quadpath)
 	end,
 
-	remove = function(app, data, ...)
-		if select("#", ...) == 0 then
+	remove = function(app, data, quads)
+		if #quads == 0 then
 			return
 		else
-			Quadtastic.deselect(self, ...)
-			for _,quad in ipairs({...}) do
+			Quadtastic.deselect(data, quads)
+			for _,quad in ipairs(quads) do
 				local keys = {table.find_key(data.quads, quad)}
 				if #keys > 0 then
-					table.set(data.quads, nil, keys)
+					table.set(data.quads, nil, unpack(keys))
 				end
 			end
 		end
@@ -265,7 +267,7 @@ Quadtastic.draw = function(app, state, gui_state)
           QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 19,
                         state.selection, state.hovered)
         if clicked then
-          Quadtastic.set_selection(state, clicked)
+          Quadtastic.set_selection(state, {clicked})
         end
         state.hovered = hovered
 
@@ -283,8 +285,10 @@ Quadtastic.draw = function(app, state, gui_state)
         Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.rename)
         Tooltip.draw(gui_state, "Rename")
         Layout.next(gui_state, "|")
-        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.delete)
-        Tooltip.draw(gui_state, "Delete")
+        if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.delete) then
+          app.quadtastic.remove(Quadtastic.get_selection(state))
+        end
+        Tooltip.draw(gui_state, "Delete selected quad(s)")
         Layout.next(gui_state, "|")
         Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.sort)
         Tooltip.draw(gui_state, "Sort unnamed quads from top to bottom, left to right")
