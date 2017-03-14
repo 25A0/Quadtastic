@@ -36,10 +36,10 @@ local function draw_quads(gui_state, quads, active, last_hovered)
 
     if libquadtastic.is_quad(quad) then
       Label.draw(gui_state, nil, nil, gui_state.layout.max_w, nil,
-        string.format("%d: x%d y%d  %dx%d", name, quad.x, quad.y, quad.w, quad.h))
+        string.format("%s: x%d y%d  %dx%d", tostring(name), quad.x, quad.y, quad.w, quad.h))
     else
       Label.draw(gui_state, nil, nil, gui_state.layout.max_w, nil,
-        string.format("%d: quad group", name))
+        string.format("%s: quad group", tostring(name)))
     end
     gui_state.layout.adv_x = gui_state.layout.max_w
     gui_state.layout.adv_y = 20
