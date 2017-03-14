@@ -12,6 +12,7 @@ local Scrollpane = require("Quadtastic/Scrollpane")
 local Tooltip = require("Quadtastic/Tooltip")
 local ImageEditor = require("Quadtastic/ImageEditor")
 local QuadList = require("Quadtastic/QuadList")
+local libquadtastic = require("Quadtastic/libquadtastic")
 
 local lfs = require("lfs")
 
@@ -50,18 +51,18 @@ end
 
 -- Repace the current selection by the given selection
 Quadtastic.set_selection = function(self, ...)
-  self:clear_selection()
-  self:select(...)
+  Quadtastic.clear_selection(self)
+  Quadtastic.select(self, ...)
 end
 
 -- Add the given quads or table of quads to the selection
 Quadtastic.select = function(self, ...)
   for _, v in ipairs({...}) do
     self.selection[v] = true
-    if type(v) == "table" and not is_quad(v) then
+    if type(v) == "table" and not libquadtastic.is_quad(v) then
       -- Add children
-      for _,v in pairs(table_name) do
-        self:select(v)
+      for _,vv in pairs(v) do
+        Quadtastic.select(self, vv)
       end
     end
   end
@@ -72,7 +73,7 @@ end
 -- removed from the selection.
 Quadtastic.deselect = function(self, ...)
   for _, v in ipairs({...}) do
-    if not is_quad(v) and type(v) == "table" then -- might be a table of quads, or table of tables
+    if not libquadtastic.is_quad(v) and type(v) == "table" then -- might be a table of quads, or table of tables
       -- Deselect its children
       for _, c in pairs(v) do
         Quadtastic.deselect(self, c)
@@ -260,7 +261,15 @@ Quadtastic.draw = function(app, state, gui_state)
 
       do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 21)
         -- Draw the list of quads
-        QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 19)
+        local clicked, hovered = 
+          QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 19,
+                        state.selection, state.hovered)
+        if clicked then
+          Quadtastic.set_selection(state, clicked)
+        end
+        if hovered then
+          state.hovered = hovered
+        end
 
         Layout.next(gui_state, "|")
 

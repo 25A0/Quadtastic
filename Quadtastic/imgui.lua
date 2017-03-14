@@ -270,6 +270,22 @@ imgui.is_mouse_in_rect = function(state, x, y, w, h, mx, my, transform)
                             transform:unproject(mx, my))
 end
 
+imgui.was_mouse_pressed = function(state, x, y, w, h, button)
+  if not state.input then return false end
+  local button_state
+  if button then
+    button_state = state.input.mouse.buttons[button]
+  else
+    button_state = state.input.mouse.buttons[1]
+  end
+  if not button_state then return false end
+  if button_state.presses < 1 then return false end
+  local mx, my = button_state.at_x, button_state.at_y
+  local transform = state.transform
+  return Rectangle.contains({x = x, y = y, w = w, h = h}, 
+                            transform:unproject(mx, my))
+end
+
 imgui.was_key_pressed = function(state, key)
   return state.input.keyboard.keys[key] and state.input.keyboard.keys[key].presses > 0
 end

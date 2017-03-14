@@ -81,9 +81,21 @@ function love.load()
   gui_state.style.font = med_font
   gui_state.style.stylesheet = stylesheet
   gui_state.style.rowbackground = {
-    top    = love.graphics.newQuad(0, 32, 1, 2, 128, 128),
-    center = love.graphics.newQuad(0, 34, 1, 1, 128, 128),
-    bottom = love.graphics.newQuad(0, 46, 1, 2, 128, 128),
+    default = {
+      top    = love.graphics.newQuad(0, 32, 1, 2, 128, 128),
+      center = love.graphics.newQuad(0, 34, 1, 1, 128, 128),
+      bottom = love.graphics.newQuad(0, 46, 1, 2, 128, 128),
+    },
+    hovered = {
+      top    = love.graphics.newQuad(1, 32, 1, 2, 128, 128),
+      center = love.graphics.newQuad(1, 34, 1, 1, 128, 128),
+      bottom = love.graphics.newQuad(1, 46, 1, 2, 128, 128),
+    },
+    selected = {
+      top    = love.graphics.newQuad(2, 32, 1, 2, 128, 128),
+      center = love.graphics.newQuad(2, 34, 1, 1, 128, 128),
+      bottom = love.graphics.newQuad(2, 46, 1, 2, 128, 128),
+    },
   }
   gui_state.style.buttonicons = {
     plus  = love.graphics.newQuad(64, 0, 5, 5, 128, 128),
