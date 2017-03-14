@@ -115,6 +115,33 @@ Quadtastic.transitions = {
 		QuadExport.export(data.quads, data.quadpath)
 	end,
 
+  rename = function(app, data, quads)
+    if #quads == 0 then return
+    elseif #quads > 1 then
+      Dialog.show_dialog("You cannot rename more than one quad at once.")
+      return
+    else
+      local quad = quads[1]
+      local current_keys = {table.find_key(data.quads, quad)}
+      local old_key = table.remove(current_keys)
+      local new_key
+      if type(old_key) == "number" then 
+        new_key = ""
+      else 
+        new_key = old_key
+      end
+      local ret
+      ret, new_key = Dialog.query("Name:", new_key, {"Cancel", "OK"})
+      if ret == "OK" then
+        -- Remove the entry under the old key
+        local parent = table.get(data.quads, unpack(current_keys))
+        parent[old_key] = nil
+        -- Add the entry under the new key
+        parent[new_key] = quad
+      end
+    end
+  end,
+
 	remove = function(app, data, quads)
 		if #quads == 0 then
 			return
@@ -368,7 +395,9 @@ Quadtastic.draw = function(app, state, gui_state)
 
       -- Draw button column
       do Layout.start(gui_state)
-        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.rename)
+        if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.rename) then
+          app.quadtastic.rename(Quadtastic.get_selection(state))
+        end
         Tooltip.draw(gui_state, "Rename")
         Layout.next(gui_state, "|")
         if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.delete) then
