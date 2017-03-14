@@ -1,11 +1,10 @@
 local Scrollpane = require("Quadtastic/Scrollpane")
+local libquadtastic = require("Quadtastic/libquadtastic")
 
 local ImageEditor = {}
 
 local function show_quad(state, quad)
-  if type(quad) == "table" and
-    quad.x and quad.y and quad.w and quad.h
-  then
+  if libquadtastic.is_quad(quad) then
     love.graphics.setColor(255, 255, 255, 255)
     -- We'll draw the quads differently if the viewport is zoomed out
     -- all the way
@@ -22,6 +21,11 @@ local function show_quad(state, quad)
       love.graphics.setLineWidth(1/state.display.zoom)
       love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
       love.graphics.pop()
+    end
+  else
+    -- If it's not a quad then it's a list of quads
+    for k,v in pairs(quad) do
+      show_quad(state, v)
     end
   end
 end
