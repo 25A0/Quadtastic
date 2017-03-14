@@ -64,7 +64,7 @@ function Dialog.query(message, input, buttons)
         do Layout.start(gui_state)
           for _,button in ipairs(data.buttons) do
             if Button.draw(gui_state, nil, nil, nil, nil, string.upper(button)) then
-              app.dialog.respond(button)
+              app.query.respond(button)
             end
             Layout.next(gui_state, "-")
           end
@@ -75,8 +75,8 @@ function Dialog.query(message, input, buttons)
   
   assert(coroutine.running(), "This function must be run in a coroutine.")
   local transitions = {
-    respond = function(app, data, input, response)
-      return response
+    respond = function(app, data, response)
+      return response, data.input
     end,
   }
   local query_state = State("query", transitions, 

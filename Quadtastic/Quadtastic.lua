@@ -164,7 +164,7 @@ Quadtastic.transitions = {
     if success then
       data.quads, data.quadpath = unpack(more)
     else
-      Dialog.show_dialog(string.format("Could not load image: %s", more))
+      Dialog.show_dialog(string.format("Could not load quads: %s", more))
     end
 
   end,
