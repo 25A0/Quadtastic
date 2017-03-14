@@ -8,8 +8,16 @@ local function run(self, f, ...)
   assert(type(f) == "function" or self._state.coroutine)
   local co, ret
   if self._state.coroutine then
-    co = self._state.coroutine
-    ret = {coroutine.resume(co, ...)}
+    -- The coroutine might be running if this was a nested call.
+    -- In this case however we do expect that a function was passed.
+    if coroutine.running() then
+      assert(type(f) == "function")
+      co = coroutine.running()
+      ret = {true, f(self, self._state.data, ...)}
+    else
+      co = self._state.coroutine
+      ret = {coroutine.resume(co, ...)}
+    end
   else
     co = coroutine.create(f)
     ret = {coroutine.resume(co, self, self._state.data, ...)}
@@ -24,9 +32,12 @@ local function run(self, f, ...)
     self._state.coroutine = co
     self:push_state(new_state)
   else
-    assert(coroutine.status(co) == "dead")
-    -- Remove dead coroutine
-    self._state.coroutine = nil
+    if coroutine.status(co) == "dead" then
+      -- Remove dead coroutine
+      self._state.coroutine = nil
+    else
+      assert(co == coroutine.running(), "coroutine wasn't running")
+    end
     -- If values were returned, then they will be returned to the
     -- next state higher up in the state stack.
     -- If this is the only state, then the app will exit with the
