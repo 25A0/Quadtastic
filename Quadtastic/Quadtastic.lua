@@ -268,17 +268,67 @@ Quadtastic.draw = function(app, state, gui_state)
           QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 19,
                         state.selection, state.hovered)
         if clicked then
-          if gui_state.input and 
+          local new_quads = {clicked}
+          -- If shift was pressed, select all quads between the clicked one and
+          -- the last quad that was clicked
+          if gui_state.input and
+            (imgui.is_key_pressed(gui_state, "lshift") or
+             imgui.is_key_pressed(gui_state, "rshift")) and
+            state.previous_clicked
+          then
+            -- Make sure that the new quad and the last quads are child of the
+            -- same parent
+            local previous_keys = {table.find_key(state.quads, state.previous_clicked)}
+            local new_keys = {table.find_key(state.quads, clicked)}
+            -- Remove the last keys since they will likely differ
+            local previous_key = table.remove(previous_keys)
+            local new_key = table.remove(new_keys)
+            if table.shallow_equals(previous_keys, new_keys) then
+              if previous_key == new_key then
+                assert(state.previous_clicked == clicked)
+                -- In this case the user clicked the same quad twice after
+                -- pressing shift. We don't need to take any extra steps.
+              else
+                -- We don't know the exact order in which quads appear. So we
+                -- iterate through the quads of the shared parent. Once we
+                -- encounter either the new or the previous quad, we start
+                -- adding all intermediate quads to a list that will then be
+                -- selected.
+                local parent = table.get(state.quads, unpack(new_keys))
+                local found_previous = false
+                local found_new = false
+                -- Clear the list of new quads to make the accumulation process
+                -- a bit easier
+                new_quads = {}
+                for k,v in pairs(parent) do
+                  if v == clicked then
+                    found_new = true
+                  end
+                  if v == state.previous_clicked then
+                    found_previous = true
+                  end
+                  if found_new or found_previous then
+                    table.insert(new_quads, v)
+                  end
+                  if found_new and found_previous then break end
+                end
+              end
+            end
+          else
+            state.previous_clicked = clicked
+          end
+
+          if gui_state.input and
             (imgui.is_key_pressed(gui_state, "lctrl") or
              imgui.is_key_pressed(gui_state, "rctrl"))
           then
-            if Quadtastic.is_selected(state, clicked) then
-              Quadtastic.deselect(state, {clicked})
+            if #new_quads == 1 and Quadtastic.is_selected(state, clicked) then
+              Quadtastic.deselect(state, new_quads)
             else
-              Quadtastic.select(state, {clicked})
+              Quadtastic.select(state, new_quads)
             end
           else
-            Quadtastic.set_selection(state, {clicked})
+            Quadtastic.set_selection(state, new_quads)
           end
         end
         state.hovered = hovered

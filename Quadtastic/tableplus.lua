@@ -5,6 +5,9 @@ local table = table
 -- but there is no built-in way in Lua to do this in an automated way
 function table.get(tab, key, ...)
   if tab == nil then return nil
+  elseif not key then
+    -- this covers the case table.get(tab)
+    return tab
   elseif select("#", ...) == 0 then
     return tab[key]
   else
@@ -55,6 +58,21 @@ function table.values(tab)
     table.insert(values, v)
   end
   return values
+end
+
+-- Compares the contents of the two tables in a shallow manner. That is, it will
+-- make sure that the two tables have the same number of arguments, the same
+-- numeric values, and that the keys and values of both tables are equal.
+function table.shallow_equals(a, b)
+  if not type(a) == "table" then error("The first parameter is not a table") end
+  if not type(b) == "table" then error("The second parameter is not a table") end
+  for k,v in pairs(a) do
+    if not b[k] == v then return false end
+  end
+  for k,v in pairs(b) do
+    if not a[k] == v then return false end
+  end
+  return true
 end
 
 return table
