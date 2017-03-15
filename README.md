@@ -61,6 +61,19 @@ its rgb value.
  - [x] Export defined quads as lua code
  - [x] Detect and import existing quad definitions
  - [x] Group quads
+ - [ ] Highlight selected and hovered quads
+ - [ ] Display name of quads in ImageEditor
+ - [ ] Use dot notation in quad names to move them to quad groups
+ - [ ] Detect when an image changed on disk
+ - [ ] Make Load button glow when file changed on disk
+ - [ ] Make Export button glow when quads have changed since last export
+ - [ ] Add text area that wraps at layout boundary automatically
+ - [ ] Add toolbar with tools:
+    - [ ] The Create tool to create new quads
+    - [ ] The Select tool to select, move and resize quads
+    - [ ] The Border tool to create border quads
+    - [ ] The Strip tool to create strips of equally sized quads
+ - [ ] Undo/Redo history
  - [ ] >>>>>>> TURBO-WorkflOw >>>>>
 	 - [ ] Automatically reload image when it changes on disk
 	 - [ ] Automatically export new quad file whenever quads are changed
