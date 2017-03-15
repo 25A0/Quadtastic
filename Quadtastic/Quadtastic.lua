@@ -142,6 +142,61 @@ Quadtastic.transitions = {
     end
   end,
 
+  sort = function(app, data, quads)
+    if #quads == 0 then return end
+    -- Find the shared parent of the selected quads.
+    local first_keys = {table.find_key(data.quads, quads[1])}
+    -- Remove the last element of the key list to get the shared key
+    table.remove(first_keys)
+    local shared_keys = first_keys
+    local shared_parent = table.get(data.quads, unpack(shared_keys))
+    local individual_keys = {}
+    local numeric_quads = 0
+    for _,v in ipairs(quads) do
+      -- This is an N^2 search and it sucks, but it probably won't matter.
+      local key = table.find_key(shared_parent, v)
+      if not key then
+        Dialog.show_dialog("You cannot sort quads across different groups")
+        return
+      else
+        individual_keys[v] = key
+      end
+      if type(key) == "number" then
+        numeric_quads = numeric_quads + 1
+      end
+    end
+    if numeric_quads == 0 then
+      Dialog.show_dialog("Only unnamed quads can be sorted")
+      return
+    end
+
+    -- Filter out non-quad elements and elements with non-numeric keys
+    local new_group = {}
+    for _,v in ipairs(quads) do
+      if libquadtastic.is_quad(v) and type(individual_keys[v]) == "number" then
+        table.insert(new_group, v)
+      end
+    end
+
+    -- Sort the quads
+    local function sort(quad_a, quad_b)
+      return quad_a.y < quad_b.y or quad_a.y == quad_b.y and quad_a.x < quad_b.x
+    end
+    table.sort(new_group, sort)
+
+    -- Remove the quads from their parent
+    for _,v in ipairs(new_group) do
+      local key = individual_keys[v]
+      -- Remove the element from the shared parent
+      shared_parent[key] = nil
+    end
+
+    -- Now add the quads to the parent in order
+    for _,v in ipairs(new_group) do
+      table.insert(shared_parent, v)
+    end
+  end,
+
   remove = function(app, data, quads)
     if #quads == 0 then
       return
@@ -405,7 +460,9 @@ Quadtastic.draw = function(app, state, gui_state)
         end
         Tooltip.draw(gui_state, "Delete selected quad(s)")
         Layout.next(gui_state, "|")
-        Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.sort)
+        if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.sort) then
+          app.quadtastic.sort(Quadtastic.get_selection(state))
+        end
         Tooltip.draw(gui_state, "Sort unnamed quads from top to bottom, left to right")
         Layout.next(gui_state, "|")
         if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.group) then
