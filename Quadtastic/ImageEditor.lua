@@ -13,10 +13,8 @@ local function show_quad(gui_state, state, quad, quadname)
     if state.display.zoom == 1 then
       if quad.w > 1 and quad.h > 1 then
         love.graphics.rectangle("line", quad.x + .5, quad.y + .5, quad.w - 1, quad.h - 1)
-      elseif quad.w > 1 or quad.h > 1 then
-        love.graphics.rectangle("fill", quad.x, quad.y, quad.w, quad.h)
       else
-        love.graphics.rectangle("fill", quad.x, quad.y, 1, 1)
+        love.graphics.rectangle("fill", quad.x, quad.y, quad.w, quad.h)
       end
     else
       love.graphics.push("all")
