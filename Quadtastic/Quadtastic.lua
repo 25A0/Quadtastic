@@ -475,6 +475,9 @@ Quadtastic.draw = function(app, state, gui_state)
         end
         Tooltip.draw(gui_state, "Zoom out")
       end
+      Layout.next(gui_state, "-")
+      love.graphics.setColor(255, 255, 255, 255)
+      Label.draw(gui_state, nil, -3, nil, nil, string.format("%d%%", state.display.zoom * 100))
     end Layout.finish(gui_state, "-") -- Zoom buttons
 
   end Window.finish(gui_state, {active = true, borderless = true})
