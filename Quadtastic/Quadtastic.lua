@@ -133,11 +133,30 @@ Quadtastic.transitions = {
       local ret
       ret, new_key = Dialog.query("Name:", new_key, {"Cancel", "OK"})
       if ret == "OK" then
-        -- Remove the entry under the old key
+        if new_key == old_key then return end
+
         local parent = table.get(data.quads, unpack(current_keys))
-        parent[old_key] = nil
-        -- Add the entry under the new key
-        parent[new_key] = quad
+        -- Check if that key already exists
+        if parent[new_key] then
+          local ret = Dialog.show_dialog(
+            string.format("The quad '%s' already exists.", new_key),
+            {"Cancel", "Swap", "Replace"})
+          if ret == "Swap" then
+            parent[old_key], parent[new_key] = parent[new_key], parent[old_key]
+          elseif ret == "Replace" then
+            -- Remove the entry under the old key
+            parent[old_key] = nil
+            -- Add the entry under the new key
+            parent[new_key] = quad
+          else -- Cancel option
+            return
+          end
+        else
+          -- Remove the entry under the old key
+          parent[old_key] = nil
+          -- Add the entry under the new key
+          parent[new_key] = quad
+        end
       end
     end
   end,
