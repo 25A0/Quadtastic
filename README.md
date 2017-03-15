@@ -61,7 +61,7 @@ its rgb value.
  - [x] Export defined quads as lua code
  - [x] Detect and import existing quad definitions
  - [x] Group quads
- - [ ] Highlight selected and hovered quads
+ - [x] Highlight selected and hovered quads
  - [x] Display name of quads in ImageEditor
  - [ ] Use dot notation in quad names to move them to quad groups
  - [ ] Detect when an image changed on disk

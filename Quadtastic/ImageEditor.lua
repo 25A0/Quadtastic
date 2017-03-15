@@ -20,7 +20,55 @@ local function show_quad(gui_state, state, quad, quadname)
       love.graphics.push("all")
       love.graphics.setLineStyle("rough")
       love.graphics.setLineWidth(1/state.display.zoom)
-      love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
+      if quad == state.hovered or state.selection:is_selected(quad) then
+        -- Use a dashed line to outline the quad
+        local segment_length = 1
+        local circumference = 2*(quad.w + quad.h)
+        local adv = (gui_state.second or 0) * 2 * segment_length
+        -- top
+        if adv > segment_length then adv = adv - 2*segment_length end
+        while adv < quad.w do
+          local start = math.max(quad.x, quad.x + adv)
+          local max_adv = math.min(quad.w, adv + segment_length)
+          love.graphics.line(start    , quad.y, 
+                             quad.x + max_adv, quad.y)
+          adv = adv + 2*segment_length
+        end
+        adv = adv - quad.w
+        -- right
+        if adv > segment_length then adv = adv - 2*segment_length end
+        while adv < quad.h do
+          local start = math.max(quad.y, quad.y + adv)
+          local max_adv = math.min(quad.h, adv + segment_length)
+          love.graphics.line(quad.x + quad.w, start, 
+                             quad.x + quad.w, quad.y + max_adv)
+          adv = adv + 2*segment_length
+        end
+        adv = adv - quad.h
+        -- bottom
+        if adv > segment_length then adv = adv - 2*segment_length end
+        while adv < quad.w do
+          local start = math.min(quad.x + quad.w, quad.x + quad.w - adv)
+          local max_adv = math.min(quad.w, adv + segment_length)
+          love.graphics.line(start    , quad.y + quad.h, 
+                             quad.x + quad.w - max_adv, quad.y + quad.h)
+          adv = adv + 2*segment_length
+        end
+        adv = adv - quad.w
+        -- left
+        if adv > segment_length then adv = adv - 2*segment_length end
+        while adv < quad.h do
+          local start = math.min(quad.y + quad.h, quad.y + quad.h - adv)
+          local max_adv = math.min(quad.h, adv + segment_length)
+          love.graphics.line(quad.x, start, 
+                             quad.x, quad.y + quad.h - max_adv)
+          adv = adv + 2*segment_length
+        end
+        adv = adv - quad.h
+      else
+        -- Use a simple line to outline the quad
+        love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
+      end
       love.graphics.pop()
     end
     -- If the mouse is inside that quad, display its name

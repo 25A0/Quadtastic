@@ -84,6 +84,7 @@ imgui.init_state = function(transform)
       cursor_dt = 0,
     },
     dt = 0, -- Time since last update
+    second = 0, -- Accumulative timer that counts up to a second
     style = {
       font = nil, -- The font that is being used
       stylesheet = nil, -- A texture atlas with gui styles
@@ -254,6 +255,7 @@ end
 
 imgui.update = function(state, dt)
   state.dt = dt
+  _, state.second = math.modf(state.second + dt)
 end
 
 -- -------------------------------------------------------------------------- --
