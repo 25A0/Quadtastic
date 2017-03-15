@@ -5,18 +5,6 @@ local imgui = require("Quadtastic/imgui")
 
 local Button = {}
 
-local buttonquads = {
-  ul = love.graphics.newQuad( 0,  0, 3, 3, 128, 128),
-   l = love.graphics.newQuad( 0,  3, 3, 1, 128, 128),
-  ll = love.graphics.newQuad( 0, 13, 3, 3, 128, 128),
-   b = love.graphics.newQuad( 3, 13, 1, 3, 128, 128),
-  lr = love.graphics.newQuad(29, 13, 3, 3, 128, 128),
-   r = love.graphics.newQuad(29,  3, 3, 1, 128, 128),
-  ur = love.graphics.newQuad(29,  0, 3, 3, 128, 128),
-   t = love.graphics.newQuad( 3,  0, 1, 3, 128, 128),
-   c = love.graphics.newQuad( 3,  3, 1, 1, 128, 128),
-}
-
 local function handle_input(state, x, y, w, h, label, iconquad, options)
   assert(state.input)
   if imgui.is_mouse_in_rect(state, x, y, w, h) then
@@ -61,7 +49,7 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
-  renderutils.draw_border(state.style.stylesheet, buttonquads, x, y, w, h, 3)
+  renderutils.draw_border(state.style.stylesheet, state.style.quads.button_border, x, y, w, h, 3)
 
   -- Print label
   if not options then options = {} end

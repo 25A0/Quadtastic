@@ -7,12 +7,6 @@ local Tooltip = {}
 
 unpack = unpack or table.unpack
 
-local border_quads  = Renderutils.border_quads(0, 48, 5, 5, 128, 128, 2)
-local tip_quads = {
-  above = love.graphics.newQuad(6, 48, 5, 3, 128, 128),
-  below = love.graphics.newQuad(6, 50, 5, 3, 128, 128),  
-}
-
 local find_tooltip_position = function(gui_state, x, y, w, h, label, options)
   local textlength = Text.min_width(gui_state, label or "Someone forgot to set the tooltip text...")
 
@@ -25,11 +19,11 @@ local find_tooltip_position = function(gui_state, x, y, w, h, label, options)
   if above > below then
     tty = y - (3 + tooltip_height) -- move tooltip above the frame
     tip_y = y - 3
-    orientation = "above"
+    orientation = "downwards"
   else
     tty = y + h + 3 -- move tooltip below the frame
     tip_y = y + h
-    orientation = "below"
+    orientation = "upwards"
   end
 
   -- Change the x position depending on how close we are to the window's border
@@ -77,9 +71,11 @@ local show_tooltip = function(gui_state, x, y, w, h, label, options)
 
     love.graphics.setColor(255, 255, 255, 255)
     -- Draw tooltip border
-    Renderutils.draw_border(gui_state.style.stylesheet, border_quads, ttx, tty, ttw, tth, 2)
+    Renderutils.draw_border(gui_state.style.stylesheet, 
+                            gui_state.style.quads.tooltip.border, 
+                            ttx, tty, ttw, tth, 2)
     -- Draw tooltip tip
-    love.graphics.draw(gui_state.style.stylesheet, tip_quads[orientation], tipx, tipy)
+    love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.tooltip.tip[orientation], tipx, tipy)
     if not options then options = {} end
     if not options.font_color then
       options.font_color = {202, 222, 227}

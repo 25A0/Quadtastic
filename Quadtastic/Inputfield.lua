@@ -10,18 +10,6 @@ local transform = require("Quadtastic/transform")
 -- Cache ibeam cursor
 local i_beam_cursor = love.mouse.getSystemCursor("ibeam")
 
-local quads = {
-  ul = love.graphics.newQuad( 0, 16, 3, 3, 128, 128),
-   l = love.graphics.newQuad( 0, 19, 3, 1, 128, 128),
-  ll = love.graphics.newQuad( 0, 29, 3, 3, 128, 128),
-   b = love.graphics.newQuad( 3, 29, 1, 3, 128, 128),
-  lr = love.graphics.newQuad(29, 29, 3, 3, 128, 128),
-   r = love.graphics.newQuad(29, 19, 3, 1, 128, 128),
-  ur = love.graphics.newQuad(29, 16, 3, 3, 128, 128),
-   t = love.graphics.newQuad( 3, 16, 1, 3, 128, 128),
-   c = love.graphics.newQuad( 3, 19, 1, 1, 128, 128),
-}
-
 local function handle_input(state, x, y, w, h, content, options, text_x)
   assert(state.input)
   -- Track whether the cursor was moved. In that case we will always display it
@@ -146,7 +134,7 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
-  renderutils.draw_border(state.style.stylesheet, quads, x, y, w, h, 3)
+  renderutils.draw_border(state.style.stylesheet, state.style.quads.input_field_border, x, y, w, h, 3)
 
   -- Push state
   love.graphics.push("all")

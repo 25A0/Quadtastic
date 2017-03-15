@@ -23,6 +23,7 @@ local ImageEditor = require("ImageEditor")
 local QuadList = require("QuadList")
 local AppLogic = require("AppLogic")
 local Quadtastic = require("Quadtastic")
+local libquadtastic = require("Quadtastic/libquadtastic")
 
 -- Make the state variables local unless we are in debug mode
 if not _DEBUG then
@@ -64,48 +65,24 @@ function love.load()
 
   local stylesheet = love.graphics.newImage("res/style.png")
 
-  backgroundcanvas = love.graphics.newCanvas(8, 8)
-  do
-    -- Create a canvas with the background texture on it
-    backgroundquad = love.graphics.newQuad(48, 16, 8, 8, 128, 128)
-    backgroundcanvas:setWrap("repeat", "repeat")
-    backgroundcanvas:renderTo(function()
-      love.graphics.draw(stylesheet, backgroundquad)
-    end)
-  end
-
   love.keyboard.setKeyRepeat(true)
   gui_state = imgui.init_state(transform)
   gui_state.style.small_font = smol_font
   gui_state.style.med_font = med_font
   gui_state.style.font = med_font
   gui_state.style.stylesheet = stylesheet
-  gui_state.style.rowbackground = {
-    default = {
-      top    = love.graphics.newQuad(0, 32, 1, 2, 128, 128),
-      center = love.graphics.newQuad(0, 34, 1, 1, 128, 128),
-      bottom = love.graphics.newQuad(0, 46, 1, 2, 128, 128),
-    },
-    hovered = {
-      top    = love.graphics.newQuad(1, 32, 1, 2, 128, 128),
-      center = love.graphics.newQuad(1, 34, 1, 1, 128, 128),
-      bottom = love.graphics.newQuad(1, 46, 1, 2, 128, 128),
-    },
-    selected = {
-      top    = love.graphics.newQuad(2, 32, 1, 2, 128, 128),
-      center = love.graphics.newQuad(2, 34, 1, 1, 128, 128),
-      bottom = love.graphics.newQuad(2, 46, 1, 2, 128, 128),
-    },
-  }
-  gui_state.style.buttonicons = {
-    plus  = love.graphics.newQuad(64, 0, 5, 5, 128, 128),
-    minus = love.graphics.newQuad(69, 0, 5, 5, 128, 128),
-    rename = love.graphics.newQuad(48, 64, 13, 13, 128, 128),
-    delete = love.graphics.newQuad(96, 64, 13, 13, 128, 128),
-    sort = love.graphics.newQuad(112, 64, 13, 13, 128, 128),
-    group = love.graphics.newQuad(96, 48, 13, 13, 128, 128),
-    ungroup = love.graphics.newQuad(112, 48, 13, 13, 128, 128),
-  }
+  gui_state.style.quads = libquadtastic.import_quads(require("Quadtastic/res/style"), 
+    stylesheet:getWidth(), stylesheet:getHeight())
+
+  backgroundcanvas = love.graphics.newCanvas(8, 8)
+  do
+    -- Create a canvas with the background texture on it
+    backgroundcanvas:setWrap("repeat", "repeat")
+    backgroundcanvas:renderTo(function()
+      love.graphics.draw(stylesheet, gui_state.style.quads.background)
+    end)
+  end
+
   gui_state.overlay_canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
 end
 

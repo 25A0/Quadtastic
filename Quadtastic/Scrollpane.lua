@@ -7,21 +7,6 @@ local Scrollpane = {}
 
 local scrollbar_margin = 7
 
-local quads = {
-	up_button =      love.graphics.newQuad(80, 0, 7, 7, 128, 128),
-	down_button =    love.graphics.newQuad(80, 9, 7, 7, 128, 128),
-	left_button =    love.graphics.newQuad(96, 9, 7, 7, 128, 128),
-	right_button =   love.graphics.newQuad(96, 0, 7, 7, 128, 128),
-	top_bar =        love.graphics.newQuad(89, 0, 7, 3, 128, 128),
-	horizontal_bar = love.graphics.newQuad(89, 3, 7, 1, 128, 128),
-	bottom_bar =     love.graphics.newQuad(89, 6, 7, 3, 128, 128),
-	left_bar =       love.graphics.newQuad(106, 0, 2, 7, 128, 128),
-	vertical_bar =   love.graphics.newQuad(108, 0, 1, 7, 128, 128),
-	right_bar =      love.graphics.newQuad(109, 0, 2, 7, 128, 128),
-	background =     love.graphics.newQuad(89, 9, 1, 1, 128, 128),
-	corner =         love.graphics.newQuad(105, 9, 7, 7, 128, 128),
-}
-
 local function handle_input(state, scrollpane_state, w, h)
 	assert(state.input)
 
@@ -225,16 +210,18 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	local has_horizontal = content_w > state.layout.max_w - 
 		(scrollpane_state.had_vertical and scrollbar_margin or 0)
 
+	local quads = state.style.quads.scrollpane
+
 	-- Render the vertical scrollbar if necessary
 	if has_vertical then
 		local height = h
 		if has_horizontal then height = height - scrollbar_margin end
-		love.graphics.draw(state.style.stylesheet, quads.up_button,
+		love.graphics.draw(state.style.stylesheet, quads.buttons.up,
 			               x + w - scrollbar_margin, y)
-		love.graphics.draw(state.style.stylesheet, quads.background,
+		love.graphics.draw(state.style.stylesheet, quads.scrollbar_v.background,
 			               x + w - scrollbar_margin, y + scrollbar_margin,
-			               0, 7, height - 2*scrollbar_margin)
-		love.graphics.draw(state.style.stylesheet, quads.down_button,
+			               0, 1, height - 2*scrollbar_margin)
+		love.graphics.draw(state.style.stylesheet, quads.buttons.down,
 			               x + w - scrollbar_margin, y + height - scrollbar_margin)
 	end
 
@@ -242,19 +229,19 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	if has_horizontal then
 		local width = w
 		if has_vertical then width = width - scrollbar_margin end
-		love.graphics.draw(state.style.stylesheet, quads.left_button,
+		love.graphics.draw(state.style.stylesheet, quads.buttons.left,
 			               x, y + h - scrollbar_margin)
-		love.graphics.draw(state.style.stylesheet, quads.background,
+		love.graphics.draw(state.style.stylesheet, quads.scrollbar_h.background,
 			               x + scrollbar_margin, y + h - scrollbar_margin,
-			               0, width - 2*scrollbar_margin, 7)
-		love.graphics.draw(state.style.stylesheet, quads.right_button,
+			               0, width - 2*scrollbar_margin, 1)
+		love.graphics.draw(state.style.stylesheet, quads.buttons.right,
 			               x + width - scrollbar_margin, y + h - scrollbar_margin)
 	end
 
 	-- Render the little corner if we have both a vertical and horizontal
 	-- scrollbar
 	if has_vertical and has_horizontal then
-		love.graphics.draw(state.style.stylesheet, quads.corner,
+		love.graphics.draw(state.style.stylesheet, quads.buttons.corner,
 			               x + w - scrollbar_margin, y + h - scrollbar_margin)
 	end
 

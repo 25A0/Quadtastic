@@ -5,9 +5,6 @@ local Frame = require("Quadtastic/Frame")
 
 local Window = {}
 
-local bordersize = 7
-local quads = renderutils.border_quads(80, 32, 16, 16, 128, 128, bordersize)
-
 Window.start = function(gui_state, x, y, w, h, options)
 	-- Store the window's bounds in the gui state
 	gui_state.window_bounds = {x = x, y = y, w = w, h = h}
@@ -19,8 +16,11 @@ Window.start = function(gui_state, x, y, w, h, options)
 	end
 
    	local margin = options and options.margin or 4
+	local bordersize = 7
 	if not (options and options.borderless) then
-		Frame.start(gui_state, x, y, w, h, {margin = margin, quads = quads, bordersize = bordersize})
+		Frame.start(gui_state, x, y, w, h,
+			{margin = margin, quads = gui_state.style.quads.window_border, 
+			 bordersize = bordersize})
 	else
     	-- Enclose the window's content in a Layout
     	Layout.start(gui_state, x + margin, y + margin, w - 2*margin, h - 2*margin)

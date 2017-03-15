@@ -3,8 +3,6 @@ local renderutils = require("Quadtastic/Renderutils")
 local Layout = require("Quadtastic/Layout")
 local Frame = {}
 
-local default_quads = renderutils.border_quads(48, 0, 16, 16, 128, 128, 2)
-
 Frame.start = function(state, x, y, w, h, options)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
@@ -14,7 +12,7 @@ Frame.start = function(state, x, y, w, h, options)
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
-  local quads = options and options.quads or default_quads
+  local quads = options and options.quads or state.style.quads.frame_border
   local bordersize = options and options.bordersize or 2
   renderutils.draw_border(state.style.stylesheet, quads, x, y, w, h, bordersize)
 

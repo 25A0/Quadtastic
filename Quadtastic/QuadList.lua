@@ -12,11 +12,11 @@ local function draw_quads(gui_state, state, quads, last_hovered)
   for name,quad in pairs(quads) do
     local background_quads
     if state.selection:is_selected(quad) then
-      background_quads = gui_state.style.rowbackground.selected
+      background_quads = gui_state.style.quads.rowbackground.selected
     elseif last_hovered == quad then
-      background_quads = gui_state.style.rowbackground.hovered
+      background_quads = gui_state.style.quads.rowbackground.hovered
     else
-      background_quads = gui_state.style.rowbackground.default
+      background_quads = gui_state.style.quads.rowbackground.default
     end
 
     love.graphics.setColor(255, 255, 255)

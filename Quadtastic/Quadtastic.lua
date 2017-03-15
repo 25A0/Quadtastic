@@ -486,27 +486,37 @@ Quadtastic.draw = function(app, state, gui_state)
     
           -- Draw button column
           do Layout.start(gui_state)
-            if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.rename) then
+            if Button.draw(gui_state, nil, nil, nil, nil, nil,
+                           gui_state.style.quads.buttons.rename)
+            then
               app.quadtastic.rename(state.selection:get_selection())
             end
             Tooltip.draw(gui_state, "Rename")
             Layout.next(gui_state, "|")
-            if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.delete) then
+            if Button.draw(gui_state, nil, nil, nil, nil, nil,
+                           gui_state.style.quads.buttons.delete)
+            then
               app.quadtastic.remove(state.selection:get_selection())
             end
             Tooltip.draw(gui_state, "Delete selected quad(s)")
             Layout.next(gui_state, "|")
-            if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.sort) then
+            if Button.draw(gui_state, nil, nil, nil, nil, nil,
+                           gui_state.style.quads.buttons.sort)
+            then
               app.quadtastic.sort(state.selection:get_selection())
             end
             Tooltip.draw(gui_state, "Sort unnamed quads from top to bottom, left to right")
             Layout.next(gui_state, "|")
-            if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.group) then
+            if Button.draw(gui_state, nil, nil, nil, nil, nil,
+                           gui_state.style.quads.buttons.group)
+            then
               app.quadtastic.group(state.selection:get_selection())
             end
             Tooltip.draw(gui_state, "Form new group from selected quads")
             Layout.next(gui_state, "|")
-            if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.ungroup) then
+            if Button.draw(gui_state, nil, nil, nil, nil, nil,
+                           gui_state.style.quads.buttons.ungroup)
+            then
               app.quadtastic.ungroup(state.selection:get_selection())
             end
             Tooltip.draw(gui_state, "Break up selected group(s)")
@@ -521,7 +531,7 @@ Quadtastic.draw = function(app, state, gui_state)
     do Layout.start(gui_state) -- Zoom buttons
       do
         local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
-          gui_state.style.buttonicons.plus)
+          gui_state.style.quads.buttons.plus)
         if pressed then
           app.quadtastic.zoom_in()
         end
@@ -530,7 +540,7 @@ Quadtastic.draw = function(app, state, gui_state)
       Layout.next(gui_state, "-")
       do
         local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
-          gui_state.style.buttonicons.minus)
+          gui_state.style.quads.buttons.minus)
         if pressed then
           app.quadtastic.zoom_out()
         end
