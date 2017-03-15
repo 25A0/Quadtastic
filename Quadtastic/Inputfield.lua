@@ -96,7 +96,7 @@ local function handle_input(state, x, y, w, h, content, options, text_x)
   end
 
   -- If the LMB was pressed in the last frame, set the cursor position
-  if state.input.mouse.buttons[1].presses > 0 then
+  if state.input.mouse.buttons[1] and state.input.mouse.buttons[1].presses > 0 then
     local mx = state.input.mouse.buttons[1].at_x
     local my = state.input.mouse.buttons[1].at_y
     -- Set the cursor position
@@ -169,12 +169,22 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
   -- Label position
   local text_x = x + margin_x
 
-  if state and state.input and state.input.mouse.buttons[1] then
-    local mx = state.input.mouse.buttons[1].at_x
-    local my = state.input.mouse.buttons[1].at_y
-    -- This widget has the keyboard focus if the last LMB click was inside this
-    -- widget
-    if imgui.is_mouse_in_rect(state, x, y, w, h, mx, my) then
+  if state and state.input then
+    local has_focus = false
+    -- Check if options force keyboard focus
+    if options and options.forced_keyboard_focus then
+      has_focus = true
+    elseif state.input.mouse.buttons[1] then
+      local mx = state.input.mouse.buttons[1].at_x
+      local my = state.input.mouse.buttons[1].at_y
+      -- This widget has the keyboard focus if the last LMB click was inside this
+      -- widget
+      if imgui.is_mouse_in_rect(state, x, y, w, h, mx, my) then
+        has_focus = true
+      end
+    end
+
+    if has_focus then
       content, text_x = handle_input(state, x, y, w, h, content, options, text_x)
     else
       -- The widget does not have the keyboard focus

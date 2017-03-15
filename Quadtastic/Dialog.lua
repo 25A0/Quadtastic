@@ -59,7 +59,7 @@ function Dialog.query(message, input, buttons)
                    data.message)
         Layout.next(gui_state, "|")
         data.input = InputField.draw(gui_state, nil, nil, 
-                                     gui_state.layout.max_w, nil, data.input)
+                                     gui_state.layout.max_w, nil, data.input, {forced_keyboard_focus = true})
         Layout.next(gui_state, "|")
         do Layout.start(gui_state)
           for _,button in ipairs(data.buttons) do
