@@ -15,6 +15,7 @@ local ImageEditor = require("Quadtastic/ImageEditor")
 local QuadList = require("Quadtastic/QuadList")
 local libquadtastic = require("Quadtastic/libquadtastic")
 local table = require("Quadtastic/tableplus")
+local Selection = require("Quadtastic/Selection")
 
 local lfs = require("lfs")
 
@@ -35,51 +36,8 @@ local Quadtastic = State("quadtastic",
     scrollpane_state = nil,
     quad_scrollpane_state = nil,
     quads = {},
-    selection = {},
+    selection = Selection(),
   })
-
--- -------------------------------------------------------------------------- --
--- Selection handling
--- -------------------------------------------------------------------------- --
-
-Quadtastic.is_selected = function(self, v)
-  return self.selection[v]
-end
-
--- Clear the current selection
-Quadtastic.clear_selection = function(self)
-  self.selection = {}
-end
-
--- Repace the current selection by the given selection
-Quadtastic.set_selection = function(self, quads)
-  Quadtastic.clear_selection(self)
-  Quadtastic.select(self, quads)
-end
-
--- Add the given quads or table of quads to the selection
-Quadtastic.select = function(self, quads)
-  for _, v in ipairs(quads) do
-    self.selection[v] = true
-  end
-end
-
--- Remove the given quads from the selection.
--- If a table of quads is passed, the table and all contained quads will be
--- removed from the selection.
-Quadtastic.deselect = function(self, quads)
-  for _, v in ipairs(quads) do
-    self.selection[v] = nil
-  end
-end
-
-Quadtastic.get_selection = function(self)
-  return table.keys(self.selection)
-end
-
-Quadtastic.count_selection = function(self) return #self.selection end
-
--- -------------------------------------------------------------------------- --
 
 function Quadtastic.reset_view(state)
   state.scrollpane_state = Scrollpane.init_scrollpane_state()
@@ -220,7 +178,7 @@ Quadtastic.transitions = {
     if #quads == 0 then
       return
     else
-      Quadtastic.deselect(data, quads)
+      data.selection:deselect(quads)
       for _,quad in ipairs(quads) do
         local keys = {table.find_key(data.quads, quad)}
         if #keys > 0 then
@@ -392,7 +350,7 @@ Quadtastic.draw = function(app, state, gui_state)
             -- Draw the list of quads
             local clicked, hovered = 
               QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 19,
-                            state.selection, state.hovered)
+                            state.hovered)
             if clicked then
               local new_quads = {clicked}
               -- If shift was pressed, select all quads between the clicked one and
@@ -448,13 +406,13 @@ Quadtastic.draw = function(app, state, gui_state)
                 (imgui.is_key_pressed(gui_state, "lctrl") or
                  imgui.is_key_pressed(gui_state, "rctrl"))
               then
-                if #new_quads == 1 and Quadtastic.is_selected(state, clicked) then
-                  Quadtastic.deselect(state, new_quads)
+                if #new_quads == 1 and state.selection:is_selected(clicked) then
+                  state.selection:deselect(new_quads)
                 else
-                  Quadtastic.select(state, new_quads)
+                  state.selection:select(new_quads)
                 end
               else
-                Quadtastic.set_selection(state, new_quads)
+                state.selection:set_selection(new_quads)
               end
             end
             state.hovered = hovered
@@ -470,22 +428,22 @@ Quadtastic.draw = function(app, state, gui_state)
           -- Draw button column
           do Layout.start(gui_state)
             if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.rename) then
-              app.quadtastic.rename(Quadtastic.get_selection(state))
+              app.quadtastic.rename(state.selection:get_selection())
             end
             Tooltip.draw(gui_state, "Rename")
             Layout.next(gui_state, "|")
             if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.delete) then
-              app.quadtastic.remove(Quadtastic.get_selection(state))
+              app.quadtastic.remove(state.selection:get_selection())
             end
             Tooltip.draw(gui_state, "Delete selected quad(s)")
             Layout.next(gui_state, "|")
             if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.sort) then
-              app.quadtastic.sort(Quadtastic.get_selection(state))
+              app.quadtastic.sort(state.selection:get_selection())
             end
             Tooltip.draw(gui_state, "Sort unnamed quads from top to bottom, left to right")
             Layout.next(gui_state, "|")
             if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.group) then
-              app.quadtastic.group(Quadtastic.get_selection(state))
+              app.quadtastic.group(state.selection:get_selection())
             end
             Tooltip.draw(gui_state, "Group selected quads")
             Layout.next(gui_state, "|")

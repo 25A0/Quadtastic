@@ -7,11 +7,11 @@ local libquadtastic = require("Quadtastic/libquadtastic")
 
 local QuadList = {}
 
-local function draw_quads(gui_state, quads, active, last_hovered)
+local function draw_quads(gui_state, state, quads, last_hovered)
   local clicked, hovered
   for name,quad in pairs(quads) do
     local background_quads
-    if active[quad] then
+    if state.selection:is_selected(quad) then
       background_quads = gui_state.style.rowbackground.selected
     elseif last_hovered == quad then
       background_quads = gui_state.style.rowbackground.hovered
@@ -58,7 +58,7 @@ local function draw_quads(gui_state, quads, active, last_hovered)
     if not libquadtastic.is_quad(quad) then
       -- Use translate to add some indentation
       love.graphics.translate(10, 0)
-      local rec_clicked, rec_hovered = draw_quads(gui_state, quad, active, last_hovered)
+      local rec_clicked, rec_hovered = draw_quads(gui_state, state, quad, last_hovered)
       clicked = clicked or rec_clicked
       hovered = hovered or rec_hovered
       love.graphics.translate(-10, 0)
@@ -70,7 +70,7 @@ end
 -- Draw the quads in the current state.
 -- active is a table that contains for each quad whether it is active.
 -- hovered is nil, or a single quad that the mouse hovers over.
-QuadList.draw = function(gui_state, state, x, y, w, h, active, last_hovered)
+QuadList.draw = function(gui_state, state, x, y, w, h, last_hovered)
   -- The quad that the user clicked on
   local clicked = nil
   local hovered = nil
@@ -78,7 +78,7 @@ QuadList.draw = function(gui_state, state, x, y, w, h, active, last_hovered)
     imgui.push_style(gui_state, "font", gui_state.style.small_font)
     do state.quad_scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, state.quad_scrollpane_state)
       do Layout.start(gui_state, nil, nil, nil, nil, {noscissor = true})
-        clicked, hovered = draw_quads(gui_state, state.quads, active, last_hovered)
+        clicked, hovered = draw_quads(gui_state, state, state.quads, last_hovered)
       end Layout.finish(gui_state, "|")
       -- Restrict the viewport's position to the visible content as good as
       -- possible
