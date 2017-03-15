@@ -225,6 +225,65 @@ Quadtastic.transitions = {
     table.insert(shared_parent, new_group)
   end,
 
+  ungroup = function(app, data, quads)
+    if #quads == 0 then return end
+    if #quads > 1 then
+      Dialog.show_dialog("You can only break up one group at a time")
+      return
+    end
+    if libquadtastic.is_quad(quads[1]) then
+      return
+    end
+
+    local group = quads[1]
+    local keys = {table.find_key(data.quads, group)}
+    -- Remove the last element of the key list to get the parent's keys
+    local group_key = table.remove(keys)
+    local parent_keys = keys
+    local parent = table.get(data.quads, unpack(parent_keys))
+
+    -- Check that we can break up this group by making sure that the parent
+    -- element and the group don't have any conflicting keys
+    local ignore_numeric_clash = false
+    for k,v in pairs(group) do
+      if parent[k] and k ~= group_key then
+        local parent_name
+        for _,v in ipairs(parent_keys) do
+          parent_name = (parent_name and (parent_name .. ".") or "") .. tostring(v)
+        end
+        if type(k) == "number" and not ignore_numeric_clash then
+          local ret = Dialog.show_dialog(string.format([[
+Breaking up this group will change some numeric indices of the 
+elements in that group. In particular, the index %d already exists%s.
+Proceed anyways?]],
+            k, (parent_name and " in group "..parent_name) or ""),
+            {"Yes", "No"})
+          if ret == "Yes" then
+            ignore_numeric_clash = true
+          else
+            return
+          end
+        else
+          Dialog.show_dialog(string.format([[
+This group cannot be broken up since there is already an element 
+called '%s'%s.]],
+            k, (parent_name and " in group "..parent_name) or ""))
+          return
+        end
+      end
+    end
+
+    -- Remove group from parent
+    parent[group_key] = nil
+    for k,v in pairs(group) do
+      if type(k) == "number" then
+        table.insert(parent, v)
+      else
+        parent[k] = v
+      end
+    end
+  end,
+
   zoom_in = function(app, data)
     data.display.zoom = math.min(12, data.display.zoom + 1)
   end,
@@ -445,10 +504,12 @@ Quadtastic.draw = function(app, state, gui_state)
             if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.group) then
               app.quadtastic.group(state.selection:get_selection())
             end
-            Tooltip.draw(gui_state, "Group selected quads")
+            Tooltip.draw(gui_state, "Form new group from selected quads")
             Layout.next(gui_state, "|")
-            Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.ungroup)
-            Tooltip.draw(gui_state, "Ungroup selected quads")
+            if Button.draw(gui_state, nil, nil, nil, nil, nil, gui_state.style.buttonicons.ungroup) then
+              app.quadtastic.ungroup(state.selection:get_selection())
+            end
+            Tooltip.draw(gui_state, "Break up selected group(s)")
           end Layout.finish(gui_state, "|")
         end Layout.finish(gui_state, "-")
       end Layout.finish(gui_state, "|")
