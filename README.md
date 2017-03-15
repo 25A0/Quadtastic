@@ -62,7 +62,7 @@ its rgb value.
  - [x] Detect and import existing quad definitions
  - [x] Group quads
  - [ ] Highlight selected and hovered quads
- - [ ] Display name of quads in ImageEditor
+ - [x] Display name of quads in ImageEditor
  - [ ] Use dot notation in quad names to move them to quad groups
  - [ ] Detect when an image changed on disk
  - [ ] Make Load button glow when file changed on disk

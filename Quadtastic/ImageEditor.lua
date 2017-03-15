@@ -1,9 +1,11 @@
 local Scrollpane = require("Quadtastic/Scrollpane")
 local libquadtastic = require("Quadtastic/libquadtastic")
+local imgui = require("Quadtastic/imgui")
+local Text = require("Quadtastic/Text")
 
 local ImageEditor = {}
 
-local function show_quad(state, quad)
+local function show_quad(gui_state, state, quad, quadname)
   if libquadtastic.is_quad(quad) then
     love.graphics.setColor(255, 255, 255, 255)
     -- We'll draw the quads differently if the viewport is zoomed out
@@ -22,10 +24,25 @@ local function show_quad(state, quad)
       love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
       love.graphics.pop()
     end
+    -- If the mouse is inside that quad, display its name
+    if gui_state.input and quadname then
+      if imgui.is_mouse_in_rect(gui_state, quad.x, quad.y, quad.w, quad.h) then
+        love.graphics.push("all")
+        love.graphics.scale(1/state.display.zoom, 1/state.display.zoom)
+        local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
+        local x, y = gui_state.transform:unproject(mx + 10, my + 10)
+        Text.draw(gui_state, x, y, nil, nil, quadname)
+        love.graphics.pop()
+
+        -- Set this quad as the hovered quad in the application state
+        state.hovered = quad
+      end
+    end
   else
     -- If it's not a quad then it's a list of quads
     for k,v in pairs(quad) do
-      show_quad(state, v)
+      local name = quadname and quadname .. "." .. tostring(k) or tostring(k)
+      show_quad(gui_state, state, v, name)
     end
   end
 end
@@ -82,7 +99,7 @@ local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
       then
         local rect = get_dragged_rect(gui_state, scrollpane_state)
         if rect then
-          show_quad(state, rect)
+          show_quad(gui_state, state, rect)
         end
       end
     end
@@ -122,8 +139,8 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
     end
 
     -- Draw the outlines of all quads
-    for _, quad in pairs(state.quads) do
-      show_quad(state, quad)
+    for name, quad in pairs(state.quads) do
+      show_quad(gui_state, state, quad, tostring(name))
     end
 
     local content_w = img_w * state.display.zoom
