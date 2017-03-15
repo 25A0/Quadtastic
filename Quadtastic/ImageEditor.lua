@@ -18,6 +18,7 @@ local function show_quad(gui_state, state, quad, quadname)
       end
     else
       love.graphics.push("all")
+      love.graphics.setLineStyle("rough")
       love.graphics.setLineWidth(1/state.display.zoom)
       love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
       love.graphics.pop()
