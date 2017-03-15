@@ -56,11 +56,11 @@ its rgb value.
  - [x] Display the image
  - [x] zoom and move the image around
  - [x] Define quads
- - [ ] Name quads
- - [ ] Delete and modify existing quads
- - [ ] Export defined quads as lua code
- - [ ] Detect and import existing quad definitions
- - [ ] Group quads
+ - [x] Name quads
+ - [x] Delete and modify existing quads
+ - [x] Export defined quads as lua code
+ - [x] Detect and import existing quad definitions
+ - [x] Group quads
  - [ ] >>>>>>> TURBO-WorkflOw >>>>>
 	 - [ ] Automatically reload image when it changes on disk
 	 - [ ] Automatically export new quad file whenever quads are changed
