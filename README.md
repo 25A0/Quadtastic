@@ -64,10 +64,17 @@ its rgb value.
  - [x] Highlight selected and hovered quads
  - [x] Display name of quads in ImageEditor
  - [ ] Use dot notation in quad names to move them to quad groups
+ - [ ] Drag and drop quads in the quad list to form groups
  - [ ] Detect when an image changed on disk
  - [ ] Make Load button glow when file changed on disk
  - [ ] Make Export button glow when quads have changed since last export
  - [ ] Add text area that wraps at layout boundary automatically
+ - [ ] Outline quads with a color that maximizes contrast (i.e. white for darker
+       areas, black for brighter areas). The most efficient way to do this is
+       probably by creating a canvas with the image's size that is black in all
+       bright areas of the canvas, and white in all dark areas. When we then
+       draw the the outline, we use a shader that samples the pre-processed
+       image. The outline uses the color of the pixel that is being outlined.
  - [ ] Add toolbar with tools:
     - [ ] The Create tool to create new quads
     - [ ] The Select tool to select, move and resize quads
