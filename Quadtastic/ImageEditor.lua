@@ -7,6 +7,21 @@ local ImageEditor = {}
 
 local function show_quad(gui_state, state, quad, quadname)
   if libquadtastic.is_quad(quad) then
+    -- If the mouse is inside that quad, display its name
+    if gui_state.input and quadname and not state.hovered then
+      if imgui.is_mouse_in_rect(gui_state, quad.x, quad.y, quad.w, quad.h) then
+        love.graphics.push("all")
+        love.graphics.scale(1/state.display.zoom, 1/state.display.zoom)
+        local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
+        local x, y = gui_state.transform:unproject(mx + 10, my + 10)
+        Text.draw(gui_state, x, y, nil, nil, quadname)
+        love.graphics.pop()
+
+        -- Set this quad as the hovered quad in the application state
+        state.hovered = quad
+      end
+    end
+
     love.graphics.setColor(255, 255, 255, 255)
     -- We'll draw the quads differently if the viewport is zoomed out
     -- all the way
@@ -70,20 +85,6 @@ local function show_quad(gui_state, state, quad, quadname)
         love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
       end
       love.graphics.pop()
-    end
-    -- If the mouse is inside that quad, display its name
-    if gui_state.input and quadname then
-      if imgui.is_mouse_in_rect(gui_state, quad.x, quad.y, quad.w, quad.h) then
-        love.graphics.push("all")
-        love.graphics.scale(1/state.display.zoom, 1/state.display.zoom)
-        local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
-        local x, y = gui_state.transform:unproject(mx + 10, my + 10)
-        Text.draw(gui_state, x, y, nil, nil, quadname)
-        love.graphics.pop()
-
-        -- Set this quad as the hovered quad in the application state
-        state.hovered = quad
-      end
     end
   else
     -- If it's not a quad then it's a list of quads
