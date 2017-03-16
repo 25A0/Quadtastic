@@ -296,11 +296,44 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		if has_vertical then width = width - scrollbar_margin end
 		love.graphics.draw(state.style.stylesheet, quads.buttons.left,
 			               x, y + h - scrollbar_margin)
+		love.graphics.draw(state.style.stylesheet, quads.buttons.right,
+			               x + width - scrollbar_margin, y + h - scrollbar_margin)
+
+		-- scrollbar
 		love.graphics.draw(state.style.stylesheet, quads.scrollbar_h.background,
 			               x + scrollbar_margin, y + h - scrollbar_margin,
 			               0, width - 2*scrollbar_margin, 1)
-		love.graphics.draw(state.style.stylesheet, quads.buttons.right,
-			               x + width - scrollbar_margin, y + h - scrollbar_margin)
+
+		-- The area in which the scrollbar can be moved around
+		local sb_area = width - 2*scrollbar_margin - 2
+		-- The maximum scrollbar width needs to leave room for the left and
+		-- right sprite, as well as a one pixel margin to either side
+		local max_sb_width = sb_area -
+		                     state.style.raw_quads.scrollpane.scrollbar_h.left.w -
+		                     state.style.raw_quads.scrollpane.scrollbar_h.right.w
+		local sb_width = math.floor((inner_w / content_w) * max_sb_width)
+		sb_width = math.max(1, sb_width)
+
+		-- Relative viewport position: 0 when the viewport shows the very
+		-- beginning of the content, 1 when the viewport shows the very end of
+		-- the content
+		local rel_vp_pos = scrollpane_state.x / (content_w - inner_w)
+		-- crop to [0, 1]
+		rel_vp_pos = math.min(1, math.max(0, rel_vp_pos))
+
+		local total_sb_width = sb_width + 
+		    state.style.raw_quads.scrollpane.scrollbar_h.left.w +
+		    state.style.raw_quads.scrollpane.scrollbar_h.right.w
+
+		local sb_x = scrollbar_margin + 1 + rel_vp_pos * (sb_area - total_sb_width)
+		love.graphics.draw(state.style.stylesheet, quads.scrollbar_h.left,
+			               sb_x, y + h - scrollbar_margin)
+		sb_x = sb_x + state.style.raw_quads.scrollpane.scrollbar_h.left.w
+		love.graphics.draw(state.style.stylesheet, quads.scrollbar_h.center,
+			               sb_x, y + h - scrollbar_margin, 0, sb_width, 1)
+		sb_x = sb_x + sb_width
+		love.graphics.draw(state.style.stylesheet, quads.scrollbar_h.right,
+			               sb_x, y + h - scrollbar_margin)
 	end
 
 	-- Render the little corner if we have both a vertical and horizontal
