@@ -258,6 +258,15 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 			               x + w - scrollbar_margin, y + scrollbar_margin,
 			               0, 1, height - 2*scrollbar_margin)
 
+		-- we have to take cases into account where the viewport can move beyond
+		-- the content
+		local total_content_h = content_h
+		if scrollpane_state.y < 0 then 
+			total_content_h = total_content_h + math.abs(scrollpane_state.y)
+		elseif scrollpane_state.y > content_h - inner_h then
+			total_content_h = total_content_h + scrollpane_state.y - (content_h - inner_h)
+		end
+
 		-- The area in which the scrollbar can be moved around
 		local sb_area = height - 2*scrollbar_margin - 2
 		-- The maximum scrollbar height needs to leave room for the top and
@@ -265,13 +274,13 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		local max_sb_height = sb_area -
 		                      state.style.raw_quads.scrollpane.scrollbar_v.bottom.h -
 		                      state.style.raw_quads.scrollpane.scrollbar_v.top.h
-		local sb_height = math.floor((inner_h / content_h) * max_sb_height)
+		local sb_height = math.floor((inner_h / total_content_h) * max_sb_height)
 		sb_height = math.max(1, sb_height)
 
 		-- Relative viewport position: 0 when the viewport shows the very
 		-- beginning of the content, 1 when the viewport shows the very end of
 		-- the content
-		local rel_vp_pos = scrollpane_state.y / (content_h - inner_h)
+		local rel_vp_pos = scrollpane_state.y / (total_content_h - inner_h)
 		-- crop to [0, 1]
 		rel_vp_pos = math.min(1, math.max(0, rel_vp_pos))
 
@@ -304,6 +313,15 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 			               x + scrollbar_margin, y + h - scrollbar_margin,
 			               0, width - 2*scrollbar_margin, 1)
 
+		-- we have to take cases into account where the viewport can move beyond
+		-- the content
+		local total_content_w = content_w
+		if scrollpane_state.x < 0 then 
+			total_content_w = total_content_w + math.abs(scrollpane_state.x)
+		elseif scrollpane_state.x > content_w - inner_w then
+			total_content_w = total_content_w + scrollpane_state.x - (content_w - inner_w)
+		end
+
 		-- The area in which the scrollbar can be moved around
 		local sb_area = width - 2*scrollbar_margin - 2
 		-- The maximum scrollbar width needs to leave room for the left and
@@ -311,13 +329,13 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		local max_sb_width = sb_area -
 		                     state.style.raw_quads.scrollpane.scrollbar_h.left.w -
 		                     state.style.raw_quads.scrollpane.scrollbar_h.right.w
-		local sb_width = math.floor((inner_w / content_w) * max_sb_width)
+		local sb_width = math.floor((inner_w / total_content_w) * max_sb_width)
 		sb_width = math.max(1, sb_width)
 
 		-- Relative viewport position: 0 when the viewport shows the very
 		-- beginning of the content, 1 when the viewport shows the very end of
 		-- the content
-		local rel_vp_pos = scrollpane_state.x / (content_w - inner_w)
+		local rel_vp_pos = scrollpane_state.x / (total_content_w - inner_w)
 		-- crop to [0, 1]
 		rel_vp_pos = math.min(1, math.max(0, rel_vp_pos))
 
