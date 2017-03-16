@@ -71,7 +71,8 @@ function love.load()
   gui_state.style.med_font = med_font
   gui_state.style.font = med_font
   gui_state.style.stylesheet = stylesheet
-  gui_state.style.quads = libquadtastic.import_quads(require("Quadtastic/res/style"), 
+  gui_state.style.raw_quads = require("Quadtastic/res/style")
+  gui_state.style.quads = libquadtastic.import_quads(gui_state.style.raw_quads, 
     stylesheet:getWidth(), stylesheet:getHeight())
 
   backgroundcanvas = love.graphics.newCanvas(8, 8)
