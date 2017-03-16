@@ -66,7 +66,7 @@ its rgb value.
  - [ ] Use dot notation in quad names to move them to quad groups
  - [ ] Scroll quad list viewport to hovered quad
  - [x] Scroll image editor viewport to clicked quad
- - [ ] Fix scroll bars not displaying in image editor
+ - [x] Fix scroll bars not displaying in image editor
  - [ ] Implement scroll bars
  - [ ] Drag and drop quads in the quad list to form groups
  - [ ] Detect when an image changed on disk

@@ -169,6 +169,7 @@ local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
 end
 
 ImageEditor.draw = function(gui_state, state, x, y, w, h)
+  local content_w, content_h
   do state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
     nil, state.scrollpane_state
   )
@@ -191,8 +192,8 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
       show_quad(gui_state, state, quad, tostring(name))
     end
 
-    local content_w = img_w * state.display.zoom
-    local content_h = img_h * state.display.zoom
+    content_w = img_w * state.display.zoom
+    content_h = img_h * state.display.zoom
   end Scrollpane.finish(gui_state, state.scrollpane_state, content_w, content_h)
 end
 
