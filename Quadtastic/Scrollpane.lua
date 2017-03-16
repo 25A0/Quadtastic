@@ -233,10 +233,13 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	local w = state.layout.max_w
 	local h = state.layout.max_h
 
-	local has_vertical = content_h > state.layout.max_h - 
-		(scrollpane_state.had_horizontal and scrollbar_margin or 0)
-	local has_horizontal = content_w > state.layout.max_w - 
-		(scrollpane_state.had_vertical and scrollbar_margin or 0)
+	local inner_w = state.layout.max_w - (scrollpane_state.had_vertical and 
+		                                  scrollbar_margin or 0)
+	local inner_h = state.layout.max_h - (scrollpane_state.had_horizontal and 
+		                                  scrollbar_margin or 0)
+
+	local has_vertical = content_h > inner_h
+	local has_horizontal = content_w > inner_w
 
 	local quads = state.style.quads.scrollpane
 
@@ -244,13 +247,47 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	if has_vertical then
 		local height = h
 		if has_horizontal then height = height - scrollbar_margin end
+		-- buttons
 		love.graphics.draw(state.style.stylesheet, quads.buttons.up,
 			               x + w - scrollbar_margin, y)
+		love.graphics.draw(state.style.stylesheet, quads.buttons.down,
+			               x + w - scrollbar_margin, y + height - scrollbar_margin)
+
+		-- scrollbar
 		love.graphics.draw(state.style.stylesheet, quads.scrollbar_v.background,
 			               x + w - scrollbar_margin, y + scrollbar_margin,
 			               0, 1, height - 2*scrollbar_margin)
-		love.graphics.draw(state.style.stylesheet, quads.buttons.down,
-			               x + w - scrollbar_margin, y + height - scrollbar_margin)
+
+		-- The area in which the scrollbar can be moved around
+		local sb_area = height - 2*scrollbar_margin - 2
+		-- The maximum scrollbar height needs to leave room for the top and
+		-- bottom sprite, as well as a one pixel margin to either side
+		local max_sb_height = sb_area -
+		                      state.style.raw_quads.scrollpane.scrollbar_v.bottom.h -
+		                      state.style.raw_quads.scrollpane.scrollbar_v.top.h
+		local sb_height = math.floor((inner_h / content_h) * max_sb_height)
+		sb_height = math.max(1, sb_height)
+
+		-- Relative viewport position: 0 when the viewport shows the very
+		-- beginning of the content, 1 when the viewport shows the very end of
+		-- the content
+		local rel_vp_pos = scrollpane_state.y / (content_h - inner_h)
+		-- crop to [0, 1]
+		rel_vp_pos = math.min(1, math.max(0, rel_vp_pos))
+
+		local total_sb_height = sb_height + 
+		    state.style.raw_quads.scrollpane.scrollbar_v.bottom.h +
+		    state.style.raw_quads.scrollpane.scrollbar_v.top.h
+
+		local sb_y = scrollbar_margin + 1 + rel_vp_pos * (sb_area - total_sb_height)
+		love.graphics.draw(state.style.stylesheet, quads.scrollbar_v.top,
+			               x + w - scrollbar_margin, sb_y)
+		sb_y = sb_y + state.style.raw_quads.scrollpane.scrollbar_v.top.h
+		love.graphics.draw(state.style.stylesheet, quads.scrollbar_v.center,
+			               x + w - scrollbar_margin, sb_y, 0, 1, sb_height)
+		sb_y = sb_y + sb_height
+		love.graphics.draw(state.style.stylesheet, quads.scrollbar_v.bottom,
+			               x + w - scrollbar_margin, sb_y)
 	end
 
 	-- Render the horizontal scrollbar if necessary
