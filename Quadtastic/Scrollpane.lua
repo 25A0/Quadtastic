@@ -187,6 +187,13 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 	local inner_h = h
 	if scrollpane_state.had_horizontal then inner_h = inner_h - scrollbar_margin end
 
+	-- The scrollpane's content will not see any input unless the mouse is in
+	-- the scrollpane's area
+	scrollpane_state.covered_input = not imgui.is_mouse_in_rect(state, 0, 0, inner_w, inner_h)
+	if scrollpane_state.covered_input then
+		imgui.cover_input(state)
+	end
+
 	-- Start a layout that encloses the viewport's content
 	Layout.start(state, 0, 0, inner_w, inner_h)
 
@@ -216,6 +223,10 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 
 	-- Finish the layout that encloses the viewport's content
 	Layout.finish(state)
+
+	if scrollpane_state.covered_input then
+		imgui.uncover_input(state)
+	end
 
 	local x = state.layout.next_x
 	local y = state.layout.next_y
