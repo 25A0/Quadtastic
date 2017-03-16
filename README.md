@@ -64,6 +64,8 @@ its rgb value.
  - [x] Highlight selected and hovered quads
  - [x] Display name of quads in ImageEditor
  - [ ] Use dot notation in quad names to move them to quad groups
+ - [ ] Scroll quad list viewport to hovered quad
+ - [x] Scroll image editor viewport to clicked quad
  - [ ] Drag and drop quads in the quad list to form groups
  - [ ] Detect when an image changed on disk
  - [ ] Make Load button glow when file changed on disk

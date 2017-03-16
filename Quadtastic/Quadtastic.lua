@@ -474,6 +474,21 @@ Quadtastic.draw = function(app, state, gui_state)
                 state.selection:set_selection(new_quads)
               end
             end
+
+            -- Move viewport so that clicked quad is visible
+            if clicked and libquadtastic.is_quad(clicked) then
+              local bounds = {}
+              -- We need to transform the position and dimension of the clicked
+              -- quad, since the scrollpane doesn't handle the zoom.
+              bounds.x = clicked.x * state.display.zoom
+              bounds.y = clicked.y * state.display.zoom
+              bounds.w = clicked.w * state.display.zoom
+              bounds.h = clicked.h * state.display.zoom
+
+              -- Move the image editor's viewport to the focused quad
+              Scrollpane.set_focus(state.scrollpane_state, bounds)
+            end
+
             state.hovered = hovered
 
             Layout.next(gui_state, "|")

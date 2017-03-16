@@ -78,7 +78,7 @@ local apply_focus = function(gui_state, scrollpane_state)
 	local x, y = scrollpane_state.x + dx, scrollpane_state.y + dy
 
 	-- In immediate mode both the current and the target location are changed
-	if bounds.mode == "immediate" then
+	if bounds.mode and bounds.mode == "immediate" then
 		move_viewport_within_bounds(scrollpane_state, x, y)
 	end
 	-- Otherwise only the target position is changed
@@ -99,6 +99,23 @@ Scrollpane.set_focus = function(scrollpane_state, bounds, mode)
 		h = bounds.h,
 		mode = mode,
 	}
+end
+
+Scrollpane.is_in_viewport = function(scrollpane_state, bounds)
+	return Rectangle.contains(scrollpane_state, bounds.x, bounds.y, bounds.w, bounds.h)
+end
+
+Scrollpane.move_into_view = function(scrollpane_state, bounds, mode)
+	if Scrollpane.is_in_viewport(scrollpane_state, bounds) then return
+	else
+		scrollpane_state.focus = {
+			x = bounds.x,
+			y = bounds.y,
+			w = bounds.w,
+			h = bounds.h,
+			mode = mode,
+		}
+	end
 end
 
 Scrollpane.is_mouse_inside_widget = function(gui_state, scrollpane_state, mx, my)
