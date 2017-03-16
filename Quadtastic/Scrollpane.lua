@@ -243,6 +243,17 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 
 	local quads = state.style.quads.scrollpane
 
+	local function viewport_from_scrollbar(sb_pos, sb_area, total_sb_size, 
+										   total_content_size, inner_size)
+		-- Limit it to the same bounds that we used when drawing it
+		sb_pos = math.max(0, math.min(sb_area - total_sb_size, sb_pos))
+		-- Reverse all calculations that we did to draw the scrollbar
+		-- in order to get the new viewport position
+		local new_rel_vp_pos = sb_pos / (sb_area - total_sb_size)
+		local new_vp_pos = new_rel_vp_pos * (total_content_size - inner_size)
+		return new_vp_pos
+	end
+
 	-- Render the vertical scrollbar if necessary
 	if has_vertical then
 		local height = h
@@ -288,7 +299,8 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		    state.style.raw_quads.scrollpane.scrollbar_v.bottom.h +
 		    state.style.raw_quads.scrollpane.scrollbar_v.top.h
 
-		local sb_y = scrollbar_margin + 1 + rel_vp_pos * (sb_area - total_sb_height)
+		local sb_start = rel_vp_pos * (sb_area - total_sb_height)
+		local sb_y = scrollbar_margin + 1 + sb_start
 		love.graphics.draw(state.style.stylesheet, quads.scrollbar_v.top,
 			               x + w - scrollbar_margin, sb_y)
 		sb_y = sb_y + state.style.raw_quads.scrollpane.scrollbar_v.top.h
@@ -297,6 +309,55 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		sb_y = sb_y + sb_height
 		love.graphics.draw(state.style.stylesheet, quads.scrollbar_v.bottom,
 			               x + w - scrollbar_margin, sb_y)
+		local sb_end = sb_y + state.style.raw_quads.scrollpane.scrollbar_v.bottom.h
+
+		-- Move viewport when mouse was dragged
+		if state and state.input and state.input.mouse.buttons[1] then
+			-- Update drag state
+			if state.input.mouse.buttons[1].presses >= 1 and
+				state.input.mouse.buttons[1].pressed and
+				imgui.is_mouse_in_rect(state, x + w - scrollbar_margin, sb_start + scrollbar_margin + 1,
+			    	                   scrollbar_margin, sb_end - (sb_start + scrollbar_margin + 1))
+			then
+				scrollpane_state.is_dragging_vertical = true
+			elseif state.input.mouse.buttons[1].releases > 1 or
+				   not state.input.mouse.buttons[1].pressed then
+				scrollpane_state.is_dragging_vertical = false
+			end
+
+			if scrollpane_state.is_dragging_vertical then
+				-- Calculate the desired viewport position from the moved scrollbar
+				local _, dy = state.transform:unproject_dimensions(0, state.input.mouse.dy)
+				-- local dy = state.input.mouse.dy
+				
+				if dy ~= 0 then
+					-- Calculate the scrollbar position with this delta applied
+					local new_sb = sb_start + dy
+					local new_vp_y = viewport_from_scrollbar(
+						new_sb, sb_area, total_sb_height, total_content_h, inner_h)
+					-- Move viewport to that position
+					move_viewport_within_bounds(scrollpane_state, 0, new_vp_y - scrollpane_state.y)
+					scrollpane_state.ty = scrollpane_state.y
+				end
+			elseif state.input.mouse.buttons[1].presses >= 1 and
+				imgui.is_mouse_in_rect(state,
+					                   x + w - scrollbar_margin, scrollbar_margin + 1,
+			    	                   scrollbar_margin, sb_area)
+			then
+				-- Move viewport to click position. The scrollbar should be
+				-- centered around the click position.
+				local _, y = state.transform:unproject(0, state.input.mouse.y)
+				-- Subtract margin and offset
+				y = y - scrollbar_margin - 1
+				-- Subtract half of the scrollbar to center scrollbar around mouse
+				y = y - .5 * total_sb_height
+				local new_vp_y = viewport_from_scrollbar(
+					y, sb_area, total_sb_height, total_content_h, inner_h)
+            	-- Move viewport to that position
+            	move_viewport_within_bounds(scrollpane_state, 0, new_vp_y - scrollpane_state.y)
+            	scrollpane_state.ty = scrollpane_state.y
+			end
+		end
 	end
 
 	-- Render the horizontal scrollbar if necessary
@@ -343,7 +404,8 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		    state.style.raw_quads.scrollpane.scrollbar_h.left.w +
 		    state.style.raw_quads.scrollpane.scrollbar_h.right.w
 
-		local sb_x = scrollbar_margin + 1 + rel_vp_pos * (sb_area - total_sb_width)
+	    local sb_start = rel_vp_pos * (sb_area - total_sb_width)
+		local sb_x = scrollbar_margin + 1 + sb_start
 		love.graphics.draw(state.style.stylesheet, quads.scrollbar_h.left,
 			               sb_x, y + h - scrollbar_margin)
 		sb_x = sb_x + state.style.raw_quads.scrollpane.scrollbar_h.left.w
@@ -352,6 +414,54 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		sb_x = sb_x + sb_width
 		love.graphics.draw(state.style.stylesheet, quads.scrollbar_h.right,
 			               sb_x, y + h - scrollbar_margin)
+		local sb_end = sb_x + state.style.raw_quads.scrollpane.scrollbar_h.right.w
+
+		-- Move viewport when mouse was dragged
+		if state and state.input and state.input.mouse.buttons[1] then
+			-- Update drag state
+			if state.input.mouse.buttons[1].presses >= 1 and
+				state.input.mouse.buttons[1].pressed and
+				imgui.is_mouse_in_rect(state, sb_start + scrollbar_margin + 1, y + h - scrollbar_margin, 
+			    	                   sb_end - (sb_start + scrollbar_margin + 1), scrollbar_margin)
+			then
+				scrollpane_state.is_dragging_horizontal = true
+			elseif state.input.mouse.buttons[1].releases > 1 or
+				   not state.input.mouse.buttons[1].pressed then
+				scrollpane_state.is_dragging_horizontal = false
+			end
+
+			if scrollpane_state.is_dragging_horizontal then
+				-- Calculate the desired viewport position from the moved scrollbar
+				local dx, _ = state.transform:unproject_dimensions(state.input.mouse.dx, 0)
+				
+				if dx ~= 0 then
+					-- Calculate the scrollbar position with this delta applied
+					local new_sb = sb_start + dx
+					local new_vp_x = viewport_from_scrollbar(
+						new_sb, sb_area, total_sb_width, total_content_w, inner_w)
+					-- Move viewport to that position
+					move_viewport_within_bounds(scrollpane_state, new_vp_x - scrollpane_state.x, 0)
+					scrollpane_state.tx = scrollpane_state.x
+				end
+			elseif state.input.mouse.buttons[1].presses >= 1 and
+				imgui.is_mouse_in_rect(state,
+					                   scrollbar_margin + 1, y + h - scrollbar_margin,
+			    	                   sb_area, scrollbar_margin)
+			then
+				-- Move viewport to click position. The scrollbar should be
+				-- centered around the click position.
+				local x, _ = state.transform:unproject(state.input.mouse.x, 0)
+				-- Subtract margin and offset
+				x = x - scrollbar_margin - 1
+				-- Subtract half of the scrollbar to center scrollbar around mouse
+				x = x - .5 * total_sb_width
+				local new_vp_x = viewport_from_scrollbar(
+					x, sb_area, total_sb_width, total_content_w, inner_w)
+            	-- Move viewport to that position
+            	move_viewport_within_bounds(scrollpane_state, new_vp_x - scrollpane_state.x, 0)
+            	scrollpane_state.tx = scrollpane_state.x
+			end
+		end
 	end
 
 	-- Render the little corner if we have both a vertical and horizontal
