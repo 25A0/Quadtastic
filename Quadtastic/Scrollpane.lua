@@ -27,10 +27,10 @@ local function handle_input(state, scrollpane_state, w, h)
 	end
 end
 
--- Moves the viewport's focus as far to the given coordinates as possible
+-- Moves the viewport's focus by the given delta as far as possible
 -- without violating the bounds set in the scrollpane state
-local move_viewport_within_bounds = function(sp_state, x, y)
-	local new_x, new_y = x, y
+local move_viewport_within_bounds = function(sp_state, dx, dy)
+	local new_x, new_y = sp_state.x + dx, sp_state.y + dy
 
 	if sp_state.min_x then 
 		new_x = math.max(sp_state.min_x, new_x)
@@ -79,7 +79,7 @@ local apply_focus = function(gui_state, scrollpane_state)
 
 	-- In immediate mode both the current and the target location are changed
 	if bounds.mode and bounds.mode == "immediate" then
-		move_viewport_within_bounds(scrollpane_state, x, y)
+		move_viewport_within_bounds(scrollpane_state, dx, dy)
 	end
 	-- Otherwise only the target position is changed
 	scrollpane_state.tx = x
@@ -358,9 +358,7 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	local dy = friction * (scrollpane_state.ty - scrollpane_state.y)
 
 	-- Apply the translation change
-	move_viewport_within_bounds(scrollpane_state, 
-		                        scrollpane_state.x + dx,
-		                        scrollpane_state.y + dy)
+	move_viewport_within_bounds(scrollpane_state, dx, dy)
 
 	-- Remember the last delta to possibly trigger floating in the next frame
 	scrollpane_state.last_dx = dx
