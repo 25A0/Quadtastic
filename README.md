@@ -67,7 +67,7 @@ its rgb value.
  - [ ] Scroll quad list viewport to hovered quad
  - [x] Scroll image editor viewport to clicked quad
  - [x] Fix scroll bars not displaying in image editor
- - [ ] Implement scroll bars
+ - [x] Implement scroll bars
  - [ ] Drag and drop quads in the quad list to form groups
  - [ ] Detect when an image changed on disk
  - [ ] Make Load button glow when file changed on disk
