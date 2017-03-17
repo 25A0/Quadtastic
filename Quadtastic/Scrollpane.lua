@@ -7,6 +7,8 @@ local Scrollpane = {}
 
 local scrollbar_margin = 7
 
+local scroll_delta = 2
+
 local function handle_input(state, scrollpane_state, w, h)
 	assert(state.input)
 
@@ -238,8 +240,33 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 	local inner_h = state.layout.max_h - (scrollpane_state.had_horizontal and 
 		                                  scrollbar_margin or 0)
 
-	local has_vertical = content_h > inner_h
-	local has_horizontal = content_w > inner_w
+	-- we have to take cases into account where the viewport can move beyond
+	-- the content
+	local total_content_h = content_h
+	if scrollpane_state.dragging_vertical_height then
+		total_content_h = scrollpane_state.dragging_vertical_height
+	elseif scrollpane_state.y < 0 then 
+		total_content_h = total_content_h + math.abs(scrollpane_state.y)
+		scrollpane_state.extra_v_lead = math.abs(scrollpane_state.y)
+	elseif scrollpane_state.y > content_h - inner_h then
+		total_content_h = total_content_h + scrollpane_state.y - (content_h - inner_h)
+	end
+
+	local has_vertical = total_content_h > inner_h
+
+	-- we have to take cases into account where the viewport can move beyond
+	-- the content
+	local total_content_w = content_w
+	if scrollpane_state.dragging_horizontal_width then
+		total_content_w = scrollpane_state.dragging_horizontal_width
+	elseif scrollpane_state.x < 0 then 
+		total_content_w = total_content_w + math.abs(scrollpane_state.x)
+		scrollpane_state.extra_h_lead = math.abs(scrollpane_state.x)
+	elseif scrollpane_state.x > content_w - inner_w then
+		total_content_w = total_content_w + scrollpane_state.x - (content_w - inner_w)
+	end
+
+	local has_horizontal = total_content_w > inner_w
 
 	local quads = state.style.quads.scrollpane
 
@@ -269,17 +296,6 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 			               x + w - scrollbar_margin, y + scrollbar_margin,
 			               0, 1, height - 2*scrollbar_margin)
 
-		-- we have to take cases into account where the viewport can move beyond
-		-- the content
-		local total_content_h = content_h
-		if scrollpane_state.dragging_vertical_height then
-			total_content_h = scrollpane_state.dragging_vertical_height
-		elseif scrollpane_state.y < 0 then 
-			total_content_h = total_content_h + math.abs(scrollpane_state.y)
-			scrollpane_state.extra_v_lead = math.abs(scrollpane_state.y)
-		elseif scrollpane_state.y > content_h - inner_h then
-			total_content_h = total_content_h + scrollpane_state.y - (content_h - inner_h)
-		end
 
 		-- The area in which the scrollbar can be moved around
 		local sb_area = height - 2*scrollbar_margin - 2
@@ -391,18 +407,6 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		love.graphics.draw(state.style.stylesheet, quads.scrollbar_h.background,
 			               x + scrollbar_margin, y + h - scrollbar_margin,
 			               0, width - 2*scrollbar_margin, 1)
-
-		-- we have to take cases into account where the viewport can move beyond
-		-- the content
-		local total_content_w = content_w
-		if scrollpane_state.dragging_horizontal_width then
-			total_content_w = scrollpane_state.dragging_horizontal_width
-		elseif scrollpane_state.x < 0 then 
-			total_content_w = total_content_w + math.abs(scrollpane_state.x)
-			scrollpane_state.extra_h_lead = math.abs(scrollpane_state.x)
-		elseif scrollpane_state.x > content_w - inner_w then
-			total_content_w = total_content_w + scrollpane_state.x - (content_w - inner_w)
-		end
 
 		-- The area in which the scrollbar can be moved around
 		local sb_area = width - 2*scrollbar_margin - 2
