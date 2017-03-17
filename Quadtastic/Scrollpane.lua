@@ -272,8 +272,11 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		-- we have to take cases into account where the viewport can move beyond
 		-- the content
 		local total_content_h = content_h
-		if scrollpane_state.y < 0 then 
+		if scrollpane_state.dragging_vertical_height then
+			total_content_h = scrollpane_state.dragging_vertical_height
+		elseif scrollpane_state.y < 0 then 
 			total_content_h = total_content_h + math.abs(scrollpane_state.y)
+			scrollpane_state.extra_v_lead = math.abs(scrollpane_state.y)
 		elseif scrollpane_state.y > content_h - inner_h then
 			total_content_h = total_content_h + scrollpane_state.y - (content_h - inner_h)
 		end
@@ -291,13 +294,20 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		-- Relative viewport position: 0 when the viewport shows the very
 		-- beginning of the content, 1 when the viewport shows the very end of
 		-- the content
-		local rel_vp_pos = scrollpane_state.y / (total_content_h - inner_h)
+		local rel_vp_pos = (scrollpane_state.y + (scrollpane_state.extra_v_lead or 0)) / (total_content_h - inner_h)
 		-- crop to [0, 1]
 		rel_vp_pos = math.min(1, math.max(0, rel_vp_pos))
 
 		local total_sb_height = sb_height + 
 		    state.style.raw_quads.scrollpane.scrollbar_v.bottom.h +
 		    state.style.raw_quads.scrollpane.scrollbar_v.top.h
+		if scrollpane_state.total_sb_height then
+			total_sb_height = scrollpane_state.total_sb_height
+		end
+
+		if scrollpane_state.y < 0 then
+			scrollpane_state.total_sb_height = total_sb_height
+		end
 
 		local sb_start = rel_vp_pos * (sb_area - total_sb_height)
 		local sb_y = scrollbar_margin + 1 + sb_start
@@ -320,9 +330,13 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 			    	                   scrollbar_margin, sb_end - (sb_start + scrollbar_margin + 1))
 			then
 				scrollpane_state.is_dragging_vertical = true
+				scrollpane_state.dragging_vertical_height = total_content_h
 			elseif state.input.mouse.buttons[1].releases > 1 or
 				   not state.input.mouse.buttons[1].pressed then
 				scrollpane_state.is_dragging_vertical = false
+				scrollpane_state.dragging_vertical_height = nil
+				scrollpane_state.extra_v_lead = nil
+				scrollpane_state.total_sb_height = nil
 			end
 
 			if scrollpane_state.is_dragging_vertical then
@@ -335,6 +349,10 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 					local new_sb = sb_start + dy
 					local new_vp_y = viewport_from_scrollbar(
 						new_sb, sb_area, total_sb_height, total_content_h, inner_h)
+					if scrollpane_state.extra_v_lead then
+						new_vp_y = new_vp_y - scrollpane_state.extra_v_lead
+					end
+
 					-- Move viewport to that position
 					move_viewport_within_bounds(scrollpane_state, 0, new_vp_y - scrollpane_state.y)
 					scrollpane_state.ty = scrollpane_state.y
@@ -377,8 +395,11 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		-- we have to take cases into account where the viewport can move beyond
 		-- the content
 		local total_content_w = content_w
-		if scrollpane_state.x < 0 then 
+		if scrollpane_state.dragging_horizontal_width then
+			total_content_w = scrollpane_state.dragging_horizontal_width
+		elseif scrollpane_state.x < 0 then 
 			total_content_w = total_content_w + math.abs(scrollpane_state.x)
+			scrollpane_state.extra_h_lead = math.abs(scrollpane_state.x)
 		elseif scrollpane_state.x > content_w - inner_w then
 			total_content_w = total_content_w + scrollpane_state.x - (content_w - inner_w)
 		end
@@ -396,13 +417,20 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		-- Relative viewport position: 0 when the viewport shows the very
 		-- beginning of the content, 1 when the viewport shows the very end of
 		-- the content
-		local rel_vp_pos = scrollpane_state.x / (total_content_w - inner_w)
+		local rel_vp_pos = (scrollpane_state.x + (scrollpane_state.extra_h_lead or 0)) / (total_content_w - inner_w)
 		-- crop to [0, 1]
 		rel_vp_pos = math.min(1, math.max(0, rel_vp_pos))
 
 		local total_sb_width = sb_width + 
 		    state.style.raw_quads.scrollpane.scrollbar_h.left.w +
 		    state.style.raw_quads.scrollpane.scrollbar_h.right.w
+		if scrollpane_state.total_sb_width then
+			total_sb_width = scrollpane_state.total_sb_width
+		end
+
+		if scrollpane_state.x < 0 then
+			scrollpane_state.total_sb_width = total_sb_width
+		end
 
 	    local sb_start = rel_vp_pos * (sb_area - total_sb_width)
 		local sb_x = scrollbar_margin + 1 + sb_start
@@ -425,9 +453,13 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 			    	                   sb_end - (sb_start + scrollbar_margin + 1), scrollbar_margin)
 			then
 				scrollpane_state.is_dragging_horizontal = true
+				scrollpane_state.dragging_horizontal_width = total_content_w
 			elseif state.input.mouse.buttons[1].releases > 1 or
 				   not state.input.mouse.buttons[1].pressed then
 				scrollpane_state.is_dragging_horizontal = false
+				scrollpane_state.dragging_horizontal_width = nil
+				scrollpane_state.extra_h_lead = nil
+				scrollpane_state.total_sb_width = nil
 			end
 
 			if scrollpane_state.is_dragging_horizontal then
@@ -439,6 +471,9 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 					local new_sb = sb_start + dx
 					local new_vp_x = viewport_from_scrollbar(
 						new_sb, sb_area, total_sb_width, total_content_w, inner_w)
+					if scrollpane_state.extra_h_lead then
+						new_vp_x = new_vp_x - scrollpane_state.extra_h_lead
+					end
 					-- Move viewport to that position
 					move_viewport_within_bounds(scrollpane_state, new_vp_x - scrollpane_state.x, 0)
 					scrollpane_state.tx = scrollpane_state.x
