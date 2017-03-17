@@ -281,16 +281,31 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		return new_vp_pos
 	end
 
+	local function get_button_state(state, bounds, was_pressed)
+		local button_state = "default"
+		if state and state.input then
+			if imgui.is_mouse_in_rect(state, bounds.x, bounds.y, bounds.w, bounds.h) then
+				button_state = "hovered"
+				if state.input.mouse.buttons and state.input.mouse.buttons[1]
+					and state.input.mouse.buttons[1].presses >= 1 then
+					button_state = "pressed"
+				end
+			end
+			if state.input.mouse.buttons and state.input.mouse.buttons[1] then
+				if was_pressed and not state.input.mouse.buttons[1].pressed then
+					button_state = "default"
+				elseif was_pressed then
+					button_state = "pressed"
+				end
+			end
+		end
+		return button_state
+	end
+
 	-- Render the vertical scrollbar if necessary
 	if has_vertical then
 		local height = h
 		if has_horizontal then height = height - scrollbar_margin end
-		-- buttons
-		love.graphics.draw(state.style.stylesheet, quads.buttons.up,
-			               x + w - scrollbar_margin, y)
-		love.graphics.draw(state.style.stylesheet, quads.buttons.down,
-			               x + w - scrollbar_margin, y + height - scrollbar_margin)
-
 		-- scrollbar
 		love.graphics.draw(state.style.stylesheet, quads.scrollbar_v.background,
 			               x + w - scrollbar_margin, y + scrollbar_margin,
@@ -317,14 +332,6 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		local total_sb_height = sb_height + 
 		    state.style.raw_quads.scrollpane.scrollbar_v.bottom.h +
 		    state.style.raw_quads.scrollpane.scrollbar_v.top.h
-		if scrollpane_state.total_sb_height then
-			total_sb_height = scrollpane_state.total_sb_height
-		end
-
-		if scrollpane_state.y < 0 then
-			scrollpane_state.total_sb_height = total_sb_height
-		end
-
 		local sb_start = rel_vp_pos * (sb_area - total_sb_height)
 		local sb_y = scrollbar_margin + 1 + sb_start
 		love.graphics.draw(state.style.stylesheet, quads.scrollbar_v.top,
@@ -352,7 +359,6 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 				scrollpane_state.is_dragging_vertical = false
 				scrollpane_state.dragging_vertical_height = nil
 				scrollpane_state.extra_v_lead = nil
-				scrollpane_state.total_sb_height = nil
 			end
 
 			if scrollpane_state.is_dragging_vertical then
@@ -392,16 +398,41 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
             	scrollpane_state.ty = scrollpane_state.y
 			end
 		end
+
+		-- buttons
+		do
+			local bounds = {
+				x = x + w - scrollbar_margin, y = y, 
+				w = scrollbar_margin, h = scrollbar_margin}
+    		local button_state = get_button_state(state, bounds, scrollpane_state.scrolling_up)
+	    	scrollpane_state.scrolling_up = button_state == "pressed"
+	    	if scrollpane_state.scrolling_up then
+	    		move_viewport_within_bounds(scrollpane_state, 0, -scroll_delta)
+            	scrollpane_state.ty = scrollpane_state.y
+	    	end
+    		love.graphics.draw(state.style.stylesheet, quads.buttons.up[button_state],
+    			               x + w - scrollbar_margin, y)
+
+		end
+		do
+			local bounds = {
+				x = x + w - scrollbar_margin, y = y + height - scrollbar_margin, 
+				w = scrollbar_margin, h = scrollbar_margin}
+    		local button_state = get_button_state(state, bounds, scrollpane_state.scrolling_down)
+	    	scrollpane_state.scrolling_down = button_state == "pressed"
+	    	if scrollpane_state.scrolling_down then
+	    		move_viewport_within_bounds(scrollpane_state, 0, scroll_delta)
+            	scrollpane_state.ty = scrollpane_state.y
+	    	end
+    		love.graphics.draw(state.style.stylesheet, quads.buttons.down[button_state],
+    			               x + w - scrollbar_margin, y + height - scrollbar_margin)
+		end
 	end
 
 	-- Render the horizontal scrollbar if necessary
 	if has_horizontal then
 		local width = w
 		if has_vertical then width = width - scrollbar_margin end
-		love.graphics.draw(state.style.stylesheet, quads.buttons.left,
-			               x, y + h - scrollbar_margin)
-		love.graphics.draw(state.style.stylesheet, quads.buttons.right,
-			               x + width - scrollbar_margin, y + h - scrollbar_margin)
 
 		-- scrollbar
 		love.graphics.draw(state.style.stylesheet, quads.scrollbar_h.background,
@@ -428,13 +459,6 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 		local total_sb_width = sb_width + 
 		    state.style.raw_quads.scrollpane.scrollbar_h.left.w +
 		    state.style.raw_quads.scrollpane.scrollbar_h.right.w
-		if scrollpane_state.total_sb_width then
-			total_sb_width = scrollpane_state.total_sb_width
-		end
-
-		if scrollpane_state.x < 0 then
-			scrollpane_state.total_sb_width = total_sb_width
-		end
 
 	    local sb_start = rel_vp_pos * (sb_area - total_sb_width)
 		local sb_x = scrollbar_margin + 1 + sb_start
@@ -463,7 +487,6 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
 				scrollpane_state.is_dragging_horizontal = false
 				scrollpane_state.dragging_horizontal_width = nil
 				scrollpane_state.extra_h_lead = nil
-				scrollpane_state.total_sb_width = nil
 			end
 
 			if scrollpane_state.is_dragging_horizontal then
@@ -501,12 +524,40 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
             	scrollpane_state.tx = scrollpane_state.x
 			end
 		end
+
+		-- buttons
+		do
+			local bounds = {
+				x = x, y = y + h - scrollbar_margin, 
+				w = scrollbar_margin, h = scrollbar_margin}
+    		local button_state = get_button_state(state, bounds, scrollpane_state.scrolling_left)
+	    	scrollpane_state.scrolling_left = button_state == "pressed"
+	    	if scrollpane_state.scrolling_left then
+	    		move_viewport_within_bounds(scrollpane_state, -scroll_delta, 0)
+            	scrollpane_state.tx = scrollpane_state.x
+	    	end
+    		love.graphics.draw(state.style.stylesheet, quads.buttons.left[button_state],
+    			               x, y + h - scrollbar_margin)
+		end
+		do
+			local bounds = {
+				x = x + width - scrollbar_margin, y = y + h - scrollbar_margin, 
+				w = scrollbar_margin, h = scrollbar_margin}
+    		local button_state = get_button_state(state, bounds, scrollpane_state.scrolling_right)
+	    	scrollpane_state.scrolling_right = button_state == "pressed"
+	    	if scrollpane_state.scrolling_right then
+	    		move_viewport_within_bounds(scrollpane_state, scroll_delta, 0)
+            	scrollpane_state.tx = scrollpane_state.x
+	    	end
+    		love.graphics.draw(state.style.stylesheet, quads.buttons.right[button_state],
+    			               x + width - scrollbar_margin, y + h - scrollbar_margin)
+		end
 	end
 
 	-- Render the little corner if we have both a vertical and horizontal
 	-- scrollbar
 	if has_vertical and has_horizontal then
-		love.graphics.draw(state.style.stylesheet, quads.buttons.corner,
+		love.graphics.draw(state.style.stylesheet, quads.corner,
 			               x + w - scrollbar_margin, y + h - scrollbar_margin)
 	end
 
