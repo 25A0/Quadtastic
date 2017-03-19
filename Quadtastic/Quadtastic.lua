@@ -76,44 +76,67 @@ Quadtastic.transitions = {
   rename = function(app, data, quads)
     if #quads == 0 then return
     elseif #quads > 1 then
-      Dialog.show_dialog("You cannot rename more than one quad at once.")
+      Dialog.show_dialog("You cannot rename more than one element at once.")
       return
     else
       local quad = quads[1]
       local current_keys = {table.find_key(data.quads, quad)}
-      local old_key = table.remove(current_keys)
-      local new_key
-      if type(old_key) == "number" then 
-        new_key = ""
-      else 
-        new_key = old_key
-      end
+      local old_key = table.concat(current_keys, ".")
+      local new_key = old_key
       local ret
       ret, new_key = Dialog.query("Name:", new_key, {"Cancel", "OK"})
+
+      local function replace(tab, current_keys, new_keys, element)
+        -- Make sure that the new keys form a valid path, that is, all but the
+        -- last key must be tables that are not quads
+        local current_table = tab
+        for i=1,#new_keys do
+          if type(current_table) == "table" and libquadtastic.is_quad(current_table) then
+            local keys_so_far = table.concat(new_keys, ".", 1, i)
+            Dialog.show_dialog(string.format("The element %s is a quad, and can therefore not have nested quads.", keys_so_far), {"OK"})
+            return
+          end
+          -- This does intentionally not check the very last key, since it is
+          -- fine when that one is a quad
+          if i < #new_keys then
+            local next_key = new_keys[i]
+            -- Create a new empty table if necessary
+            if not current_table[next_key] then
+              current_table[next_key] = {}
+            end
+            current_table = current_table[next_key]
+          end
+        end
+
+        -- Remove the entry under the old key
+        table.set(data.quads, nil, unpack(current_keys))
+        -- Add the entry under the new key
+        table.set(data.quads, quad, unpack(new_keys))
+      end
+
       if ret == "OK" then
         if new_key == old_key then return end
 
-        local parent = table.get(data.quads, unpack(current_keys))
+        local new_keys = {}
+        for k in string.gmatch(new_key, "([^.]+)") do
+          table.insert(new_keys, k)
+        end
         -- Check if that key already exists
-        if parent[new_key] then
+        if table.get(data.quads, unpack(new_keys)) then
           local ret = Dialog.show_dialog(
-            string.format("The quad '%s' already exists.", new_key),
+            string.format("The element '%s' already exists.", new_key),
             {"Cancel", "Swap", "Replace"})
           if ret == "Swap" then
-            parent[old_key], parent[new_key] = parent[new_key], parent[old_key]
+            local old_value = table.get(data.quads, unpack(new_keys))
+            table.set(data.quads, old_value, unpack(current_keys))
+            table.set(data.quads, quad, unpack(new_keys))
           elseif ret == "Replace" then
-            -- Remove the entry under the old key
-            parent[old_key] = nil
-            -- Add the entry under the new key
-            parent[new_key] = quad
+            replace(data.quads, current_keys, new_keys, quad)
           else -- Cancel option
             return
           end
         else
-          -- Remove the entry under the old key
-          parent[old_key] = nil
-          -- Add the entry under the new key
-          parent[new_key] = quad
+          replace(data.quads, current_keys, new_keys, quad)
         end
       end
     end
