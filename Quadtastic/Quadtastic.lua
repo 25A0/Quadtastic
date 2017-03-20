@@ -386,7 +386,7 @@ Quadtastic.draw = function(app, state, gui_state)
   love.graphics.clear(138, 179, 189)
   do Window.start(gui_state, 0, 0, w, h, {margin = 2, active = true, borderless = true})
 
-    do Layout.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 30) -- Image editor
+    do Layout.start(gui_state) -- Image editor
       do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 160, nil)
         do Layout.start(gui_state)
           state.filepath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.filepath)
@@ -401,7 +401,7 @@ Quadtastic.draw = function(app, state, gui_state)
 
         Layout.next(gui_state, "|", 2)
 
-        do Frame.start(gui_state)
+        do Frame.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 13)
           if state.image then
             local new_quad = ImageEditor.draw(gui_state, state)
             if new_quad then
@@ -415,6 +415,32 @@ Quadtastic.draw = function(app, state, gui_state)
                        "no image :(", {alignment = ":"})
           end
         end Frame.finish(gui_state)
+
+        Layout.next(gui_state, "|", 1)
+
+        do Layout.start(gui_state) -- Zoom buttons
+          do
+            local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
+              gui_state.style.quads.buttons.plus)
+            if pressed then
+              ImageEditor.zoom(state, 1)
+            end
+            Tooltip.draw(gui_state, "Zoom in")
+          end
+          Layout.next(gui_state, "-")
+          do
+            local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
+              gui_state.style.quads.buttons.minus)
+            if pressed then
+              ImageEditor.zoom(state, -1)
+            end
+            Tooltip.draw(gui_state, "Zoom out")
+          end
+          Layout.next(gui_state, "-")
+          love.graphics.setColor(255, 255, 255, 255)
+          Label.draw(gui_state, nil, -3, nil, nil, string.format("%d%%", state.display.zoom * 100))
+        end Layout.finish(gui_state, "-") -- Zoom buttons
+
       end Layout.finish(gui_state, "|")
 
       Layout.next(gui_state, "-", 2)
@@ -572,31 +598,6 @@ Quadtastic.draw = function(app, state, gui_state)
       end Layout.finish(gui_state, "|")
 
     end Layout.finish(gui_state, "-") -- Image editor and quad list
-
-    Layout.next(gui_state, "|", 2)
-
-    do Layout.start(gui_state) -- Zoom buttons
-      do
-        local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
-          gui_state.style.quads.buttons.plus)
-        if pressed then
-          ImageEditor.zoom(state, 1)
-        end
-        Tooltip.draw(gui_state, "Zoom in")
-      end
-      Layout.next(gui_state, "-")
-      do
-        local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
-          gui_state.style.quads.buttons.minus)
-        if pressed then
-          ImageEditor.zoom(state, -1)
-        end
-        Tooltip.draw(gui_state, "Zoom out")
-      end
-      Layout.next(gui_state, "-")
-      love.graphics.setColor(255, 255, 255, 255)
-      Label.draw(gui_state, nil, -3, nil, nil, string.format("%d%%", state.display.zoom * 100))
-    end Layout.finish(gui_state, "-") -- Zoom buttons
 
   end Window.finish(gui_state, {active = true, borderless = true})
 
