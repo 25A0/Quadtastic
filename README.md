@@ -68,7 +68,7 @@ its rgb value.
  - [x] Scroll image editor viewport to clicked quad
  - [x] Fix scroll bars not displaying in image editor
  - [x] Implement scroll bars
- - [ ] Use CTRL+Mousewheel to zoom
+ - [x] Use CTRL+Mousewheel to zoom
  - [ ] Use MMB to pan image
  - [ ] Drag and drop quads in the quad list to form groups
  - [ ] Detect when an image changed on disk

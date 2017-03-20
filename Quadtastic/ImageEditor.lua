@@ -5,6 +5,11 @@ local Text = require("Quadtastic/Text")
 
 local ImageEditor = {}
 
+function ImageEditor.zoom(state, delta)
+  if not state.display.zoom then state.display.zoom = 1 end
+  state.display.zoom = math.max(1, math.min(12, state.display.zoom + delta))
+end
+
 local function show_quad(gui_state, state, quad, quadname)
   if libquadtastic.is_quad(quad) then
     -- If the mouse is inside that quad, display its name
@@ -165,6 +170,19 @@ local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
           new_quad = rect
         end
       end
+    end
+
+
+    -- if CTRL was pressed and the mousewheel was moved, adjust the zoom level
+    -- and consume the mousewheel movement
+    if gui_state.input and gui_state.input.mouse.wheel_dy and 
+      (imgui.is_key_pressed(gui_state, "lctrl") or
+       imgui.is_key_pressed(gui_state, "lctrl"))
+    then
+      local dy = gui_state.input.mouse.wheel_dy
+      ImageEditor.zoom(state, dy)
+      -- Consume mousewheel movement
+      gui_state.input.mouse.wheel_dy = 0
     end
     return new_quad
 end

@@ -318,14 +318,6 @@ called '%s'%s.]],
     end
   end,
 
-  zoom_in = function(app, data)
-    data.display.zoom = math.min(12, data.display.zoom + 1)
-  end,
-
-  zoom_out = function(app, data)
-    data.display.zoom = math.max(1, data.display.zoom - 1)
-  end,
-
   load_quads_from_path = function(app, data, filepath)
     local success, more = pcall(function()
       local filehandle, err = io.open(filepath, "r")
@@ -588,7 +580,7 @@ Quadtastic.draw = function(app, state, gui_state)
         local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
           gui_state.style.quads.buttons.plus)
         if pressed then
-          app.quadtastic.zoom_in()
+          ImageEditor.zoom(state, 1)
         end
         Tooltip.draw(gui_state, "Zoom in")
       end
@@ -597,7 +589,7 @@ Quadtastic.draw = function(app, state, gui_state)
         local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
           gui_state.style.quads.buttons.minus)
         if pressed then
-          app.quadtastic.zoom_out()
+          ImageEditor.zoom(state, -1)
         end
         Tooltip.draw(gui_state, "Zoom out")
       end
