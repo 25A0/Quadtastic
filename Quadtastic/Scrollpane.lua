@@ -51,6 +51,12 @@ local move_viewport_within_bounds = function(sp_state, dx, dy)
   sp_state.y = new_y
 end
 
+function Scrollpane.move_viewport(sp_state, dx, dy)
+  move_viewport_within_bounds(sp_state, dx, dy)
+  sp_state.tx = sp_state.x
+  sp_state.ty = sp_state.y
+end
+
 -- Move the scrollpane to focus on the given bounds.
 -- Might be restricted by the inner bounds in the scrollpane_state
 -- (i.e. when moving to the first item, it will not center the viewport on

@@ -69,7 +69,7 @@ its rgb value.
  - [x] Fix scroll bars not displaying in image editor
  - [x] Implement scroll bars
  - [x] Use CTRL+Mousewheel to zoom
- - [ ] Use MMB to pan image
+ - [x] Use MMB to pan image
  - [ ] Drag and drop quads in the quad list to form groups
  - [ ] Detect when an image changed on disk
  - [ ] Make Load button glow when file changed on disk

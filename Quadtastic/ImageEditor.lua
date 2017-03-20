@@ -110,7 +110,7 @@ local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
       love.graphics.rectangle("fill", mx, my, 1, 1)
     end
 
-    local get_dragged_rect = function(gui_state, sp_state)
+    local get_dragged_rect = function(gui_state)
       assert(gui_state.input)
       -- Absolute mouse coordinates
       local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
@@ -131,7 +131,7 @@ local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
         from_y = math.max(0, math.min(img_h - 1, from_y))
 
         -- Round coordinates
-        local rmx, rmy = math.floor(mx), math.floor(my)            
+        local rmx, rmy = math.floor(mx), math.floor(my)
         local rfx, rfy = math.floor(from_x), math.floor(from_y)
 
         local x = math.min(rmx, rfx)
@@ -150,7 +150,7 @@ local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
       if gui_state.input and gui_state.input.mouse.buttons[1] and 
         gui_state.input.mouse.buttons[1].pressed
       then
-        local rect = get_dragged_rect(gui_state, scrollpane_state)
+        local rect = get_dragged_rect(gui_state)
         if rect then
           show_quad(gui_state, state, rect)
         end
@@ -165,13 +165,26 @@ local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
       if gui_state.input and gui_state.input.mouse.buttons[1] and
         gui_state.input.mouse.buttons[1].releases > 0
       then
-        local rect = get_dragged_rect(gui_state, scrollpane_state)
+        local rect = get_dragged_rect(gui_state)
         if rect and rect.w > 0 and rect.h > 0 then
           new_quad = rect
         end
       end
     end
 
+    -- If the middle mouse button was dragged in this scrollpane, pan the image
+    -- by the dragged distance
+    if gui_state.input and gui_state.input.mouse.buttons[3] and gui_state.input.mouse.buttons[3].pressed then
+      local button_state = gui_state.input.mouse.buttons[3]
+      if Scrollpane.is_mouse_inside_widget(gui_state, state.scrollpane_state,
+                                           button_state.at_x, button_state.at_y)
+      then
+        local dx, dy = -gui_state.input.mouse.dx, -gui_state.input.mouse.dy
+        dx, dy = gui_state.transform:unproject_dimensions(dx, dy)
+        dx, dy = dx * state.display.zoom, dy * state.display.zoom
+        Scrollpane.move_viewport(state.scrollpane_state, dx, dy)
+      end
+    end
 
     -- if CTRL was pressed and the mousewheel was moved, adjust the zoom level
     -- and consume the mousewheel movement
