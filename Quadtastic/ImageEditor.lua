@@ -154,6 +154,7 @@ local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
 
     -- If the mouse was dragged and released in this scrollpane then add a
     -- new quad
+    local new_quad
     do
       -- Check if the lmb was released
       if gui_state.input and gui_state.input.mouse.buttons[1] and
@@ -161,15 +162,16 @@ local function handle_input(gui_state, state, x, y, w, h, img_w, img_h)
       then
         local rect = get_dragged_rect(gui_state, scrollpane_state)
         if rect and rect.w > 0 and rect.h > 0 then
-          table.insert(state.quads, rect)
+          new_quad = rect
         end
       end
     end
-
+    return new_quad
 end
 
 ImageEditor.draw = function(gui_state, state, x, y, w, h)
   local content_w, content_h
+  local new_quad
   do state.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, 
     nil, state.scrollpane_state
   )
@@ -184,7 +186,7 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
     love.graphics.draw(state.image)
 
     if gui_state and gui_state.input then
-      handle_input(gui_state, state, x, y, w, h, img_w, img_h)
+      new_quad = handle_input(gui_state, state, x, y, w, h, img_w, img_h)
     end
 
     -- Draw the outlines of all quads
@@ -195,6 +197,7 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
     content_w = img_w * state.display.zoom
     content_h = img_h * state.display.zoom
   end Scrollpane.finish(gui_state, state.scrollpane_state, content_w, content_h)
+  return new_quad
 end
 
 return ImageEditor

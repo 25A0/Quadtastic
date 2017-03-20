@@ -138,6 +138,9 @@ Quadtastic.transitions = {
         else
           replace(data.quads, current_keys, new_keys, quad)
         end
+
+        -- Set the focus of the quad list to the renamed quad
+        QuadList.move_quad_into_view(data.quad_scrollpane_state, quad)
       end
     end
   end,
@@ -246,6 +249,9 @@ Quadtastic.transitions = {
       new_group[key] = v
     end
     table.insert(shared_parent, new_group)
+
+    -- Focus quad list on new group
+    QuadList.move_quad_into_view(data.quad_scrollpane_state, new_group)
   end,
 
   ungroup = function(app, data, quads)
@@ -398,7 +404,11 @@ Quadtastic.draw = function(app, state, gui_state)
 
         do Frame.start(gui_state)
           if state.image then
-            ImageEditor.draw(gui_state, state)
+            local new_quad = ImageEditor.draw(gui_state, state)
+            if new_quad then
+              table.insert(state.quads, new_quad)
+              QuadList.move_quad_into_view(state.quad_scrollpane_state, new_quad)
+            end
           else
             -- Put a label in the center of the frame
             local y = gui_state.layout.max_h / 2 - gui_state.style.font:getHeight()

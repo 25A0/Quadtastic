@@ -64,7 +64,7 @@ its rgb value.
  - [x] Highlight selected and hovered quads
  - [x] Display name of quads in ImageEditor
  - [x] Use dot notation in quad names to move them to quad groups
- - [ ] Scroll quad list viewport to hovered quad
+ - [x] Scroll quad list viewport to created or modified quad
  - [x] Scroll image editor viewport to clicked quad
  - [x] Fix scroll bars not displaying in image editor
  - [x] Implement scroll bars

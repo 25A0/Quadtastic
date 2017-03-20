@@ -7,7 +7,7 @@ local libquadtastic = require("Quadtastic/libquadtastic")
 
 local QuadList = {}
 
-local function draw_quads(gui_state, state, quads, last_hovered)
+local function draw_quads(gui_state, state, quads, last_hovered, quad_bounds)
   local clicked, hovered
   for name,quad in pairs(quads) do
     local background_quads
@@ -44,6 +44,9 @@ local function draw_quads(gui_state, state, quads, last_hovered)
     gui_state.layout.adv_x = gui_state.layout.max_w
     gui_state.layout.adv_y = 16
 
+    quad_bounds[quad] = {x = gui_state.layout.next_x, y = gui_state.layout.next_y,
+                         w = gui_state.layout.adv_x, h = gui_state.layout.adv_y}
+
     -- Check if the mouse was clicked on this list entry
     local x, y = gui_state.layout.next_x, gui_state.layout.next_y
     local w, h = gui_state.layout.adv_x, gui_state.layout.adv_y
@@ -58,7 +61,7 @@ local function draw_quads(gui_state, state, quads, last_hovered)
     if not libquadtastic.is_quad(quad) then
       -- Use translate to add some indentation
       love.graphics.translate(10, 0)
-      local rec_clicked, rec_hovered = draw_quads(gui_state, state, quad, last_hovered)
+      local rec_clicked, rec_hovered = draw_quads(gui_state, state, quad, last_hovered, quad_bounds)
       clicked = clicked or rec_clicked
       hovered = hovered or rec_hovered
       love.graphics.translate(-10, 0)
@@ -74,11 +77,12 @@ QuadList.draw = function(gui_state, state, x, y, w, h, last_hovered)
   -- The quad that the user clicked on
   local clicked = nil
   local hovered = nil
+  local quad_bounds = {}
   do Frame.start(gui_state, x, y, w, h)
     imgui.push_style(gui_state, "font", gui_state.style.small_font)
     do state.quad_scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, state.quad_scrollpane_state)
       do Layout.start(gui_state, nil, nil, nil, nil, {noscissor = true})
-        clicked, hovered = draw_quads(gui_state, state, state.quads, last_hovered)
+        clicked, hovered = draw_quads(gui_state, state, state.quads, last_hovered, quad_bounds)
       end Layout.finish(gui_state, "|")
       -- Restrict the viewport's position to the visible content as good as
       -- possible
@@ -89,7 +93,21 @@ QuadList.draw = function(gui_state, state, x, y, w, h, last_hovered)
     end Scrollpane.finish(gui_state, state.quad_scrollpane_state)
     imgui.pop_style(gui_state, "font")
   end Frame.finish(gui_state)
+
+  -- Move viewport to focus quad if necessary
+  if state.quad_scrollpane_state.focus_quad then
+    Scrollpane.move_into_view(
+      state.quad_scrollpane_state,
+      quad_bounds[state.quad_scrollpane_state.focus_quad])
+    -- Clear focus quad
+    state.quad_scrollpane_state.focus_quad = nil
+  end
+
   return clicked, hovered
+end
+
+QuadList.move_quad_into_view = function(scrollpane_state, quad)
+  scrollpane_state.focus_quad = quad
 end
 
 return QuadList
