@@ -1,7 +1,7 @@
-local Scrollpane = require("Quadtastic/Scrollpane")
-local libquadtastic = require("Quadtastic/libquadtastic")
-local imgui = require("Quadtastic/imgui")
-local Text = require("Quadtastic/Text")
+local Scrollpane = require("Scrollpane")
+local libquadtastic = require("libquadtastic")
+local imgui = require("imgui")
+local Text = require("Text")
 
 local ImageEditor = {}
 

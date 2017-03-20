@@ -1,7 +1,7 @@
-local Layout = require("Quadtastic/Layout")
-local Rectangle = require("Quadtastic/Rectangle")
+local Layout = require("Layout")
+local Rectangle = require("Rectangle")
 local affine = require("lib/affine")
-local imgui = require("Quadtastic/imgui")
+local imgui = require("imgui")
 
 local Scrollpane = {}
 

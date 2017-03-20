@@ -1,9 +1,9 @@
-local State = require("Quadtastic/State")
-local InputField = require("Quadtastic/InputField")
-local Layout = require("Quadtastic/Layout")
-local Button = require("Quadtastic/Button")
-local Label = require("Quadtastic/Label")
-local Window = require("Quadtastic/Window")
+local State = require("State")
+local InputField = require("Inputfield")
+local Layout = require("Layout")
+local Button = require("Button")
+local Label = require("Label")
+local Window = require("Window")
 
 local Dialog = {}
 

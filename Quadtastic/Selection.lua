@@ -1,4 +1,4 @@
-local table = require("Quadtastic/tableplus")
+local table = require("tableplus")
 local Selection = {}
 
 Selection.is_selected = function(self, v)

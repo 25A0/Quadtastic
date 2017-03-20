@@ -1,6 +1,6 @@
-local Rectangle = require("Quadtastic/Rectangle")
-local renderutils = require("Quadtastic/Renderutils")
-local Layout = require("Quadtastic/Layout")
+local Rectangle = require("Rectangle")
+local renderutils = require("Renderutils")
+local Layout = require("Layout")
 local Frame = {}
 
 Frame.start = function(state, x, y, w, h, options)

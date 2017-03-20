@@ -1,7 +1,7 @@
-local Layout = require("Quadtastic/Layout")
-local imgui = require("Quadtastic/imgui")
-local renderutils = require("Quadtastic/renderutils")
-local Frame = require("Quadtastic/Frame")
+local Layout = require("Layout")
+local imgui = require("imgui")
+local renderutils = require("Renderutils")
+local Frame = require("Frame")
 
 local Window = {}
 

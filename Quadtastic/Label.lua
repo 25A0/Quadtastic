@@ -1,6 +1,6 @@
-local Rectangle = require("Quadtastic/Rectangle")
-local renderutils = require("Quadtastic/Renderutils")
-local Text = require("Quadtastic/Text")
+local Rectangle = require("Rectangle")
+local renderutils = require("Renderutils")
+local Text = require("Text")
 local Label = {}
 
 local function handle_input(state, x, y, w, h, label, options)
