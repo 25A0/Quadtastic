@@ -1,4 +1,4 @@
-package.cpath = package.cpath .. ';./lib/luafilesystem/src/?.so'
+package.cpath = package.cpath .. ';./Quadtastic/lib/luafilesystem/src/?.so'
 
 local inspect = require("lib/inspect")
 
