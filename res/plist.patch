@@ -6,6 +6,14 @@
 < 	<string>LÖVE</string>
 ---
 > 	<string>__APPNAME</string>
+69c69
+< 	<string>0.10.2</string>
+---
+> 	<string>__APPVERSION</string>
+95c95
+< 	<string>© 2006-2016 LÖVE Development Team</string>
+---
+> 	<string>© __APPCOPYRIGHT</string>
 98,126d97
 < 	<key>UTExportedTypeDeclarations</key>
 < 	<array>

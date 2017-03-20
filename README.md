@@ -72,11 +72,14 @@ its rgb value.
  - [x] Use MMB to pan image
  - [ ] Drag and drop quads in the quad list to form groups
  - [ ] Distribution:
+    - [ ] License
+    - [x] Automatically put version and commit hash in plist
     - [x] MacOS
     - [ ] Windows 32 bit
     - [ ] Windows 64 bit
     - [ ] Linux
     - [ ] Icon
+    - [ ] Show Quadtastic in title bar
  - [ ] Detect when an image changed on disk
  - [ ] Make Load button glow when file changed on disk
  - [ ] Make Export button glow when quads have changed since last export

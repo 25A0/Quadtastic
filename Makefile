@@ -2,6 +2,8 @@ TESTS := $(shell find tests -type f -name "test_*.lua")
 
 APPNAME = Quadtastic
 APPIDENTIFIER = com.25a0.quadtastic
+APPVERSION = $(shell git tag -l)-$(shell git log -1 --pretty=format:%h )
+APPCOPYRIGHT = 2017 Moritz Neikes
 macos-love-distname = love-0.10.2-macosx-x64
 
 .PHONY: clean test tests/*
@@ -25,6 +27,8 @@ dist/macos/${APPNAME}.app: dist/res/love.app dist/${APPNAME}.love
 	cp res/plist.patch dist/macos/
 	sed -i -e 's/__APPIDENTIFIER/${APPIDENTIFIER}/g' dist/macos/plist.patch
 	sed -i -e 's/__APPNAME/${APPNAME}/g' dist/macos/plist.patch
+	sed -i -e 's/__APPVERSION/${APPVERSION}/g' dist/macos/plist.patch
+	sed -i -e 's/__APPCOPYRIGHT/${APPCOPYRIGHT}/g' dist/macos/plist.patch
 	patch dist/macos/${APPNAME}.app/Contents/Info.plist dist/macos/plist.patch
 	rm dist/macos/plist.patch*
 
