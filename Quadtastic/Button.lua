@@ -5,22 +5,21 @@ local imgui = require("Quadtastic/imgui")
 
 local Button = {}
 
-local function handle_input(state, x, y, w, h, label, iconquad, options)
+-- Returns, in this order, if the button was just pressed, if the button is still
+-- being pressed, and if the button is hovered.
+local function handle_input(state, x, y, w, h, label, options)
   assert(state.input)
   if imgui.is_mouse_in_rect(state, x, y, w, h) then
-    local active
+    local pressed
     if state.input.mouse.buttons[1] and state.input.mouse.buttons[1].pressed then
-      love.graphics.setColor(0, 0, 0, 70)
-      active = true
+      pressed = true
     else
-      love.graphics.setColor(255, 255, 255, 70)
-      active = false
+      pressed = false
     end
-    love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
     -- We consider this button clicked when the mouse is in the button's area
     -- and the left mouse button was just clicked
     return state.input.mouse.buttons[1] and state.input.mouse.buttons[1].presses > 0,
-      active, true
+      pressed, true
   end
 end
 
@@ -72,10 +71,89 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
 
   -- Highlight if mouse is over button
   if state and state.input then
-    return handle_input(state, x, y, w, h, label, iconquad, options)
+    local clicked, pressed, hovered = handle_input(state, x, y, w, h, label, options)
+    if pressed then
+      love.graphics.setColor(0, 0, 0, 70)
+    elseif hovered then
+      love.graphics.setColor(255, 255, 255, 70)
+    end
+    if pressed or hovered then
+      love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
+    end
+    love.graphics.setColor(255, 255, 255, 255)
+    return clicked, pressed, hovered
   else
     return false
   end
+end
+
+-- Draws a borderless button. Here, icons needs to be a table containing quads
+-- for keys "default", "hovered" and "pressed".
+Button.draw_flat = function(state, x, y, w, h, label, icons, options)
+  x = x or state.layout.next_x
+  y = y or state.layout.next_y
+
+  assert(not icons or icons.default and icons.hovered and icons.pressed)
+  local _, _, iconwidth, iconheight = unpack(icons and {icons.default:getViewport()} or {})
+  local labelwidth, labelheight = label and Text.min_width(state, label) or nil, 16
+
+  if not w then
+    w = (label and labelwidth or 0) +
+        (icons and iconwidth or 0) +
+        (not label and 0 or not icons or 0)
+  end
+  if not h then
+    h = math.max(label and labelheight or 0, icons and iconheight or 0)
+  end
+
+  love.graphics.setColor(255, 255, 255, 255)
+
+  -- Handle input before drawing so that we can decide which quad should be drawn
+  local clicked, pressed, hovered
+  if state and state.input then
+    clicked, pressed, hovered = handle_input(state, x, y, w, h, label, options)
+    if pressed then
+      love.graphics.setColor(0, 0, 0, 70)
+    elseif hovered then
+      love.graphics.setColor(255, 255, 255, 70)
+    end
+    love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
+    love.graphics.setColor(255, 255, 255, 255)
+  else
+    clicked, pressed, hovered = false, false, false
+  end
+
+  -- Print label
+  if not options then options = {} end
+  if not options.font_color then
+    options.font_color = {255, 255, 255, 255}
+  end
+  local next_x = x
+  if icons then
+
+    local quad
+    if pressed then
+      quad = icons.pressed
+    elseif hovered then
+      quad = icons.hovered
+    else
+      quad = icons.default
+    end
+
+    love.graphics.setColor(255, 255, 255, 255)
+    local margin_y = (h - iconheight) / 2
+    love.graphics.draw(state.style.stylesheet, quad, x, y + margin_y)
+    next_x = next_x + iconwidth + 2 -- small margin between icon and label
+  end
+  if label then
+    local margin_y = (h - labelheight) / 2
+    Text.draw(state, next_x, y + margin_y, w, h, label, options)
+  end
+
+  state.layout.adv_x = w
+  state.layout.adv_y = h
+
+  return clicked, pressed, hovered
 end
 
 setmetatable(Button, {
