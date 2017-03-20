@@ -4,6 +4,7 @@ local Text = require("Quadtastic/Text")
 local Scrollpane = require("Quadtastic/Scrollpane")
 local imgui = require("Quadtastic/imgui")
 local libquadtastic = require("Quadtastic/libquadtastic")
+local Button = require("Quadtastic/Button")
 
 local QuadList = {}
 
@@ -34,11 +35,38 @@ local function draw_quads(gui_state, state, quads, last_hovered, quad_bounds)
       gui_state.layout.next_x, gui_state.layout.next_y + 14, 
       0, gui_state.layout.max_w, 1)
 
+    local input_consumed
     if libquadtastic.is_quad(quad) then
       Text.draw(gui_state, 2, nil, gui_state.layout.max_w, nil,
         string.format("%s: x%d y%d  %dx%d", tostring(name), quad.x, quad.y, quad.w, quad.h))
     else
-      Text.draw(gui_state, 2, nil, gui_state.layout.max_w, nil,
+      local raw_quads, quads
+      if state.collapsed_groups[quad] then
+        raw_quads = gui_state.style.raw_quads.rowbackground.collapsed
+        quads = gui_state.style.quads.rowbackground.collapsed
+      else
+        raw_quads = gui_state.style.raw_quads.rowbackground.expanded
+        quads = gui_state.style.quads.rowbackground.expanded
+      end
+
+      assert(raw_quads.default.w == raw_quads.default.h)
+      local quad_size = raw_quads.default.w
+      local rot = 0
+
+      local x, y = gui_state.layout.next_x + 1, gui_state.layout.next_y + 5
+      local w, h = quad_size, quad_size
+
+      local clicked, pressed, hovered = Button.draw_flat(gui_state, x, y, w, h, nil, quads)
+      if clicked then
+        if state.collapsed_groups[quad] then
+          state.collapsed_groups[quad] = false
+        else
+          state.collapsed_groups[quad] = true
+        end
+      end
+      input_consumed = clicked or pressed or hovered
+
+      Text.draw(gui_state, quad_size + 3, nil, gui_state.layout.max_w, nil,
         string.format("%s: quad group", tostring(name)))
     end
     gui_state.layout.adv_x = gui_state.layout.max_w
@@ -50,21 +78,21 @@ local function draw_quads(gui_state, state, quads, last_hovered, quad_bounds)
     -- Check if the mouse was clicked on this list entry
     local x, y = gui_state.layout.next_x, gui_state.layout.next_y
     local w, h = gui_state.layout.adv_x, gui_state.layout.adv_y
-    if imgui.was_mouse_pressed(gui_state, x, y, w, h) then
+    if not input_consumed and imgui.was_mouse_pressed(gui_state, x, y, w, h) then
       clicked = quad
     end
-    hovered = imgui.is_mouse_in_rect(gui_state, x, y, w, h) and quad or hovered
+    hovered = not input_consumed and imgui.is_mouse_in_rect(gui_state, x, y, w, h) and quad or hovered
 
     Layout.next(gui_state, "|")
     -- If we are drawing a quad list, we now need to recursively draw its
     -- children
-    if not libquadtastic.is_quad(quad) then
+    if not libquadtastic.is_quad(quad) and not state.collapsed_groups[quad] then
       -- Use translate to add some indentation
-      love.graphics.translate(10, 0)
+      love.graphics.translate(9, 0)
       local rec_clicked, rec_hovered = draw_quads(gui_state, state, quad, last_hovered, quad_bounds)
       clicked = clicked or rec_clicked
       hovered = hovered or rec_hovered
-      love.graphics.translate(-10, 0)
+      love.graphics.translate(-9, 0)
     end
   end
   return clicked, hovered

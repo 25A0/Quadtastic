@@ -36,6 +36,7 @@ local Quadtastic = State("quadtastic",
     scrollpane_state = nil,
     quad_scrollpane_state = nil,
     quads = {},
+    collapsed_groups = {},
     selection = Selection(),
   })
 
@@ -209,6 +210,9 @@ Quadtastic.transitions = {
         local keys = {table.find_key(data.quads, quad)}
         if #keys > 0 then
           table.set(data.quads, nil, unpack(keys))
+          -- Remove the element from the list of collapsed groups. This will have
+          -- no effect if the element was a quad.
+          data.collapsed_groups[quad] = nil
         end
       end
     end
@@ -242,7 +246,7 @@ Quadtastic.transitions = {
       -- Remove the element from the shared parent
       shared_parent[key] = nil
       -- No point in preserving a numeric key
-      if type(key) == "number" then 
+      if type(key) == "number" then
         key = num_index
         num_index = num_index + 1
       end
@@ -304,6 +308,7 @@ called '%s'%s.]],
 
     -- Remove group from parent
     parent[group_key] = nil
+    data.collapsed_groups[group_key] = nil
     for k,v in pairs(group) do
       if type(k) == "number" then
         table.insert(parent, v)
@@ -338,6 +343,8 @@ called '%s'%s.]],
   
     if success then
       data.quads, data.quadpath = unpack(more)
+      -- Reset list of collapsed groups
+      data.collapsed_groups = {}
     else
       Dialog.show_dialog(string.format("Could not load quads: %s", more))
     end

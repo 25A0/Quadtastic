@@ -96,7 +96,7 @@ its rgb value.
        include that key in the exported quad file, since we otherwise run into
        the same problem when using the quads.
  - [ ] Make quad list prettier
- - [ ] Make quad groups in quad list collapsible and expandable
+ - [x] Make quad groups in quad list collapsible and expandable
  - [ ] >>>>>>> TURBO-WorkflOw >>>>>
 	 - [ ] Automatically reload image when it changes on disk
 	 - [ ] Automatically export new quad file whenever quads are changed
