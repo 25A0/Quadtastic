@@ -1,6 +1,6 @@
 local Frame = require("Quadtastic/Frame")
 local Layout = require("Quadtastic/Layout")
-local Label = require("Quadtastic/Label")
+local Text = require("Quadtastic/Text")
 local Scrollpane = require("Quadtastic/Scrollpane")
 local imgui = require("Quadtastic/imgui")
 local libquadtastic = require("Quadtastic/libquadtastic")
@@ -28,21 +28,21 @@ local function draw_quads(gui_state, state, quads, last_hovered)
     love.graphics.draw( -- center
       gui_state.style.stylesheet, background_quads.center,
       gui_state.layout.next_x, gui_state.layout.next_y + 2, 
-      0, gui_state.layout.max_w, 18)
+      0, gui_state.layout.max_w, 12)
     love.graphics.draw( -- bottom
       gui_state.style.stylesheet, background_quads.bottom,
-      gui_state.layout.next_x, gui_state.layout.next_y + 18, 
+      gui_state.layout.next_x, gui_state.layout.next_y + 14, 
       0, gui_state.layout.max_w, 1)
 
     if libquadtastic.is_quad(quad) then
-      Label.draw(gui_state, nil, nil, gui_state.layout.max_w, nil,
+      Text.draw(gui_state, 2, nil, gui_state.layout.max_w, nil,
         string.format("%s: x%d y%d  %dx%d", tostring(name), quad.x, quad.y, quad.w, quad.h))
     else
-      Label.draw(gui_state, nil, nil, gui_state.layout.max_w, nil,
+      Text.draw(gui_state, 2, nil, gui_state.layout.max_w, nil,
         string.format("%s: quad group", tostring(name)))
     end
     gui_state.layout.adv_x = gui_state.layout.max_w
-    gui_state.layout.adv_y = 20
+    gui_state.layout.adv_y = 16
 
     -- Check if the mouse was clicked on this list entry
     local x, y = gui_state.layout.next_x, gui_state.layout.next_y
