@@ -2,5 +2,5 @@
 	path = Quadtastic/lib/lovedebug
 	url = ../Ridge/lib/lovedebug
 [submodule "luafilesystem"]
-	path = Quadtastic/lib/luafilesystem
+	path = lib/luafilesystem
 	url = git@github.com:keplerproject/luafilesystem.git
