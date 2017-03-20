@@ -71,6 +71,12 @@ its rgb value.
  - [x] Use CTRL+Mousewheel to zoom
  - [x] Use MMB to pan image
  - [ ] Drag and drop quads in the quad list to form groups
+ - [ ] Distribution:
+    - [x] MacOS
+    - [ ] Windows 32 bit
+    - [ ] Windows 64 bit
+    - [ ] Linux
+    - [ ] Icon
  - [ ] Detect when an image changed on disk
  - [ ] Make Load button glow when file changed on disk
  - [ ] Make Export button glow when quads have changed since last export

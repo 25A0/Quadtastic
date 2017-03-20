@@ -1,4 +1,4 @@
-package.cpath = package.cpath .. ';./Quadtastic/lib/luafilesystem/src/?.so'
+package.cpath = package.cpath .. string.format(";%s/shared/?.so", love.filesystem.getSourceBaseDirectory())
 
 local inspect = require("lib/inspect")
 
