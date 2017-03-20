@@ -68,6 +68,8 @@ its rgb value.
  - [x] Scroll image editor viewport to clicked quad
  - [x] Fix scroll bars not displaying in image editor
  - [x] Implement scroll bars
+ - [ ] Use CTRL+Mousewheel to zoom
+ - [ ] Use MMB to pan image
  - [ ] Drag and drop quads in the quad list to form groups
  - [ ] Detect when an image changed on disk
  - [ ] Make Load button glow when file changed on disk
@@ -85,6 +87,14 @@ its rgb value.
     - [ ] The Border tool to create border quads
     - [ ] The Strip tool to create strips of equally sized quads
  - [ ] Undo/Redo history
+ - [ ] Overhaul dialog texts
+ - [ ] Fix detection of quads: Currently the application treats all tables as
+       quads that have values for x, y, w, and h. This means that you cannot
+       have a group that contains the entire alphabet, since that group could
+       have quads named x, y, w and h. Solution: Introduce a sneaky key _type
+       that identifies the type of element. Unfortunately, we will have to
+       include that key in the exported quad file, since we otherwise run into
+       the same problem when using the quads.
  - [ ] Make quad list prettier
  - [ ] Make quad groups in quad list collapsible and expandable
  - [ ] >>>>>>> TURBO-WorkflOw >>>>>
