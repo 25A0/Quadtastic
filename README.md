@@ -72,6 +72,8 @@ its rgb value.
  - [x] Use MMB to pan image
  - [ ] Drag and drop quads in the quad list to form groups
  - [ ] Distribution:
+    - [x] Automatically generate change log from checked items
+          in README's Roadmap. Most of the time it works every time!
     - [ ] License
     - [x] Automatically put version and commit hash in plist
     - [x] MacOS
