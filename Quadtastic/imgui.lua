@@ -88,6 +88,8 @@ imgui.init_state = function(transform)
     style = {
       font = nil, -- The font that is being used
       stylesheet = nil, -- A texture atlas with gui styles
+      default_cursor = love.mouse.getSystemCursor("arrow"),
+      text_cursor = love.mouse.getSystemCursor("ibeam"),
     },
     layout = imgui.init_layout_state(nil), -- the current layout
     transform = transform, -- the current transform
@@ -95,8 +97,6 @@ imgui.init_state = function(transform)
   }
   return state
 end
-
-local default_cursor = love.mouse.getSystemCursor("arrow")
 
 imgui.cover_input = function(state)
   if not state.cover_count or state.cover_count == 0 then
@@ -125,10 +125,10 @@ imgui.uncover_input = function(state)
   end
 end
 
-imgui.begin_frame = function()
+imgui.begin_frame = function(state)
   love.graphics.origin()
   -- Reset cursor
-  love.mouse.setCursor(default_cursor)
+  love.mouse.setCursor(state.style.default_cursor)
 end
 
 imgui.end_frame = function(state)

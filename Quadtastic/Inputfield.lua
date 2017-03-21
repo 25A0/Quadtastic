@@ -4,9 +4,6 @@ local Text = require("Text")
 
 local Inputfield = {}
 
--- Cache ibeam cursor
-local i_beam_cursor = love.mouse.getSystemCursor("ibeam")
-
 local function handle_input(state, _, y, w, h, content, text_x)
   assert(state.input)
   -- Track whether the cursor was moved. In that case we will always display it
@@ -148,7 +145,7 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
     imgui.is_mouse_in_rect(state, x, y, w, h)
   then
     -- Change cursor to indicate editable text
-    love.mouse.setCursor(i_beam_cursor)
+    love.mouse.setCursor(state.style.text_cursor)
   end
 
   -- Label position
