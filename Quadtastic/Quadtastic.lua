@@ -55,7 +55,7 @@ local interface = {
   move_quad_into_view = QuadList.move_quad_into_view,
 }
 
-Quadtastic.transitions = QuadtasticLogic(interface)
+Quadtastic.transitions = QuadtasticLogic.transitions(interface)
 
 -- -------------------------------------------------------------------------- --
 --                           DRAWING
