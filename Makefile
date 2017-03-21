@@ -6,12 +6,18 @@ APPVERSION = $(shell git tag -l)-$(shell git log -1 --pretty=format:%h )
 APPCOPYRIGHT = 2017 Moritz Neikes
 macos-love-distname = love-0.10.2-macosx-x64
 
-.PHONY: clean test tests/*
+.PHONY: clean test check tests/*
 
 all: test
 	love src
 
-test: ${TESTS}
+check: ${APPNAME}/*.lua
+	@which luacheck 1>/dev/null || (echo \
+		"Luacheck (https://github.com/mpeterv/luacheck/) is required to run the static analysis checks" \
+		&& false )
+	luacheck ${APPNAME}/*.lua
+
+test: check ${TESTS}
 
 dist/${APPNAME}.love: ${APPNAME}/*
 	cd ${APPNAME}; zip ../dist/${APPNAME}.love -Z store -FS -r . -x .\*

@@ -1,0 +1,1 @@
+globals = {"love", "_DEBUG"}
