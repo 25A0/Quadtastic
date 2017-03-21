@@ -1,4 +1,5 @@
-local imgui = require("imgui")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local imgui = require(current_folder .. ".imgui")
 
 local Layout = {}
 

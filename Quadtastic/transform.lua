@@ -1,4 +1,5 @@
-local affine = require("lib/affine")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local affine = require(current_folder .. ".lib.affine")
 
 -- Storing a reference here since we will replace the function pointers later
 local lgorigin = love.graphics.origin

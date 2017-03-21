@@ -1,4 +1,5 @@
-local table = require("tableplus")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local table = require(current_folder .. ".tableplus")
 local Selection = {}
 
 Selection.is_selected = function(self, v)

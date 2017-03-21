@@ -1,6 +1,7 @@
-local Layout = require("Layout")
-local Rectangle = require("Rectangle")
-local imgui = require("imgui")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local Layout = require(current_folder .. ".Layout")
+local Rectangle = require(current_folder .. ".Rectangle")
+local imgui = require(current_folder .. ".imgui")
 
 local Scrollpane = {}
 

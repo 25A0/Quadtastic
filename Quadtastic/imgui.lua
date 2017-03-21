@@ -1,4 +1,5 @@
-local Rectangle = require("Rectangle")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local Rectangle = require(current_folder .. ".Rectangle")
 
 local imgui = {}
 

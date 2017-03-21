@@ -1,10 +1,11 @@
-local Frame = require("Frame")
-local Layout = require("Layout")
-local Text = require("Text")
-local Scrollpane = require("Scrollpane")
-local imgui = require("imgui")
-local libquadtastic = require("libquadtastic")
-local Button = require("Button")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local Frame = require(current_folder .. ".Frame")
+local Layout = require(current_folder .. ".Layout")
+local Text = require(current_folder .. ".Text")
+local Scrollpane = require(current_folder .. ".Scrollpane")
+local imgui = require(current_folder .. ".imgui")
+local libquadtastic = require(current_folder .. ".libquadtastic")
+local Button = require(current_folder .. ".Button")
 
 local QuadList = {}
 

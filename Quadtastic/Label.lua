@@ -1,5 +1,6 @@
-local Rectangle = require("Rectangle")
-local Text = require("Text")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local Rectangle = require(current_folder .. ".Rectangle")
+local Text = require(current_folder .. ".Text")
 local Label = {}
 
 local function handle_input(state, x, y, w, h)

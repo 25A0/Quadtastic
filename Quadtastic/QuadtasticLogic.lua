@@ -1,8 +1,11 @@
-local Dialog = require("Dialog")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local Dialog = require(current_folder.. ".Dialog")
+local QuadExport = require(current_folder.. ".QuadExport")
+local table = require(current_folder.. ".tableplus")
+local libquadtastic = require(current_folder.. ".libquadtastic")
+
+-- Shared library
 local lfs = require("lfs")
-local QuadExport = require("QuadExport")
-local table = require("tableplus")
-local libquadtastic = require("libquadtastic")
 
 local function find_lua_file(filepath)
   return string.gsub(filepath, "%.(%w+)$", ".lua")

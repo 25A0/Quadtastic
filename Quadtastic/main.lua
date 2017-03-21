@@ -1,3 +1,4 @@
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
 package.cpath = package.cpath .. string.format(";%s/shared/?.so", love.filesystem.getSourceBaseDirectory())
 
 if os.getenv("DEBUG") then
@@ -5,13 +6,13 @@ if os.getenv("DEBUG") then
   require("debugconfig")
 end
 
-local imgui = require("imgui")
+local imgui = require(current_folder .. ".imgui")
 
-local AppLogic = require("AppLogic")
-local Quadtastic = require("Quadtastic")
-local libquadtastic = require("libquadtastic")
+local AppLogic = require(current_folder .. ".AppLogic")
+local Quadtastic = require(current_folder .. ".Quadtastic")
+local libquadtastic = require(current_folder .. ".libquadtastic")
 
-local Transform = require('Transform')
+local Transform = require(current_folder .. '.Transform')
 local transform = Transform()
 
 -- Cover love transformation functions

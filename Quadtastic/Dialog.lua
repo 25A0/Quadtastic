@@ -1,9 +1,10 @@
-local State = require("State")
-local InputField = require("Inputfield")
-local Layout = require("Layout")
-local Button = require("Button")
-local Label = require("Label")
-local Window = require("Window")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local State = require(current_folder .. ".State")
+local InputField = require(current_folder .. ".Inputfield")
+local Layout = require(current_folder .. ".Layout")
+local Button = require(current_folder .. ".Button")
+local Label = require(current_folder .. ".Label")
+local Window = require(current_folder .. ".Window")
 
 local Dialog = {}
 

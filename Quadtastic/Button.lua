@@ -1,6 +1,7 @@
-local renderutils = require("Renderutils")
-local Text = require("Text")
-local imgui = require("imgui")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local renderutils = require(current_folder .. ".Renderutils")
+local Text = require(current_folder .. ".Text")
+local imgui = require(current_folder .. ".imgui")
 
 local Button = {}
 

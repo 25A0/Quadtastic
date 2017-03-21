@@ -1,6 +1,7 @@
-local Layout = require("Layout")
-local imgui = require("imgui")
-local Frame = require("Frame")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local Layout = require(current_folder .. ".Layout")
+local imgui = require(current_folder .. ".imgui")
+local Frame = require(current_folder .. ".Frame")
 
 local Window = {}
 

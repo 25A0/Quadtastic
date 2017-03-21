@@ -1,5 +1,6 @@
-local renderutils = require("Renderutils")
-local Layout = require("Layout")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local renderutils = require(current_folder .. ".Renderutils")
+local Layout = require(current_folder .. ".Layout")
 local Frame = {}
 
 Frame.start = function(state, x, y, w, h, options)

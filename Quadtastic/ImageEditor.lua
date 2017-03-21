@@ -1,7 +1,8 @@
-local Scrollpane = require("Scrollpane")
-local libquadtastic = require("libquadtastic")
-local imgui = require("imgui")
-local Text = require("Text")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local Scrollpane = require(current_folder .. ".Scrollpane")
+local libquadtastic = require(current_folder .. ".libquadtastic")
+local imgui = require(current_folder .. ".imgui")
+local Text = require(current_folder .. ".Text")
 
 local ImageEditor = {}
 
