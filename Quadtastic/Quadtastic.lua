@@ -416,9 +416,8 @@ Quadtastic.draw = function(app, state, gui_state)
             end
           else
             -- Put a label in the center of the frame
-            local y = gui_state.layout.max_h / 2 - gui_state.style.font:getHeight()
-            Label.draw(gui_state, nil, y, gui_state.layout.max_w, nil,
-                       "no image :(", {alignment = ":"})
+            Label.draw(gui_state, nil, nil, gui_state.layout.max_w, gui_state.layout.max_h,
+                       "no image :(", {alignment_h = ":", alignment_v = "-"})
           end
         end Frame.finish(gui_state)
 
@@ -557,7 +556,7 @@ Quadtastic.draw = function(app, state, gui_state)
 
             Layout.next(gui_state, "|")
 
-            if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment = ":"}) then
+            if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment_h = ":"}) then
               app.quadtastic.export()
             end
           end Layout.finish(gui_state, "|")
