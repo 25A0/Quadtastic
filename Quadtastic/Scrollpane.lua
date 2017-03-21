@@ -542,7 +542,7 @@ Scrollpane.finish = function(state, scrollpane_state, content_w, content_h)
       local bounds = {
         x = x, y = y + h - scrollbar_margin,
         w = scrollbar_margin, h = scrollbar_margin}
-      local button_state = get_button_state(state, bounds, scrollpane_state.scrolling_left)
+      local button_state = get_button_state(bounds, scrollpane_state.scrolling_left)
       scrollpane_state.scrolling_left = button_state == "pressed"
       if scrollpane_state.scrolling_left then
         move_viewport_within_bounds(scrollpane_state, -scroll_delta, 0)
@@ -555,7 +555,7 @@ Scrollpane.finish = function(state, scrollpane_state, content_w, content_h)
       local bounds = {
         x = x + width - scrollbar_margin, y = y + h - scrollbar_margin,
         w = scrollbar_margin, h = scrollbar_margin}
-      local button_state = get_button_state(state, bounds, scrollpane_state.scrolling_right)
+      local button_state = get_button_state(bounds, scrollpane_state.scrolling_right)
       scrollpane_state.scrolling_right = button_state == "pressed"
       if scrollpane_state.scrolling_right then
         move_viewport_within_bounds(scrollpane_state, scroll_delta, 0)
