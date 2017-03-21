@@ -1,4 +1,3 @@
-local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
 local Layout = require("Layout")
 local Frame = {}

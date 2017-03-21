@@ -1,16 +1,13 @@
-local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
 local imgui = require("imgui")
 local Text = require("Text")
 
 local Inputfield = {}
 
-local transform = require("Transform")
-
 -- Cache ibeam cursor
 local i_beam_cursor = love.mouse.getSystemCursor("ibeam")
 
-local function handle_input(state, x, y, w, h, content, options, text_x)
+local function handle_input(state, _, y, w, h, content, text_x)
   assert(state.input)
   -- Track whether the cursor was moved. In that case we will always display it
   local cursor_moved = false
@@ -53,7 +50,7 @@ local function handle_input(state, x, y, w, h, content, options, text_x)
 
   local newtext = state.input.keyboard.text or ""
   content = string.sub(content, 1 , state.input_field.cursor_pos) ..
-            newtext .. 
+            newtext ..
             string.sub(content, state.input_field.cursor_pos + 1, -1)
   -- Advance the cursor position by the lenght of the added text
   state.input_field.cursor_pos = math.min(#content, state.input_field.cursor_pos + #newtext)
@@ -61,7 +58,7 @@ local function handle_input(state, x, y, w, h, content, options, text_x)
   -- Calculate print offset based on state's cursor
   do
     -- Move text start to the left if text width is larger than field width
-    local cursor_text_width = Text.min_width(state, 
+    local cursor_text_width = Text.min_width(state,
       string.sub(content, 1, state.input_field.cursor_pos))
     if cursor_text_width + 20 > w - 6 then
       text_x = text_x - (cursor_text_width + 20 - (w-6))
@@ -72,9 +69,6 @@ local function handle_input(state, x, y, w, h, content, options, text_x)
   state.input_field.cursor_dt = state.input_field.cursor_dt + state.dt
   if state.input_field.cursor_dt > 1 then
     state.input_field.cursor_dt = state.input_field.cursor_dt - 1
-  end
-  if cursor_moved then
-    state.input_field.cursor_dt = 0
   end
   if state.input_field.cursor_dt < .5 then
     local width = Text.min_width(state, string.sub(
@@ -116,6 +110,9 @@ local function handle_input(state, x, y, w, h, content, options, text_x)
       cursor_moved = true
     end
     state.input_field.cursor_pos = math.max(0, math.min(#content, cursor_pos))
+  end
+  if cursor_moved then
+    state.input_field.cursor_dt = 0
   end
   return content, text_x
 end
@@ -173,7 +170,7 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
     end
 
     if has_focus then
-      content, text_x = handle_input(state, x, y, w, h, content, options, text_x)
+      content, text_x = handle_input(state, x, y, w, h, content, text_x)
     else
       -- The widget does not have the keyboard focus
       if textwidth + 20 > w - 6 then

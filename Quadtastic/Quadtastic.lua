@@ -45,7 +45,7 @@ function Quadtastic.reset_view(state)
   state.display.zoom = 1
   if state.image then
     Scrollpane.set_focus(state.scrollpane_state, {
-      x = 0, y = 0, 
+      x = 0, y = 0,
       w = state.image:getWidth(), h = state.image:getHeight()
     }, "immediate")
   end
@@ -58,13 +58,14 @@ end
 -- defined above.
 
 Quadtastic.transitions = {
+  -- luacheck: no unused args
   export = function(app, data)
     if not data.image then
       Dialog.show_dialog("Load an image first")
       return
     elseif not data.quadpath or data.quadpath == "" then
       local ret, path = Dialog.query(
-        "Where should the quad file be stored?", 
+        "Where should the quad file be stored?",
         find_lua_file(data.filepath),
         {"Cancel", "OK"})
       if ret == "OK" then
@@ -87,14 +88,17 @@ Quadtastic.transitions = {
       local ret
       ret, new_key = Dialog.query("Name:", new_key, {"Cancel", "OK"})
 
-      local function replace(tab, current_keys, new_keys, element)
+      local function replace(tab, old_keys, new_keys, element)
         -- Make sure that the new keys form a valid path, that is, all but the
         -- last key must be tables that are not quads
         local current_table = tab
         for i=1,#new_keys do
           if type(current_table) == "table" and libquadtastic.is_quad(current_table) then
             local keys_so_far = table.concat(new_keys, ".", 1, i)
-            Dialog.show_dialog(string.format("The element %s is a quad, and can therefore not have nested quads.", keys_so_far), {"OK"})
+            Dialog.show_dialog(string.format(
+              "The element %s is a quad, and can therefore not have nested quads.",
+              keys_so_far), {"OK"}
+            )
             return
           end
           -- This does intentionally not check the very last key, since it is
@@ -110,9 +114,9 @@ Quadtastic.transitions = {
         end
 
         -- Remove the entry under the old key
-        table.set(data.quads, nil, unpack(current_keys))
+        table.set(data.quads, nil, unpack(old_keys))
         -- Add the entry under the new key
-        table.set(data.quads, quad, unpack(new_keys))
+        table.set(data.quads, element, unpack(new_keys))
       end
 
       if ret == "OK" then
@@ -124,14 +128,14 @@ Quadtastic.transitions = {
         end
         -- Check if that key already exists
         if table.get(data.quads, unpack(new_keys)) then
-          local ret = Dialog.show_dialog(
+          local action = Dialog.show_dialog(
             string.format("The element '%s' already exists.", new_key),
             {"Cancel", "Swap", "Replace"})
-          if ret == "Swap" then
+          if action == "Swap" then
             local old_value = table.get(data.quads, unpack(new_keys))
             table.set(data.quads, old_value, unpack(current_keys))
             table.set(data.quads, quad, unpack(new_keys))
-          elseif ret == "Replace" then
+          elseif action == "Replace" then
             replace(data.quads, current_keys, new_keys, quad)
           else -- Cancel option
             return
@@ -278,7 +282,7 @@ Quadtastic.transitions = {
     -- Check that we can break up this group by making sure that the parent
     -- element and the group don't have any conflicting keys
     local ignore_numeric_clash = false
-    for k,v in pairs(group) do
+    for k,_ in pairs(group) do
       if parent[k] and k ~= group_key then
         local parent_name
         for _,v in ipairs(parent_keys) do
@@ -286,7 +290,7 @@ Quadtastic.transitions = {
         end
         if type(k) == "number" and not ignore_numeric_clash then
           local ret = Dialog.show_dialog(string.format([[
-Breaking up this group will change some numeric indices of the 
+Breaking up this group will change some numeric indices of the
 elements in that group. In particular, the index %d already exists%s.
 Proceed anyways?]],
             k, (parent_name and " in group "..parent_name) or ""),
@@ -298,7 +302,7 @@ Proceed anyways?]],
           end
         else
           Dialog.show_dialog(string.format([[
-This group cannot be broken up since there is already an element 
+This group cannot be broken up since there is already an element
 called '%s'%s.]],
             k, (parent_name and " in group "..parent_name) or ""))
           return
@@ -321,10 +325,10 @@ called '%s'%s.]],
   load_quads_from_path = function(app, data, filepath)
     local success, more = pcall(function()
       local filehandle, err = io.open(filepath, "r")
-      if err then 
+      if err then
         error(err)
       end
-  
+
       if filehandle then
         filehandle:close()
         local quads = loadfile(filepath)()
@@ -332,7 +336,7 @@ called '%s'%s.]],
         return {quads, quadpath}
       end
     end)
-  
+
     if success then
       data.quads, data.quadpath = unpack(more)
       -- Reset list of collapsed groups
@@ -342,20 +346,20 @@ called '%s'%s.]],
     end
 
   end,
-    
+
   load_image_from_path = function(app, data, filepath)
     local success, more = pcall(function()
       local filehandle, err = io.open(filepath, "rb")
-      if err then 
+      if err then
         error(err)
       end
-      local data = filehandle:read("*a")
+      local filecontent = filehandle:read("*a")
       filehandle:close()
       local imagedata = love.image.newImageData(
-        love.filesystem.newFileData(data, 'img', 'file'))
+        love.filesystem.newFileData(filecontent, 'img', 'file'))
       return love.graphics.newImage(imagedata)
     end)
-  
+
     -- success, more = pcall(love.graphics.newImage, data)
     if success then
       data.image = more
@@ -364,7 +368,10 @@ called '%s'%s.]],
       -- Try to read a quad file
       local quadfilename = find_lua_file(data.filepath)
       if lfs.attributes(quadfilename) then
-        local should_load = Dialog.show_dialog(string.format("We found a quad file in %s. Would you like to load it?", quadfilename), {"Yes", "No"})
+        local should_load = Dialog.show_dialog(string.format(
+          "We found a quad file in %s. Would you like to load it?", quadfilename),
+          {"Yes", "No"}
+        )
         if should_load == "Yes" then
           app.quadtastic.load_quads_from_path(quadfilename)
         end
@@ -373,7 +380,6 @@ called '%s'%s.]],
       Dialog.show_dialog(string.format("Could not load image: %s", more))
     end
   end,
-  
 }
 
 -- -------------------------------------------------------------------------- --
@@ -391,8 +397,8 @@ Quadtastic.draw = function(app, state, gui_state)
         do Layout.start(gui_state)
           state.filepath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.filepath)
           Layout.next(gui_state, "-", 2)
-    
-          local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Load")
+
+          local pressed = Button.draw(gui_state, nil, nil, nil, nil, "Load")
           if pressed then
             app.quadtastic.load_image_from_path(state.filepath)
           end
@@ -420,7 +426,7 @@ Quadtastic.draw = function(app, state, gui_state)
 
         do Layout.start(gui_state) -- Zoom buttons
           do
-            local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
+            local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil,
               gui_state.style.quads.buttons.plus)
             if pressed then
               ImageEditor.zoom(state, 1)
@@ -429,7 +435,7 @@ Quadtastic.draw = function(app, state, gui_state)
           end
           Layout.next(gui_state, "-")
           do
-            local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil, 
+            local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil,
               gui_state.style.quads.buttons.minus)
             if pressed then
               ImageEditor.zoom(state, -1)
@@ -451,8 +457,8 @@ Quadtastic.draw = function(app, state, gui_state)
         do Layout.start(gui_state)
           state.quadpath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.quadpath or "")
           Layout.next(gui_state, "-", 2)
-    
-          local pressed, active = Button.draw(gui_state, nil, nil, nil, nil, "Load")
+
+          local pressed = Button.draw(gui_state, nil, nil, nil, nil, "Load")
           if pressed then
             app.quadtastic.load_quads_from_path(state.quadpath)
           end
@@ -465,7 +471,7 @@ Quadtastic.draw = function(app, state, gui_state)
         do Layout.start(gui_state)
           do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 21)
             -- Draw the list of quads
-            local clicked, hovered = 
+            local clicked, hovered =
               QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 19,
                             state.hovered)
             if clicked then
@@ -501,7 +507,7 @@ Quadtastic.draw = function(app, state, gui_state)
                     -- Clear the list of new quads to make the accumulation process
                     -- a bit easier
                     new_quads = {}
-                    for k,v in pairs(parent) do
+                    for _,v in pairs(parent) do
                       if v == clicked then
                         found_new = true
                       end
@@ -556,7 +562,7 @@ Quadtastic.draw = function(app, state, gui_state)
             end
           end Layout.finish(gui_state, "|")
           Layout.next(gui_state, "-", 2)
-    
+
           -- Draw button column
           do Layout.start(gui_state)
             if Button.draw(gui_state, nil, nil, nil, nil, nil,

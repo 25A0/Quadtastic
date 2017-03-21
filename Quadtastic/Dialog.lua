@@ -12,8 +12,8 @@ function Dialog.show_dialog(message, buttons)
   local function draw(app, data, gui_state, w, h)
     local x = w/4
     local y = h/4
-    local w = w/2
-    local h = h/2
+    w = w/2
+    h = h/2
     do Window.start(gui_state, x, y, w, h)
       do Layout.start(gui_state)
         Label.draw(gui_state, nil, nil,
@@ -31,18 +31,19 @@ function Dialog.show_dialog(message, buttons)
       end Layout.finish(gui_state, "|")
     end Window.finish(gui_state)
   end
-  
-	assert(coroutine.running(), "This function must be run in a coroutine.")
-	local transitions = {
-		respond = function(app, data, response)
-			return response
-		end,
-	}
-	local dialog_state = State("dialog", transitions, 
-		                         {message = message, buttons = buttons or {"OK"}})
-	-- Store the draw function in the state
-	dialog_state.draw = draw
-	return coroutine.yield(dialog_state)
+
+  assert(coroutine.running(), "This function must be run in a coroutine.")
+  local transitions = {
+    -- luacheck: no unused args
+    respond = function(app, data, response)
+      return response
+    end,
+  }
+  local dialog_state = State("dialog", transitions,
+                             {message = message, buttons = buttons or {"OK"}})
+  -- Store the draw function in the state
+  dialog_state.draw = draw
+  return coroutine.yield(dialog_state)
 end
 
 function Dialog.query(message, input, buttons)
@@ -50,15 +51,15 @@ function Dialog.query(message, input, buttons)
   local function draw(app, data, gui_state, w, h)
     local x = w/4
     local y = h/4
-    local w = w/2
-    local h = h/2
+    w = w/2
+    h = h/2
     do Window.start(gui_state, x, y, w, h)
       do Layout.start(gui_state)
         Label.draw(gui_state, nil, nil,
                    gui_state.layout.max_w, nil,
                    data.message)
         Layout.next(gui_state, "|")
-        data.input = InputField.draw(gui_state, nil, nil, 
+        data.input = InputField.draw(gui_state, nil, nil,
                                      gui_state.layout.max_w, nil, data.input, {forced_keyboard_focus = true})
         Layout.next(gui_state, "|")
         do Layout.start(gui_state)
@@ -72,15 +73,16 @@ function Dialog.query(message, input, buttons)
       end Layout.finish(gui_state, "|")
     end Window.finish(gui_state)
   end
-  
+
   assert(coroutine.running(), "This function must be run in a coroutine.")
   local transitions = {
+    -- luacheck: no unused args
     respond = function(app, data, response)
       return response, data.input
     end,
   }
-  local query_state = State("query", transitions, 
-                             {input = input or "", message = message, 
+  local query_state = State("query", transitions,
+                             {input = input or "", message = message,
                               buttons = buttons or {"Cancel", "OK"}
                              })
   -- Store the draw function in the state

@@ -1,6 +1,5 @@
 local Layout = require("Layout")
 local Rectangle = require("Rectangle")
-local affine = require("lib/affine")
 local imgui = require("imgui")
 
 local Scrollpane = {}
@@ -9,7 +8,7 @@ local scrollbar_margin = 7
 
 local scroll_delta = 2
 
-local function handle_input(state, scrollpane_state, w, h)
+local function handle_input(state, scrollpane_state)
   assert(state.input)
 
   -- Only handle image panning if the mousewheel was triggered inside
@@ -223,11 +222,11 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
   return scrollpane_state
 end
 
-Scrollpane.finish = function(state, scrollpane_state, w, h)
+Scrollpane.finish = function(state, scrollpane_state, content_w, content_h)
   -- If the content defined advance values in x and y, we can detect whether
   -- we need to draw scroll bars at all.
-  local content_w = w or state.layout.adv_x
-  local content_h = h or state.layout.adv_y
+  content_w = content_w or state.layout.adv_x
+  content_h = content_h or state.layout.adv_y
 
   -- Finish the layout that encloses the viewport's content
   Layout.finish(state)
@@ -287,7 +286,7 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
     return new_vp_pos
   end
 
-  local function get_button_state(state, bounds, was_pressed)
+  local function get_button_state(bounds, was_pressed)
     local button_state = "default"
     if state and state.input then
       if imgui.is_mouse_in_rect(state, bounds.x, bounds.y, bounds.w, bounds.h) then
@@ -396,13 +395,13 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
       then
         -- Move viewport to click position. The scrollbar should be
         -- centered around the click position.
-        local _, y = state.transform:unproject(0, state.input.mouse.y)
+        local _, my = state.transform:unproject(0, state.input.mouse.y)
         -- Subtract margin and offset
-        y = y - scrollbar_margin - 1
+        my = my - scrollbar_margin - 1
         -- Subtract half of the scrollbar to center scrollbar around mouse
-        y = y - .5 * total_sb_height
+        my = my - .5 * total_sb_height
         local new_vp_y = viewport_from_scrollbar(
-          y, sb_area, total_sb_height, total_content_h, inner_h)
+          my, sb_area, total_sb_height, total_content_h, inner_h)
         -- Move viewport to that position
         move_viewport_within_bounds(scrollpane_state, 0, new_vp_y - scrollpane_state.y)
         scrollpane_state.ty = scrollpane_state.y
@@ -414,7 +413,7 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
       local bounds = {
         x = x + w - scrollbar_margin, y = y,
         w = scrollbar_margin, h = scrollbar_margin}
-      local button_state = get_button_state(state, bounds, scrollpane_state.scrolling_up)
+      local button_state = get_button_state(bounds, scrollpane_state.scrolling_up)
       scrollpane_state.scrolling_up = button_state == "pressed"
       if scrollpane_state.scrolling_up then
         move_viewport_within_bounds(scrollpane_state, 0, -scroll_delta)
@@ -427,7 +426,7 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
       local bounds = {
         x = x + w - scrollbar_margin, y = y + height - scrollbar_margin,
         w = scrollbar_margin, h = scrollbar_margin}
-      local button_state = get_button_state(state, bounds, scrollpane_state.scrolling_down)
+      local button_state = get_button_state(bounds, scrollpane_state.scrolling_down)
       scrollpane_state.scrolling_down = button_state == "pressed"
       if scrollpane_state.scrolling_down then
         move_viewport_within_bounds(scrollpane_state, 0, scroll_delta)
@@ -489,7 +488,7 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
       -- Update drag state
       if state.input.mouse.buttons[1].presses >= 1 and
         state.input.mouse.buttons[1].pressed and
-        imgui.is_mouse_in_rect(state, sb_start + scrollbar_margin + 1, y + h - scrollbar_margin, 
+        imgui.is_mouse_in_rect(state, sb_start + scrollbar_margin + 1, y + h - scrollbar_margin,
                                sb_end - (sb_start + scrollbar_margin + 1), scrollbar_margin)
       then
         scrollpane_state.is_dragging_horizontal = true
@@ -525,13 +524,13 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
       then
         -- Move viewport to click position. The scrollbar should be
         -- centered around the click position.
-        local x, _ = state.transform:unproject(state.input.mouse.x, 0)
+        local mx, _ = state.transform:unproject(state.input.mouse.x, 0)
         -- Subtract margin and offset
-        x = x - scrollbar_margin - 1
+        mx = mx - scrollbar_margin - 1
         -- Subtract half of the scrollbar to center scrollbar around mouse
-        x = x - .5 * total_sb_width
+        mx = mx - .5 * total_sb_width
         local new_vp_x = viewport_from_scrollbar(
-          x, sb_area, total_sb_width, total_content_w, inner_w)
+          mx, sb_area, total_sb_width, total_content_w, inner_w)
         -- Move viewport to that position
         move_viewport_within_bounds(scrollpane_state, new_vp_x - scrollpane_state.x, 0)
         scrollpane_state.tx = scrollpane_state.x
@@ -578,7 +577,7 @@ Scrollpane.finish = function(state, scrollpane_state, w, h)
   scrollpane_state.had_horizontal = has_horizontal
 
   if state and state.input then
-    handle_input(state, scrollpane_state, w, h)
+    handle_input(state, scrollpane_state)
   end
 
   -- Image panning

@@ -111,7 +111,7 @@ function AppLogic.pop_state(self, ...)
   self._has_active_state_changed = true
   local statename = self._state.name
   -- Resume state's current coroutine with the passed event
-  if self._state.coroutine and 
+  if self._state.coroutine and
      coroutine.status(self._state.coroutine) == "suspended"
   then
     run(self, nil, ...)
@@ -124,7 +124,6 @@ function AppLogic.pop_state(self, ...)
       run(self, f, unpack(event_bundle[2]))
     end
     self._event_queue[statename] = nil
-  else
   end
 end
 

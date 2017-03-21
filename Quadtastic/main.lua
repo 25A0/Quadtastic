@@ -1,9 +1,5 @@
 package.cpath = package.cpath .. string.format(";%s/shared/?.so", love.filesystem.getSourceBaseDirectory())
 
-local inspect = require("lib/inspect")
-
-unpack = unpack or table.unpack
-
 if os.getenv("DEBUG") then
   -- require("lib/lovedebug/lovedebug")
   require("debugconfig")
@@ -11,25 +7,9 @@ end
 
 local imgui = require("imgui")
 
-local Button = require("Button")
-local Inputfield = require("Inputfield")
-local Label = require("Label")
-local Frame = require("Frame")
-local Layout = require("Layout")
-local Window = require("Window")
-local Scrollpane = require("Scrollpane")
-local Tooltip = require("Tooltip")
-local ImageEditor = require("ImageEditor")
-local QuadList = require("QuadList")
 local AppLogic = require("AppLogic")
 local Quadtastic = require("Quadtastic")
 local libquadtastic = require("libquadtastic")
-
--- Make the state variables local unless we are in debug mode
-if not _DEBUG then
-  local gui_state
-  local state
-end
 
 local Transform = require('Transform')
 local transform = Transform()
@@ -50,6 +30,7 @@ end
 local scale = 2
 
 local app
+local gui_state
 
 function love.load()
   -- Initialize the state
@@ -72,14 +53,14 @@ function love.load()
   gui_state.style.font = med_font
   gui_state.style.stylesheet = stylesheet
   gui_state.style.raw_quads = require("res/style")
-  gui_state.style.quads = libquadtastic.import_quads(gui_state.style.raw_quads, 
+  gui_state.style.quads = libquadtastic.import_quads(gui_state.style.raw_quads,
     stylesheet:getWidth(), stylesheet:getHeight())
 
-  backgroundcanvas = love.graphics.newCanvas(8, 8)
+  gui_state.style.backgroundcanvas = love.graphics.newCanvas(8, 8)
   do
     -- Create a canvas with the background texture on it
-    backgroundcanvas:setWrap("repeat", "repeat")
-    backgroundcanvas:renderTo(function()
+    gui_state.style.backgroundcanvas:setWrap("repeat", "repeat")
+    gui_state.style.backgroundcanvas:renderTo(function()
       love.graphics.draw(stylesheet, gui_state.style.quads.background)
     end)
   end
@@ -87,7 +68,6 @@ function love.load()
   gui_state.overlay_canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
-local count = 0
 function love.draw()
   imgui.begin_frame(gui_state)
   love.graphics.scale(scale, scale)
@@ -102,7 +82,7 @@ function love.draw()
   end
   for _, statebundle in ipairs(app:get_states()) do
     local state, is_active = statebundle[1], statebundle[2]
-    if not state.draw then 
+    if not state.draw then
       print(string.format("Don't know how to display %s", state.name))
     else
       if not is_active then imgui.cover_input(gui_state) end
@@ -115,7 +95,7 @@ function love.draw()
       if not is_active then imgui.uncover_input(gui_state) end
     end
   end
-  
+
   love.graphics.origin()
   love.graphics.draw(gui_state.overlay_canvas)
 
@@ -146,12 +126,12 @@ function love.wheelmoved(x, y)
   imgui.wheelmoved(gui_state, x, y)
 end
 
-function love.keypressed(key, scancode, isrepeat)
-  imgui.keypressed(gui_state, key, scancode, isrepeat)
+function love.keypressed(key, scancode)
+  imgui.keypressed(gui_state, key, scancode)
 end
 
 function love.keyreleased(key, scancode)
-  imgui.keyreleased(gui_state, key, scancode, isrepeat)
+  imgui.keyreleased(gui_state, key, scancode)
 end
 
 function love.textinput(text)

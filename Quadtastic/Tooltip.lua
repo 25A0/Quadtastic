@@ -5,9 +5,9 @@ local Renderutils = require("Renderutils")
 
 local Tooltip = {}
 
-unpack = unpack or table.unpack
+local unpack = unpack or table.unpack
 
-local find_tooltip_position = function(gui_state, x, y, w, h, label, options)
+local find_tooltip_position = function(gui_state, x, y, w, h, label)
   local textlength = Text.min_width(gui_state, label or "Someone forgot to set the tooltip text...")
 
   -- Determine where the most room is to show the tooltip
@@ -57,9 +57,9 @@ local show_tooltip = function(gui_state, x, y, w, h, label, options)
       gui_state.transform:project(x, y))
     local window_w, window_h = gui_state.window_transform:unproject_dimensions(
       gui_state.transform:project_dimensions(w, h))
-  
+
     local ttx, tty, ttw, tth, tipx, tipy, orientation = find_tooltip_position(
-      gui_state, window_x, window_y, window_w, window_h, label, options)
+      gui_state, window_x, window_y, window_w, window_h, label)
 
     -- Replace current transform by window transform.
     -- Only works for translate and scale; sheared or rotated windows will have
@@ -71,8 +71,8 @@ local show_tooltip = function(gui_state, x, y, w, h, label, options)
 
     love.graphics.setColor(255, 255, 255, 255)
     -- Draw tooltip border
-    Renderutils.draw_border(gui_state.style.stylesheet, 
-                            gui_state.style.quads.tooltip.border, 
+    Renderutils.draw_border(gui_state.style.stylesheet,
+                            gui_state.style.quads.tooltip.border,
                             ttx, tty, ttw, tth, 2)
     -- Draw tooltip tip
     love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.tooltip.tip[orientation], tipx, tipy)
@@ -92,7 +92,7 @@ local show_tooltip = function(gui_state, x, y, w, h, label, options)
   end)
 end
 
-local function handle_input(gui_state, label, x, y, w, h, options)
+local function handle_input(gui_state, x, y, w, h, options)
   local old_mouse_x = gui_state.input.mouse.old_x
   local old_mouse_y = gui_state.input.mouse.old_y
   if not old_mouse_x or not old_mouse_y then return end
@@ -130,7 +130,7 @@ Tooltip.draw = function(gui_state, label, x, y, w, h, options)
   h = h or gui_state.layout.adv_y
 
   if gui_state and gui_state.input then
-    if handle_input(gui_state, label, x, y, w, h, options) then -- display the tooltip
+    if handle_input(gui_state, x, y, w, h, options) then -- display the tooltip
       show_tooltip(gui_state, x, y, w, h, label, options)
     end
   end

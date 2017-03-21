@@ -1,4 +1,3 @@
-local Rectangle = require("Rectangle")
 local renderutils = require("Renderutils")
 local Text = require("Text")
 local imgui = require("imgui")
@@ -7,7 +6,7 @@ local Button = {}
 
 -- Returns, in this order, if the button was just pressed, if the button is still
 -- being pressed, and if the button is hovered.
-local function handle_input(state, x, y, w, h, label, options)
+local function handle_input(state, x, y, w, h)
   assert(state.input)
   if imgui.is_mouse_in_rect(state, x, y, w, h) then
     local pressed
@@ -31,16 +30,16 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
   y = y or state.layout.next_y
 
   local _, _, iconwidth, iconheight = unpack(iconquad and {iconquad:getViewport()} or {})
+  local labelwidth, labelheight = label and Text.min_width(state, label) or nil, label and 16 or nil
 
   local margin_x = 4
-  local margin_y = 1
   if not w then
-    w = (label and (Text.min_width(state, label) + margin_x) or 0) +
+    w = (label and (labelwidth + margin_x) or 0) +
         (iconquad and iconwidth + 3 or 0) +
         (not label and 3 or not iconquad and margin_x or 0)
   end
   if not h then
-    h = math.max(label and 18 or 0, iconquad and iconheight + 6 or 0)
+    h = math.max(label and labelheight + 2 or 0, iconquad and iconheight + 6 or 0)
   end
   -- Also, the button cannot be smaller than the area covered by the border
   w = math.max(w, 6)
@@ -63,6 +62,7 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
     next_x = next_x + iconwidth
   end
   if label then
+    local margin_y = (h - labelheight) / 2
     Text.draw(state, next_x + margin_x, y + margin_y, w - 2*margin_x, h - 2*margin_y, label, options)
   end
 
@@ -71,7 +71,7 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
 
   -- Highlight if mouse is over button
   if state and state.input then
-    local clicked, pressed, hovered = handle_input(state, x, y, w, h, label, options)
+    local clicked, pressed, hovered = handle_input(state, x, y, w, h)
     if pressed then
       love.graphics.setColor(0, 0, 0, 70)
     elseif hovered then
@@ -95,7 +95,7 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
 
   assert(not icons or icons.default and icons.hovered and icons.pressed)
   local _, _, iconwidth, iconheight = unpack(icons and {icons.default:getViewport()} or {})
-  local labelwidth, labelheight = label and Text.min_width(state, label) or nil, 16
+  local labelwidth, labelheight = label and Text.min_width(state, label) or nil, label and 16 or nil
 
   if not w then
     w = (label and labelwidth or 0) +
@@ -111,7 +111,7 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
   -- Handle input before drawing so that we can decide which quad should be drawn
   local clicked, pressed, hovered
   if state and state.input then
-    clicked, pressed, hovered = handle_input(state, x, y, w, h, label, options)
+    clicked, pressed, hovered = handle_input(state, x, y, w, h)
     if pressed then
       love.graphics.setColor(0, 0, 0, 70)
     elseif hovered then

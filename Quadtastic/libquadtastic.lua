@@ -17,22 +17,22 @@ function libquadtastic.import_quads(table, width, height)
   return t
 end
 
-function libquadtastic.import_palette(table, image)
-  local function create_palette(table, imagedata)
-    local t = {}
+local function create_palette(table, imagedata)
+  local t = {}
 
-    for k,v in pairs(table) do
-      if libquadtastic.is_quad(v) then
-        -- Grab the pixel color of the quad's upper left corner
-        t[k] = {imagedata:getPixel(v.x, v.y)}
-      elseif type(v) == "table" then
-        -- Recursively add the quads stored in this table
-        t[k] = create_palette(v, imagedata)
-      end
+  for k,v in pairs(table) do
+    if libquadtastic.is_quad(v) then
+      -- Grab the pixel color of the quad's upper left corner
+      t[k] = {imagedata:getPixel(v.x, v.y)}
+    elseif type(v) == "table" then
+      -- Recursively add the quads stored in this table
+      t[k] = create_palette(v, imagedata)
     end
-    return t
   end
+  return t
+end
 
+function libquadtastic.import_palette(table, image)
   local imagedata
   if image:isCompressed() then
     error("Cannot currently handle compressed images")

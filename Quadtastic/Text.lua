@@ -1,8 +1,6 @@
-local Rectangle = require("Rectangle")
-local renderutils = require("Renderutils")
 local Text = {}
 
-unpack = unpack or table.unpack
+local unpack = unpack or table.unpack
 
 Text.min_width = function(state, text)
   return state.style.font and state.style.font:getWidth(text)

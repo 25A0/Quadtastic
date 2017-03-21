@@ -37,7 +37,7 @@ end
 QuadExport.export = function(quads, filepath_or_filehandle)
   assert(quads and type(quads) == "table")
 
-  local filehandle
+  local filehandle, more
   -- Errors need to be handled upstream
   if io.type(filepath_or_filehandle) == "file" then
     filehandle = filepath_or_filehandle

@@ -1,9 +1,8 @@
 local Rectangle = require("Rectangle")
-local renderutils = require("Renderutils")
 local Text = require("Text")
 local Label = {}
 
-local function handle_input(state, x, y, w, h, label, options)
+local function handle_input(state, x, y, w, h)
   assert(state.input)
 
   local active, hover = false, false
@@ -33,13 +32,14 @@ Label.draw = function(state, x, y, w, h, label, options)
   -- Print label
   local fontcolor = options and options.font_color or {32, 63, 73, 255}
   local margin_y = (h - 16) / 2
+  love.graphics.setColor(fontcolor)
   Text.draw(state, x + margin_x, y + margin_y, w - 2*margin_x, h - 2*margin_y, label, options)
 
   state.layout.adv_x = w
   state.layout.adv_y = h
 
   if state and state.input then
-    return handle_input(state, x, y, w, h, label, options)
+    return handle_input(state, x, y, w, h)
   else return false, false
   end
 end

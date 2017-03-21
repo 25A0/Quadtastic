@@ -125,7 +125,7 @@ imgui.uncover_input = function(state)
   end
 end
 
-imgui.begin_frame = function(state)
+imgui.begin_frame = function()
   love.graphics.origin()
   -- Reset cursor
   love.mouse.setCursor(default_cursor)
@@ -141,16 +141,16 @@ imgui.end_frame = function(state)
   state.input.mouse.wheel_dy = 0
   -- Reset mouse button clicks
   -- We can't use ipairs here since the first index might not be defined
-  for button, button_state in pairs(state.input.mouse.buttons) do
+  for _, button_state in pairs(state.input.mouse.buttons) do
     button_state.presses = 0
     button_state.releases = 0
   end
   -- Reset key type count
-  for key, key_state in pairs(state.input.keyboard.keys) do
+  for _, key_state in pairs(state.input.keyboard.keys) do
     key_state.presses = 0
     key_state.releases = 0
   end
-  for scancode, scancode_state in pairs(state.input.keyboard.scancodes) do
+  for _, scancode_state in pairs(state.input.keyboard.scancodes) do
     scancode_state.presses = 0
     scancode_state.releases = 0
   end
@@ -186,7 +186,7 @@ imgui.mousepressed = function(state, x, y, button)
   button_state.presses = button_state.presses + 1
 end
 
-imgui.mousereleased = function(state, x, y, button)
+imgui.mousereleased = function(state, _, _, button)
   -- We can't know in advance how many buttons there will be, so we might
   -- need to initialize this table.
   init_mouse_state(state, button)
@@ -231,7 +231,7 @@ local function init_scancode_state(state, key)
   end
 end
 
-imgui.keypressed = function(state, key, scancode, isrepeat)
+imgui.keypressed = function(state, key, scancode)
   init_key_state(state, key)
   init_scancode_state(state, scancode)
   state.input.keyboard.keys[key].pressed = true
@@ -255,6 +255,7 @@ end
 
 imgui.update = function(state, dt)
   state.dt = dt
+  local _
   _, state.second = math.modf(state.second + dt)
 end
 
@@ -269,7 +270,7 @@ imgui.is_mouse_in_rect = function(state, x, y, w, h, mx, my, transform)
   mx = mx or state.input.mouse.x
   my = my or state.input.mouse.y
   transform = transform or state.transform
-  return Rectangle.contains({x = x, y = y, w = w, h = h}, 
+  return Rectangle.contains({x = x, y = y, w = w, h = h},
                             transform:unproject(mx, my))
 end
 
@@ -285,7 +286,7 @@ imgui.was_mouse_pressed = function(state, x, y, w, h, button)
   if button_state.presses < 1 then return false end
   local mx, my = button_state.at_x, button_state.at_y
   local transform = state.transform
-  return Rectangle.contains({x = x, y = y, w = w, h = h}, 
+  return Rectangle.contains({x = x, y = y, w = w, h = h},
                             transform:unproject(mx, my))
 end
 
@@ -302,7 +303,7 @@ imgui.is_mouse_pressed = function(state, x, y, w, h, button)
   local mx, my = button_state.at_x, button_state.at_y
   local transform = state.transform
   return button_state.pressed and
-         Rectangle.contains({x = x, y = y, w = w, h = h}, 
+         Rectangle.contains({x = x, y = y, w = w, h = h},
                             transform:unproject(mx, my))
 end
 

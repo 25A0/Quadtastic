@@ -1,6 +1,6 @@
 local Rectangle = {}
 
-Rectangle.new = function(self, x, y, w, h)
+Rectangle.new = function(_, x, y, w, h)
   local rectangle = {
     x = x,
     y = y,

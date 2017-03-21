@@ -14,10 +14,10 @@ Layout.start = function(state, x, y, w, h, options)
 	love.graphics.push("all")
 
 	if not options or not options.noscissor then
-      local abs_x, abs_y = state.transform:project(x, y)
-      local abs_w, abs_h = state.transform:project_dimensions(w, h)
-      love.graphics.intersectScissor(abs_x, abs_y, abs_w, abs_h)
-    end
+	  local abs_x, abs_y = state.transform:project(x, y)
+	  local abs_w, abs_h = state.transform:project_dimensions(w, h)
+	  love.graphics.intersectScissor(abs_x, abs_y, abs_w, abs_h)
+	end
 
 	love.graphics.translate(x, y)
 end
@@ -37,16 +37,16 @@ local function update_state(state, orientation, spacing)
 		state.layout.acc_adv_x = state.layout.acc_adv_x + state.layout.adv_x
 		-- Decrease the remaining width by the advance in x
 		state.layout.max_w = math.max(0, state.layout.max_w - state.layout.adv_x - spacing)
-    	state.layout.acc_adv_y = math.max(state.layout.acc_adv_y, state.layout.adv_y)
+		state.layout.acc_adv_y = math.max(state.layout.acc_adv_y, state.layout.adv_y)
 
-    	state.layout.next_x = state.layout.next_x + state.layout.adv_x + spacing
+		state.layout.next_x = state.layout.next_x + state.layout.adv_x + spacing
 	else
-    	state.layout.acc_adv_x = math.max(state.layout.acc_adv_x, state.layout.adv_x)
-    	state.layout.acc_adv_y = state.layout.acc_adv_y + state.layout.adv_y
+		state.layout.acc_adv_x = math.max(state.layout.acc_adv_x, state.layout.adv_x)
+		state.layout.acc_adv_y = state.layout.acc_adv_y + state.layout.adv_y
 		-- Decrease the remaining height by the advance in y
 		state.layout.max_h = math.max(0, state.layout.max_h - state.layout.adv_y - spacing)
 
-    	state.layout.next_y = state.layout.next_y + state.layout.adv_y + spacing
+		state.layout.next_y = state.layout.next_y + state.layout.adv_y + spacing
 	end
 	state.layout.adv_x = 0
 	state.layout.adv_y = 0

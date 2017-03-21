@@ -36,7 +36,7 @@ Selection.get_selection = function(self)
   return table.keys(self.selection)
 end
 
-Selection.new = function(self)
+Selection.new = function(_)
   local selection = {
     selection = {} -- the actual table that contains selected elements
 	}

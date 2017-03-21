@@ -1,9 +1,15 @@
-local table = table
+local tableplus = {}
+
+setmetatable(tableplus, {
+  __index = function(_, key)
+    return rawget(tableplus, key) or table[key]
+  end
+})
 
 -- Returns table[key][...]
 -- That is, get(t, k1, k2, k3) is another way to write t[k1][k2][k3]
 -- but there is no built-in way in Lua to do this in an automated way
-function table.get(tab, key, ...)
+function tableplus.get(tab, key, ...)
   if tab == nil then return nil
   elseif not key then
     -- this covers the case table.get(tab)
@@ -12,19 +18,19 @@ function table.get(tab, key, ...)
     return tab[key]
   else
     -- apply recursively
-    return table.get(tab[key], ...)
+    return tableplus.get(tab[key], ...)
   end
 end
 
 -- Sets table[key][...] to value
 -- That is, _set(t, v, k1, k2, k3) is another way to write t[k1][k2][k3] = v
 -- but there is no built-in way in Lua to do this in an automated way
-function table.set(tab, value, key, ...)
+function tableplus.set(tab, value, key, ...)
   if select("#", ...) == 0 then
     tab[key] = value
   else
     -- apply recursively
-    table.set(tab[key], value, ...)
+    tableplus.set(tab[key], value, ...)
   end
 end
 
@@ -32,30 +38,30 @@ end
 -- Performs a depth-first-search through the given table.
 -- Therefore matching items that are nested deeper in the table might be
 -- returned even though matching items on higher levels exist.
-function table.find_key(tab, value)
+function tableplus.find_key(tab, value)
   for k,v in pairs(tab) do
     if v == value then return k
     elseif type(v) == "table" then -- search recursively
       -- Return a list of keys
-      local result = {table.find_key(v, value)}
+      local result = {tableplus.find_key(v, value)}
       if #result > 0 then return k, unpack(result) end
     end
   end
   return nil
 end
 
-function table.keys(tab)
+function tableplus.keys(tab)
   local keys = {}
   for k, _ in pairs(tab) do
-    table.insert(keys, k)
+    tableplus.insert(keys, k)
   end
   return keys
 end
 
-function table.values(tab)
+function tableplus.values(tab)
   local values = {}
   for _, v in pairs(tab) do
-    table.insert(values, v)
+    tableplus.insert(values, v)
   end
   return values
 end
@@ -63,7 +69,7 @@ end
 -- Compares the contents of the two tables in a shallow manner. That is, it will
 -- make sure that the two tables have the same number of arguments, the same
 -- numeric values, and that the keys and values of both tables are equal.
-function table.shallow_equals(a, b)
+function tableplus.shallow_equals(a, b)
   if not type(a) == "table" then error("The first parameter is not a table") end
   if not type(b) == "table" then error("The second parameter is not a table") end
   for k,v in pairs(a) do
@@ -75,4 +81,4 @@ function table.shallow_equals(a, b)
   return true
 end
 
-return table
+return tableplus
