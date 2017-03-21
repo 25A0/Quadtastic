@@ -53,3 +53,22 @@ do
   assert(not data.quads.foo.bar)
   assert(quad_ref == data.quads.foo.new)
 end
+do
+  local data = test_data()
+  local logic = QuadtasticLogic.transitions(interface_stub)
+  QuadtasticLogic.query = function(_, existing_key, _)
+    assert(existing_key == "foo.bar")
+    return "OK", "foo.baz"
+  end
+  QuadtasticLogic.show_dialog = function(_, options)
+    assert(options[1] == "Cancel")
+    assert(options[2] == "Swap")
+    assert(options[3] == "Replace")
+    return "Swap"
+  end
+  local quad_ref_bar = data.quads.foo.bar
+  local quad_ref_baz = data.quads.foo.baz
+  logic.rename(app_stub, data, {data.quads.foo.bar})
+  assert(quad_ref_baz == data.quads.foo.bar)
+  assert(quad_ref_bar == data.quads.foo.baz)
+end
