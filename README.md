@@ -83,6 +83,12 @@ its rgb value.
  - [ ] Detect when an image changed on disk
  - [ ] Make Load button glow when file changed on disk
  - [ ] Make Export button glow when quads have changed since last export
+ - [ ] Show confirmation dialog when the user would lose changes by loading a
+       new image or quad file
+ - [ ] Test palette feature in libquadtastic
+ - [ ] Adjust center of the viewport after zooming
+ - [ ] Add file browser
+ - [ ] Add info next to zoom level: size of currently drawn quad
  - [ ] Add text area that wraps at layout boundary automatically
  - [ ] Outline quads with a color that maximizes contrast (i.e. white for darker
        areas, black for brighter areas). The most efficient way to do this is
@@ -96,6 +102,9 @@ its rgb value.
     - [ ] The Border tool to create border quads
     - [ ] The Strip tool to create strips of equally sized quads
  - [ ] Undo/Redo history
+ - [ ] Export quads in consistent order. The current export method is somewhat
+       random, which causes the output to change even if the quad definitions
+       stayed the same
  - [ ] Overhaul dialog texts
  - [ ] Fix detection of quads: Currently the application treats all tables as
        quads that have values for x, y, w, and h. This means that you cannot
