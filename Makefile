@@ -15,7 +15,7 @@ check: ${APPNAME}/*.lua
 	@which luacheck 1>/dev/null || (echo \
 		"Luacheck (https://github.com/mpeterv/luacheck/) is required to run the static analysis checks" \
 		&& false )
-	luacheck ${APPNAME}/*.lua
+	luacheck -q ${APPNAME}/*.lua
 
 test: check ${TESTS}
 
