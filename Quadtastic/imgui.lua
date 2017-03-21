@@ -83,6 +83,8 @@ imgui.init_state = function(transform)
     input_field = {
       cursor_pos = 0,
       cursor_dt = 0,
+      selection_end = nil, -- If there is a selection then it ranges from the
+                           -- current cursor position to selection_end.
     },
     dt = 0, -- Time since last update
     second = 0, -- Accumulative timer that counts up to a second

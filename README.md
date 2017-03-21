@@ -71,6 +71,9 @@ its rgb value.
  - [x] Use CTRL+Mousewheel to zoom
  - [x] Use MMB to pan image
  - [ ] Drag and drop quads in the quad list to form groups
+ - [x] Selectable text in input fields
+ - [ ] Select all text when editing quad name
+ - [ ] Use common keys (Return, ESC) to confirm or cancel dialogs
  - [ ] Distribution:
     - [x] Automatically generate change log from checked items
           in README's Roadmap. Most of the time it works every time!
@@ -108,6 +111,8 @@ its rgb value.
        random, which causes the output to change even if the quad definitions
        stayed the same
  - [ ] Overhaul dialog texts
+ - [ ] Move all text to separate module for better readability, easier
+       localization, and easy comparison during tests
  - [ ] Fix detection of quads: Currently the application treats all tables as
        quads that have values for x, y, w, and h. This means that you cannot
        have a group that contains the entire alphabet, since that group could

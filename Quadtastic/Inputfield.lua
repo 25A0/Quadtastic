@@ -4,33 +4,97 @@ local imgui = require(current_folder .. ".imgui")
 local Text = require(current_folder .. ".Text")
 
 local Inputfield = {}
+local unpack = unpack or table.unpack
 
 local function handle_input(state, _, y, w, h, content, text_x)
   assert(state.input)
   -- Track whether the cursor was moved. In that case we will always display it
   local cursor_moved = false
 
+  local function has_selection() return state.input_field.selection_end end
+  local function is_shift_down()
+    return imgui.is_key_pressed(state, "lshift") or
+           imgui.is_key_pressed(state, "rshift")
+  end
+  local function clear_selection() state.input_field.selection_end = nil end
+  local function get_selection_range()
+    local from = math.min(state.input_field.selection_end, state.input_field.cursor_pos)
+    local to = math.max(state.input_field.selection_end, state.input_field.cursor_pos)
+    return from, to
+  end
+
+  if has_selection() then
+    assert(state.input_field.selection_end ~= state.input_field.cursor_pos)
+    -- Adjust selection to size of content
+    state.input_field.selection_end = math.max(0, state.input_field.selection_end)
+    state.input_field.selection_end = math.min(#content, state.input_field.selection_end)
+  end
+
   -- Change the cursor position based on special key presses
   if imgui.was_key_pressed(state, "left") then
-    state.input_field.cursor_pos = math.max(0, state.input_field.cursor_pos - 1)
+    local new_cursor = math.max(0, state.input_field.cursor_pos - 1)
+    if is_shift_down() then
+      if not has_selection() then
+        state.input_field.selection_end = state.input_field.cursor_pos
+      end
+    elseif has_selection() then
+      new_cursor = math.min(state.input_field.selection_end, state.input_field.cursor_pos)
+      clear_selection()
+    end
+    state.input_field.cursor_pos = new_cursor
     cursor_moved = true
   end
   if imgui.was_key_pressed(state, "right") then
-    state.input_field.cursor_pos = math.min(#content, state.input_field.cursor_pos + 1)
+    local new_cursor = math.min(#content, state.input_field.cursor_pos + 1)
+    if is_shift_down() then
+      if not has_selection() then
+        state.input_field.selection_end = state.input_field.cursor_pos
+      end
+    elseif has_selection() then
+      new_cursor = math.max(state.input_field.selection_end, state.input_field.cursor_pos)
+      clear_selection()
+    end
+    state.input_field.cursor_pos = new_cursor
     cursor_moved = true
   end
   if imgui.was_key_pressed(state, "home") then
-    state.input_field.cursor_pos = 0
+    local new_cursor = 0
+    if is_shift_down() then
+      if not has_selection() then
+        state.input_field.selection_end = state.input_field.cursor_pos
+      end
+    elseif has_selection() then
+        clear_selection()
+    end
+    state.input_field.cursor_pos = new_cursor
     cursor_moved = true
   end
   if imgui.was_key_pressed(state, "end") then
-    state.input_field.cursor_pos = #content
+    local new_cursor = #content
+    if is_shift_down() then
+      if not has_selection() then
+        state.input_field.selection_end = state.input_field.cursor_pos
+      end
+    elseif has_selection() then
+        clear_selection()
+    end
+    state.input_field.cursor_pos = new_cursor
     cursor_moved = true
+  end
+
+  local function delete_selection()
+    local from, to = get_selection_range()
+    content = string.sub(content, 1 , from) ..
+              string.sub(content, to + 1, -1)
+    state.input_field.cursor_pos = from
+    clear_selection()
   end
 
   -- Remove character to the left of the cursor
   if imgui.was_key_pressed(state, "backspace") then
-    if state.input_field.cursor_pos > 0 then
+    if has_selection() then
+      delete_selection()
+    elseif state.input_field.cursor_pos > 0 then
       content = string.sub(content, 1 , state.input_field.cursor_pos - 1) ..
                 string.sub(content, state.input_field.cursor_pos + 1, -1)
       -- Reduce cursor position by 1
@@ -39,7 +103,9 @@ local function handle_input(state, _, y, w, h, content, text_x)
   end
   -- Remove character to the right of the cursor
   if imgui.was_key_pressed(state, "delete") then
-    if state.input_field.cursor_pos < #content then
+    if has_selection() then
+      delete_selection()
+    elseif state.input_field.cursor_pos < #content then
       content = string.sub(content, 1 , state.input_field.cursor_pos) ..
                 string.sub(content, state.input_field.cursor_pos + 2, -1)
       -- The cursor position does not change in this case
@@ -47,6 +113,9 @@ local function handle_input(state, _, y, w, h, content, text_x)
   end
 
   local newtext = state.input.keyboard.text or ""
+  if #newtext > 0 and has_selection() then
+    delete_selection()
+  end
   content = string.sub(content, 1 , state.input_field.cursor_pos) ..
             newtext ..
             string.sub(content, state.input_field.cursor_pos + 1, -1)
@@ -75,12 +144,25 @@ local function handle_input(state, _, y, w, h, content, text_x)
     love.graphics.line(text_x + width, y + 4, text_x + width, y + h - 4)
   end
 
-  -- If the LMB was pressed in the last frame, set the cursor position
-  if state.input.mouse.buttons[1] and state.input.mouse.buttons[1].presses > 0 then
-    local mx = state.input.mouse.buttons[1].at_x
-    local my = state.input.mouse.buttons[1].at_y
+  -- Highlight the selection
+  if has_selection() then
+    love.graphics.setColor(255, 255, 255, 80)
+    local from, to = get_selection_range()
+    local x_from = Text.min_width(state, string.sub(content, 1, from))
+    local x_to = Text.min_width(state, string.sub(content, 1, to))
+    love.graphics.rectangle("fill", text_x + x_from, y + 4, x_to - x_from, h - 8)
+    love.graphics.setColor(255, 255, 255, 255)
+  end
+
+  local cursor_pos_at_mousex
+  -- Calculate the cursor position only once since it's a pricey calculation
+  if state.input.mouse.buttons[1] and
+    (state.input.mouse.buttons[1].pressed or
+     state.input.mouse.buttons[1].presses > 0)
+  then
+    local mx = state.input.mouse.x
     -- Set the cursor position
-    local delta = state.transform:unproject(mx, my) - text_x
+    local delta = state.transform:unproject(mx, 0) - text_x
     -- Find the max. length of characters that fit in delta
     local m_width = Text.min_width(state, "m")
     -- Assume that the text is just a ton of ms
@@ -107,8 +189,50 @@ local function handle_input(state, _, y, w, h, content, text_x)
     if cursor_pos ~= state.input_field.cursor_pos then
       cursor_moved = true
     end
-    state.input_field.cursor_pos = math.max(0, math.min(#content, cursor_pos))
+
+    -- Limit cursor position
+    cursor_pos_at_mousex = math.max(0, math.min(#content, cursor_pos))
   end
+
+
+  -- If the LMB is still pressed, extend the selection accordingly
+  if state.input.mouse.buttons[1] and
+    state.input.mouse.buttons[1].pressed
+  then
+    assert(cursor_pos_at_mousex)
+    local cursor_pos = cursor_pos_at_mousex
+
+    if not has_selection() then
+      state.input_field.selection_end = state.input_field.cursor_pos
+    end
+    state.input_field.cursor_pos = cursor_pos
+  end
+
+  -- If the LMB was pressed in the last frame, set the cursor position
+  if state.input.mouse.buttons[1] and
+    state.input.mouse.buttons[1].presses > 0
+  then
+    assert(cursor_pos_at_mousex)
+    local cursor_pos = cursor_pos_at_mousex
+
+    if is_shift_down() then
+      if not has_selection() then
+        state.input_field.selection_end = cursor_pos
+      end
+    elseif has_selection() then
+      clear_selection()
+      prev_cursor_pos = cursor_pos
+    end
+    state.input_field.cursor_pos = cursor_pos
+  end
+
+  -- Remove an empty selection
+  if has_selection() and
+    state.input_field.selection_end == state.input_field.cursor_pos
+  then
+    clear_selection()
+  end
+
   if cursor_moved then
     state.input_field.cursor_dt = 0
   end
