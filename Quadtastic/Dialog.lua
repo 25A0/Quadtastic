@@ -36,10 +36,12 @@ function Dialog.show_dialog(message, buttons)
     local dx, dy
     do Window.start(gui_state, x, y, min_w, min_h)
       do Layout.start(gui_state)
+        imgui.push_style(gui_state, "font", gui_state.style.small_font)
         Label.draw(gui_state, nil, nil,
                    w/2, nil,
                    data.message)
         Layout.next(gui_state, "|")
+        imgui.pop_style(gui_state, "font")
         show_buttons(app.dialog, data, gui_state, data.buttons)
       end Layout.finish(gui_state, "|")
     end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
@@ -72,10 +74,12 @@ function Dialog.query(message, input, buttons)
     local dx, dy
     do Window.start(gui_state, x, y, min_w, min_h)
       do Layout.start(gui_state)
+        imgui.push_style(gui_state, "font", gui_state.style.small_font)
         Label.draw(gui_state, nil, nil,
                    w/2, nil,
                    data.message)
         Layout.next(gui_state, "|")
+        imgui.pop_style(gui_state, "font")
         data.input = InputField.draw(gui_state, nil, nil,
                                      w/2, nil, data.input,
                                      {forced_keyboard_focus = true,
