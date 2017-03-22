@@ -4,7 +4,6 @@ local imgui = require(current_folder .. ".imgui")
 local Text = require(current_folder .. ".Text")
 
 local Inputfield = {}
-local unpack = unpack or table.unpack
 
 local function handle_input(state, _, y, w, h, content, text_x)
   assert(state.input)
@@ -226,7 +225,6 @@ local function handle_input(state, _, y, w, h, content, text_x)
       end
     elseif has_selection() then
       clear_selection()
-      prev_cursor_pos = cursor_pos
     end
     state.input_field.cursor_pos = cursor_pos
   end
