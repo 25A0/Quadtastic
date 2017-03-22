@@ -40,7 +40,7 @@ function Dialog.show_dialog(message, buttons)
                    w/2, nil,
                    data.message)
         Layout.next(gui_state, "|")
-        show_buttons(app.dialog, data, gui_state, buttons)
+        show_buttons(app.dialog, data, gui_state, data.buttons)
       end Layout.finish(gui_state, "|")
     end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
       gui_state, x, y, data.dragging)
@@ -81,7 +81,7 @@ function Dialog.query(message, input, buttons)
                                      {forced_keyboard_focus = true,
                                       select_all = not data.was_drawn})
         Layout.next(gui_state, "|")
-        show_buttons(app.query, data, gui_state, buttons)
+        show_buttons(app.query, data, gui_state, data.buttons)
       end Layout.finish(gui_state, "|")
     end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
       gui_state, x, y, data.dragging)
