@@ -56,13 +56,15 @@ local function draw_item_background(gui_state, h)
   love.graphics.rectangle("fill", x, y, w, h)
 end
 
-function Menu.menu_item(gui_state, label)
+function Menu.menu_item(gui_state, label, options)
   draw_item_background(gui_state, 16)
-  local options = {
-    font_color = {0, 0, 0, 255},
-    bg_color_hovered = {138, 179, 189},
-    bg_color_pressed = {68, 137, 156},
-  }
+  options = options or {}
+  if options.disabled then
+    options.font_color = {128, 128, 128}
+  elseif not options.font_color then options.font_color = {0, 0, 0, 255} end
+  if not options.bg_color_hovered then options.bg_color_hovered = {138, 179, 189} end
+  if not options.bg_color_pressed then options.bg_color_pressed = {68, 137, 156} end
+
   local clicked = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
     label, nil, options)
   Layout.next(gui_state, "|")
@@ -86,7 +88,11 @@ end
 
 function Menu.menubar_item(gui_state, label, options)
   options = options or {}
-  options.font_color = {0, 0, 0, 255}
+  if options.disabled then
+    options.font_color = {128, 128, 128}
+  else
+    options.font_color = {0, 0, 0, 255}
+  end
   local clicked = Button.draw_flat(gui_state, nil, nil, nil, gui_state.layout.max_h,
     label, nil, options)
   Layout.next(gui_state, "-", 1)

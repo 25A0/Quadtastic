@@ -71,13 +71,17 @@ Quadtastic.draw = function(app, state, gui_state)
   do Window.start(gui_state, win_x, win_y, w, h, {margin = 2, active = true, borderless = true})
     do Menu.menubar_start(gui_state, w, 12)
       if Menu.menu_start(gui_state, w/4, h - 12, "File") then
-        Menu.menu_item(gui_state, "New")
-        Menu.menu_item(gui_state, "Open image...")
-        Menu.menu_item(gui_state, "Open quads...")
-        Menu.menu_item(gui_state, "Save")
-        Menu.menu_item(gui_state, "Save as...")
+        Menu.menu_item(gui_state, "New", {disabled = true})
+        Menu.menu_item(gui_state, "Open image...", {disabled = true})
+        Menu.menu_item(gui_state, "Open quads...", {disabled = true})
+        Menu.menu_item(gui_state, "Save", {disabled = true})
+        Menu.menu_item(gui_state, "Save as...", {disabled = true})
         Menu.separator(gui_state)
         if Menu.menu_item(gui_state, "Quit") then love.quit() end
+      end Menu.menu_finish(gui_state)
+      if Menu.menu_start(gui_state, w/4, h - 12, "Edit") then
+        Menu.menu_item(gui_state, "Undo", {disabled = true})
+        Menu.menu_item(gui_state, "Redo", {disabled = true})
       end Menu.menu_finish(gui_state)
     end Menu.menubar_finish(gui_state)
 
