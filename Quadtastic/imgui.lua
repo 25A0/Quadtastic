@@ -311,11 +311,18 @@ imgui.is_mouse_pressed = function(state, x, y, w, h, button)
 end
 
 imgui.was_key_pressed = function(state, key)
+  if not state.input then return false end
   return state.input.keyboard.keys[key] and state.input.keyboard.keys[key].presses > 0
 end
 
 imgui.is_key_pressed = function(state, key)
+  if not state.input then return false end
   return state.input.keyboard.keys[key] and state.input.keyboard.keys[key].pressed
+end
+
+imgui.consume_key_press = function(state, key)
+  if not state.input or not state.input.keyboard.keys[key] then return end
+  state.input.keyboard.keys[key].presses = math.max(0, state.input.keyboard.keys[key].presses - 1)
 end
 
 return imgui
