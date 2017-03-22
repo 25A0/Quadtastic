@@ -42,8 +42,15 @@ function Text.break_at(state, text, width)
     end
     -- Add any outstanding words
     if #line > 0 then
-      complete_line(separator)
-      line, line_length = {}, 0
+      if separator == "\n" then
+        for _,v in ipairs(line) do
+          table.insert(lines, v)
+        end
+        line, line_length = {}, 0
+      else
+        complete_line(separator)
+        line, line_length = {}, 0
+      end
     end
   end
 

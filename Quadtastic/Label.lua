@@ -60,7 +60,7 @@ Label.draw = function(state, x, y, w, h, label, options)
   end
 
   state.layout.adv_x = (max_textwidth + 2 * margin_x)
-  state.layout.adv_y = h
+  state.layout.adv_y = h + 2 * margin_y
 
   if state and state.input then
     return handle_input(state, x, y, w, h)
