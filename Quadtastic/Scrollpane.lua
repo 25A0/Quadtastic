@@ -103,8 +103,8 @@ Scrollpane.set_focus = function(scrollpane_state, bounds, mode)
   scrollpane_state.focus = {
     x = bounds.x,
     y = bounds.y,
-    w = bounds.w,
-    h = bounds.h,
+    w = bounds.w or 0,
+    h = bounds.h or 0,
     mode = mode,
   }
 end

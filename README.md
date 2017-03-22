@@ -93,7 +93,7 @@ its rgb value.
  - [ ] Show confirmation dialog when the user would lose changes by loading a
        new image or quad file
  - [ ] Test palette feature in libquadtastic
- - [ ] Adjust center of the viewport after zooming
+ - [x] Adjust center of the viewport after zooming
  - [ ] Add file browser
  - [ ] Add info next to zoom level: size of currently drawn quad
  - [ ] Add text area that wraps at layout boundary automatically

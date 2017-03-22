@@ -3,12 +3,17 @@ local Scrollpane = require(current_folder .. ".Scrollpane")
 local libquadtastic = require(current_folder .. ".libquadtastic")
 local imgui = require(current_folder .. ".imgui")
 local Text = require(current_folder .. ".Text")
+local Rectangle = require(current_folder .. ".Rectangle")
 
 local ImageEditor = {}
 
 function ImageEditor.zoom(state, delta)
   if not state.display.zoom then state.display.zoom = 1 end
+  local cx, cy = Rectangle.center(state.scrollpane_state)
+  cx, cy = cx / state.display.zoom, cy / state.display.zoom
   state.display.zoom = math.max(1, math.min(12, state.display.zoom + delta))
+  cx, cy = cx * state.display.zoom, cy * state.display.zoom
+  Scrollpane.set_focus(state.scrollpane_state, {x = cx, y = cy}, "immediate")
 end
 
 local function show_quad(gui_state, state, quad, quadname)
