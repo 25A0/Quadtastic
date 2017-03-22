@@ -17,6 +17,8 @@ Layout.start = function(state, x, y, w, h, options)
 	if not options or not options.noscissor then
 	  local abs_x, abs_y = state.transform:project(x, y)
 	  local abs_w, abs_h = state.transform:project_dimensions(w, h)
+	  abs_w = math.max(0, abs_w)
+	  abs_h = math.max(0, abs_h)
 	  love.graphics.intersectScissor(abs_x, abs_y, abs_w, abs_h)
 	end
 

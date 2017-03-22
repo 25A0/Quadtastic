@@ -265,7 +265,9 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
   do
     local abs_x, abs_y = state.transform:project(x + 2, y + 2)
     local abs_w, abs_h = state.transform:project_dimensions(w - 4, h - 4)
-    love.graphics.setScissor(abs_x, abs_y, abs_w, abs_h)
+    abs_w = math.max(0, abs_w)
+    abs_h = math.max(0, abs_h)
+    love.graphics.intersectScissor(abs_x, abs_y, abs_w, abs_h)
   end
 
   -- Highlight if mouse is over button
