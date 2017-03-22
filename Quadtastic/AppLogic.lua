@@ -46,7 +46,8 @@ local function run(self, f, ...)
       if #self._state_stack > 0 then
         self:pop_state(select(2, unpack(ret)))
       else
-        quit(ret[1])
+        self._should_quit = true
+        quit(ret[2])
       end
     end
   end
@@ -60,6 +61,7 @@ setmetatable(AppLogic, {
     application._state_stack = {}
     application._event_queue = {}
     application._has_active_state_changed = false
+    application._should_quit = false
 
     setmetatable(application, {
       __index = function(self, key)

@@ -103,6 +103,15 @@ function love.draw()
   imgui.end_frame(gui_state)
 end
 
+function love.quit()
+  if os.getenv("DEBUG") then return false end
+  if app and app._should_quit then return false
+  else
+    app.quadtastic.quit()
+    return true
+  end
+end
+
 function love.filedropped(file)
   app.quadtastic.load_image_from_path(file:getFilename())
 end
