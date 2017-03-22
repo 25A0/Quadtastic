@@ -95,8 +95,10 @@ its rgb value.
  - [ ] Test palette feature in libquadtastic
  - [x] Adjust center of the viewport after zooming
  - [ ] Add file browser
+ - [ ] Add background to text drawn next to mouse cursor for better readability
+ - [ ] Add "Toast"-like feature for things like successful saving
  - [ ] Add info next to zoom level: size of currently drawn quad
- - [ ] Add text area that wraps at layout boundary automatically
+ - [x] Add text area that wraps at layout boundary automatically
  - [ ] Outline quads with a color that maximizes contrast (i.e. white for darker
        areas, black for brighter areas). The most efficient way to do this is
        probably by creating a canvas with the image's size that is black in all
