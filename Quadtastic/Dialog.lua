@@ -11,7 +11,7 @@ local Dialog = {}
 
 local function show_buttons(state, data, gui_state, buttons)
   do Layout.start(gui_state)
-    for key,button in pairs(data.buttons) do
+    for key,button in pairs(buttons) do
       local button_pressed = Button.draw(gui_state, nil, nil, nil, nil, string.upper(button))
       local key_pressed = type(key) == "string" and
         (imgui.was_key_pressed(gui_state, key) or
@@ -29,19 +29,19 @@ end
 function Dialog.show_dialog(message, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
-    local x = w/4
-    local y = h/4
-    w = w/2
-    h = h/2
-    do Window.start(gui_state, x, y, w, h)
+    local min_w = data.min_w or w
+    local min_h = data.min_h or h
+    local x = (w - min_w) / 2
+    local y = (h - min_h) / 2
+    do Window.start(gui_state, x, y, min_w, min_h)
       do Layout.start(gui_state)
         Label.draw(gui_state, nil, nil,
-                   gui_state.layout.max_w, nil,
+                   w/2, nil,
                    data.message)
         Layout.next(gui_state, "|")
         show_buttons(app.dialog, data, gui_state, buttons)
       end Layout.finish(gui_state, "|")
-    end Window.finish(gui_state)
+    end data.min_w, data.min_h = Window.finish(gui_state)
   end
 
   assert(coroutine.running(), "This function must be run in a coroutine.")
@@ -61,24 +61,24 @@ end
 function Dialog.query(message, input, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
-    local x = w/4
-    local y = h/4
-    w = w/2
-    h = h/2
-    do Window.start(gui_state, x, y, w, h)
+    local min_w = data.min_w or w
+    local min_h = data.min_h or h
+    local x = (w - min_w) / 2
+    local y = (h - min_h) / 2
+    do Window.start(gui_state, x, y, min_w, min_h)
       do Layout.start(gui_state)
         Label.draw(gui_state, nil, nil,
-                   gui_state.layout.max_w, nil,
+                   w/2, nil,
                    data.message)
         Layout.next(gui_state, "|")
         data.input = InputField.draw(gui_state, nil, nil,
-                                     gui_state.layout.max_w, nil, data.input,
+                                     w/2, nil, data.input,
                                      {forced_keyboard_focus = true,
                                       select_all = not data.was_drawn})
         Layout.next(gui_state, "|")
         show_buttons(app.query, data, gui_state, buttons)
       end Layout.finish(gui_state, "|")
-    end Window.finish(gui_state)
+    end data.min_w, data.min_h = Window.finish(gui_state)
     data.was_drawn = true
   end
 

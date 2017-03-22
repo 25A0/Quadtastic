@@ -28,8 +28,10 @@ Window.start = function(gui_state, x, y, w, h, options)
 end
 
 Window.finish = function(gui_state, options)
+  local w = gui_state.layout.adv_x + (options and options.margin or 4) * 2
+  local h = gui_state.layout.adv_y + (options and options.margin or 4) * 2
   if not (options and options.borderless) then
-    Frame.finish(gui_state, nil, nil, {margin = options and options.margin or 2})
+    Frame.finish(gui_state, nil, nil, {margin = options and options.margin or 4})
   else
     -- Finish the window that encloses the content
     Layout.finish(gui_state)
@@ -43,6 +45,8 @@ Window.finish = function(gui_state, options)
   -- Remove the window bounds
   gui_state.window_bounds = nil
   gui_state.window_transform = nil
+
+  return w, h
 end
 
 return Window

@@ -75,6 +75,7 @@ its rgb value.
  - [x] Select all text when editing quad name
  - [x] Use common keys (Return, ESC) to confirm or cancel dialogs
  - [x] Use Esc to clear selection of text or elements
+ - [x] Resize dialogs automatically so that they use up as little space as possible
  - [ ] Distribution:
     - [x] Automatically generate change log from checked items
           in README's Roadmap. Most of the time it works every time!
