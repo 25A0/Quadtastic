@@ -6,6 +6,52 @@ Text.min_width = function(state, text)
   return state.style.font and state.style.font:getWidth(text)
 end
 
+-- Returns a table of lines, none of which exceed the given width.
+-- Returns a table with the original text if width is 0 or nil.
+function Text.break_at(state, text, width)
+  if not width or width <= 0 then return {text} end
+
+  local lines = {}
+  local line = {}
+  local line_length = 0
+  local separators = {"\n", " ", "-", "/", "\\", "."}
+  local function complete_line(separator)
+    local new_line = table.concat(line, separator)
+    print(new_line)
+    table.insert(lines, new_line)
+  end
+
+  local function break_up(chunk, sep_index)
+    local separator = separators[sep_index]
+    local separator_width = Text.min_width(state, separator)
+    for word in string.gmatch(chunk, string.format("[^%s]+", separator)) do
+      local wordlength = Text.min_width(state, word)
+      if wordlength > width then
+        -- Try to break at other boundaries
+        if sep_index == #separators then
+          print(string.format("Warning: %s is too long for one line", chunk))
+        else
+          break_up(word, sep_index + 1)
+        end
+      elseif line_length + wordlength > width then
+        complete_line(separator)
+        line, line_length = {word}, wordlength
+      else
+        table.insert(line, word)
+        line_length = line_length + wordlength + separator_width
+      end
+    end
+    -- Add any outstanding words
+    if #line > 0 then
+      complete_line(separator)
+      line, line_length = {}, 0
+    end
+  end
+
+  break_up(text, 1)
+  return lines
+end
+
 Text.draw = function(state, x, y, w, h, text, options)
   x = x or state.layout.next_x
   y = y or state.layout.next_y

@@ -24,19 +24,42 @@ end
 Label.draw = function(state, x, y, w, h, label, options)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
+  local margin_x = 2
+  w = w or state.layout.max_w
 
-  local textwidth = Text.min_width(state, label)
-  local margin_x = 4
-  w = w or (textwidth + 2 * margin_x)
-  h = h or 18
+  local lines = Text.break_at(state, label, w - 2*margin_x)
+  local max_textwidth = 0
+  local textwidths = {}
+  for i, line in ipairs(lines) do
+    textwidths[i] = Text.min_width(state, line)
+    if textwidths[i] > max_textwidth then
+      max_textwidth = textwidths[i]
+    end
+  end
+
+  local line_height = 14
+  w = w or (max_textwidth + 2 * margin_x)
+  h = h or 2 + #lines * line_height
 
   -- Print label
   local fontcolor = options and options.font_color or {32, 63, 73, 255}
-  local margin_y = (h - 16) / 2
+  local total_text_height = line_height * #lines
+  local margin_y = (h - total_text_height) / 2
   love.graphics.setColor(fontcolor)
-  Text.draw(state, x + margin_x, y + margin_y, w - 2*margin_x, h - 2*margin_y, label, options)
+  y = y + margin_y
 
-  state.layout.adv_x = w
+  if options and options.alignment_v == "-" then
+    y = y + (h- 2*margin_y - total_text_height) / 2
+  elseif options and options.alignment_v == "v" then
+    y = y + h - total_text_height
+  end
+
+  for i, line in ipairs(lines) do
+    Text.draw(state, x + margin_x, y, w - 2*margin_x, line_height, line, options)
+    y = y + line_height
+  end
+
+  state.layout.adv_x = (max_textwidth + 2 * margin_x)
   state.layout.adv_y = h
 
   if state and state.input then

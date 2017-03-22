@@ -330,7 +330,7 @@ called '%s'%s.]],
       local quadfilename = find_lua_file(data.filepath)
       if lfs.attributes(quadfilename) then
         local should_load = QuadtasticLogic.show_dialog(string.format(
-          "We found a quad file in %s. Would you like to load it?", quadfilename),
+          "We found a quad file in\n%s. Would you like to load it?", quadfilename),
           {enter = "Yes", escape = "No"}
         )
         if should_load == "Yes" then
