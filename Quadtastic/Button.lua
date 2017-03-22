@@ -99,9 +99,8 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
   local labelwidth, labelheight = label and Text.min_width(state, label) or nil, label and 16 or nil
 
   if not w then
-    w = (label and labelwidth or 0) +
-        (icons and iconwidth or 0) +
-        (not label and 0 or not icons or 0)
+    w = (label and labelwidth+2 or 0) +
+        (icons and iconwidth or 0)
   end
   if not h then
     h = math.max(label and labelheight or 0, icons and iconheight or 0)
@@ -114,11 +113,17 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
   if state and state.input then
     clicked, pressed, hovered = handle_input(state, x, y, w, h)
     if pressed then
-      love.graphics.setColor(0, 0, 0, 70)
+      local pressed_color = options and options.bg_color_pressed or {0, 0, 0, 90}
+      love.graphics.setColor(pressed_color)
     elseif hovered then
-      love.graphics.setColor(255, 255, 255, 70)
+      local hovered_color = options and options.bg_color_hovered or {202, 222, 227}
+      love.graphics.setColor(hovered_color)
+    elseif options and options.bg_color_default then
+      love.graphics.setColor(options.bg_color_default)
     end
-    love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
+    if label and (pressed or hovered) or options and options.bg_color_default then
+      love.graphics.rectangle("fill", x, y, w, h)
+    end
     love.graphics.setColor(255, 255, 255, 255)
   else
     clicked, pressed, hovered = false, false, false
@@ -148,7 +153,7 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
   end
   if label then
     local margin_y = (h - labelheight) / 2
-    Text.draw(state, next_x, y + margin_y, w, h, label, options)
+    Text.draw(state, next_x + 1, y + margin_y, w, h, label, options)
   end
 
   state.layout.adv_x = w
