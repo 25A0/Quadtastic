@@ -29,8 +29,8 @@ end
 function Dialog.show_dialog(message, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
-    local min_w = data.min_w or w
-    local min_h = data.min_h or h
+    local min_w = data.min_w or 0
+    local min_h = data.min_h or 0
     local x = (w - min_w) / 2
     local y = (h - min_h) / 2
     do Window.start(gui_state, x, y, min_w, min_h)
@@ -61,8 +61,8 @@ end
 function Dialog.query(message, input, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
-    local min_w = data.min_w or w
-    local min_h = data.min_h or h
+    local min_w = data.min_w or 0
+    local min_h = data.min_h or 0
     local x = (w - min_w) / 2
     local y = (h - min_h) / 2
     do Window.start(gui_state, x, y, min_w, min_h)
