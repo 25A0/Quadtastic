@@ -61,7 +61,9 @@ function Dialog.query(message, input, buttons)
                    data.message)
         Layout.next(gui_state, "|")
         data.input = InputField.draw(gui_state, nil, nil,
-                                     gui_state.layout.max_w, nil, data.input, {forced_keyboard_focus = true})
+                                     gui_state.layout.max_w, nil, data.input,
+                                     {forced_keyboard_focus = true,
+                                      select_all = not data.was_drawn})
         Layout.next(gui_state, "|")
         do Layout.start(gui_state)
           for _,button in ipairs(data.buttons) do
@@ -73,6 +75,7 @@ function Dialog.query(message, input, buttons)
         end Layout.finish(gui_state, "-")
       end Layout.finish(gui_state, "|")
     end Window.finish(gui_state)
+    data.was_drawn = true
   end
 
   assert(coroutine.running(), "This function must be run in a coroutine.")
@@ -84,7 +87,8 @@ function Dialog.query(message, input, buttons)
   }
   local query_state = State("query", transitions,
                              {input = input or "", message = message,
-                              buttons = buttons or {"Cancel", "OK"}
+                              buttons = buttons or {"Cancel", "OK"},
+                              was_drawn = false,
                              })
   -- Store the draw function in the state
   query_state.draw = draw

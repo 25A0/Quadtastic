@@ -72,7 +72,7 @@ its rgb value.
  - [x] Use MMB to pan image
  - [ ] Drag and drop quads in the quad list to form groups
  - [x] Selectable text in input fields
- - [ ] Select all text when editing quad name
+ - [x] Select all text when editing quad name
  - [ ] Use common keys (Return, ESC) to confirm or cancel dialogs
  - [x] Use Esc to clear selection of text or elements
  - [ ] Distribution:

@@ -297,6 +297,10 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
     end
 
     if has_focus then
+      if options and options.select_all then
+        state.input_field.cursor_pos = #content
+        state.input_field.selection_end = 0
+      end
       content, text_x = handle_input(state, x, y, w, h, content, text_x)
     else
       -- The widget does not have the keyboard focus
