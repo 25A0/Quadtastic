@@ -9,6 +9,23 @@ local imgui = require(current_folder .. ".imgui")
 
 local Dialog = {}
 
+local function show_buttons(state, data, gui_state, buttons)
+  do Layout.start(gui_state)
+    for key,button in pairs(data.buttons) do
+      local button_pressed = Button.draw(gui_state, nil, nil, nil, nil, string.upper(button))
+      local key_pressed = type(key) == "string" and
+        (imgui.was_key_pressed(gui_state, key) or
+         -- Special case since "return" is a reserved keyword
+         key == "enter" and imgui.was_key_pressed(gui_state, "return"))
+      if button_pressed or key_pressed then
+        state.respond(button)
+      end
+      Layout.next(gui_state, "-")
+    end
+  end Layout.finish(gui_state, "-")
+
+end
+
 function Dialog.show_dialog(message, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
@@ -22,19 +39,7 @@ function Dialog.show_dialog(message, buttons)
                    gui_state.layout.max_w, nil,
                    data.message)
         Layout.next(gui_state, "|")
-        do Layout.start(gui_state)
-          for key,button in pairs(data.buttons) do
-            local button_pressed = Button.draw(gui_state, nil, nil, nil, nil, string.upper(button))
-            local key_pressed = type(key) == "string" and
-              (imgui.was_key_pressed(gui_state, key) or
-               -- Special case since "return" is a reserved keyword
-               key == "enter" and imgui.was_key_pressed(gui_state, "return"))
-            if button_pressed or key_pressed then
-              app.dialog.respond(button)
-            end
-            Layout.next(gui_state, "-")
-          end
-        end Layout.finish(gui_state, "-")
+        show_buttons(app.dialog, data, gui_state, buttons)
       end Layout.finish(gui_state, "|")
     end Window.finish(gui_state)
   end
@@ -71,19 +76,7 @@ function Dialog.query(message, input, buttons)
                                      {forced_keyboard_focus = true,
                                       select_all = not data.was_drawn})
         Layout.next(gui_state, "|")
-        do Layout.start(gui_state)
-          for key,button in pairs(data.buttons) do
-            local button_pressed = Button.draw(gui_state, nil, nil, nil, nil, string.upper(button))
-            local key_pressed = type(key) == "string" and
-              (imgui.was_key_pressed(gui_state, key) or
-               -- Special case since "return" is a reserved keyword
-               key == "enter" and imgui.was_key_pressed(gui_state, "return"))
-            if button_pressed or key_pressed then
-              app.query.respond(button)
-            end
-            Layout.next(gui_state, "-")
-          end
-        end Layout.finish(gui_state, "-")
+        show_buttons(app.query, data, gui_state, buttons)
       end Layout.finish(gui_state, "|")
     end Window.finish(gui_state)
     data.was_drawn = true
