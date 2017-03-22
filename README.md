@@ -73,7 +73,7 @@ its rgb value.
  - [ ] Drag and drop quads in the quad list to form groups
  - [x] Selectable text in input fields
  - [x] Select all text when editing quad name
- - [ ] Use common keys (Return, ESC) to confirm or cancel dialogs
+ - [x] Use common keys (Return, ESC) to confirm or cancel dialogs
  - [x] Use Esc to clear selection of text or elements
  - [ ] Distribution:
     - [x] Automatically generate change log from checked items

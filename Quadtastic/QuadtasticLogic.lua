@@ -28,7 +28,7 @@ function QuadtasticLogic.transitions(interface) return {
       local ret, path = QuadtasticLogic.query(
         "Where should the quad file be stored?",
         find_lua_file(data.filepath),
-        {"Cancel", "OK"})
+        {escape = "Cancel", enter = "OK"})
       if ret == "OK" then
         data.quadpath = path
       else return end
@@ -47,7 +47,8 @@ function QuadtasticLogic.transitions(interface) return {
       local old_key = table.concat(current_keys, ".")
       local new_key = old_key
       local ret
-      ret, new_key = QuadtasticLogic.query("Name:", new_key, {"Cancel", "OK"})
+      ret, new_key = QuadtasticLogic.query(
+        "Name:", new_key, {escape = "Cancel", enter = "OK"})
 
       local function replace(tab, old_keys, new_keys, element)
         -- Make sure that the new keys form a valid path, that is, all but the
@@ -58,8 +59,7 @@ function QuadtasticLogic.transitions(interface) return {
             local keys_so_far = table.concat(new_keys, ".", 1, i)
             QuadtasticLogic.show_dialog(string.format(
               "The element %s is a quad, and can therefore not have nested quads.",
-              keys_so_far), {"OK"}
-            )
+              keys_so_far))
             return
           end
           -- This does intentionally not check the very last key, since it is
@@ -331,7 +331,7 @@ called '%s'%s.]],
       if lfs.attributes(quadfilename) then
         local should_load = QuadtasticLogic.show_dialog(string.format(
           "We found a quad file in %s. Would you like to load it?", quadfilename),
-          {"Yes", "No"}
+          {enter = "Yes", escape = "No"}
         )
         if should_load == "Yes" then
           app.quadtastic.load_quads_from_path(quadfilename)
