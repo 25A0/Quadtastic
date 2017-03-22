@@ -81,6 +81,11 @@ local function handle_input(state, _, y, w, h, content, text_x)
     state.input_field.cursor_pos = new_cursor
     cursor_moved = true
   end
+  if imgui.was_key_pressed(state, "escape") and has_selection() then
+    -- consume keypress
+    imgui.consume_key_press(state, "escape")
+    clear_selection()
+  end
 
   local function delete_selection()
     local from, to = get_selection_range()

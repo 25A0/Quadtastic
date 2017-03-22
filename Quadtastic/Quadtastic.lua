@@ -280,6 +280,12 @@ Quadtastic.draw = function(app, state, gui_state)
 
     end Layout.finish(gui_state, "-") -- Image editor and quad list
 
+    -- Clear selection if escape was pressed
+    if imgui.was_key_pressed(gui_state, "escape") then
+      imgui.consume_key_press(gui_state, "escape")
+      state.selection:clear_selection()
+    end
+
   end Window.finish(gui_state, {active = true, borderless = true})
 
 end

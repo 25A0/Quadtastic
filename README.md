@@ -74,6 +74,7 @@ its rgb value.
  - [x] Selectable text in input fields
  - [ ] Select all text when editing quad name
  - [ ] Use common keys (Return, ESC) to confirm or cancel dialogs
+ - [x] Use Esc to clear selection of text or elements
  - [ ] Distribution:
     - [x] Automatically generate change log from checked items
           in README's Roadmap. Most of the time it works every time!
