@@ -257,9 +257,14 @@ imgui.textinput = function(state, text)
 end
 
 imgui.update = function(state, dt)
+  state.frames = 1 + (state.frames or 0)
   state.dt = dt
-  local _
-  _, state.second = math.modf(state.second + dt)
+  local fullsecond
+  fullsecond, state.second = math.modf(state.second + dt)
+  if fullsecond >= 1 then
+    state.fps = state.frames
+    state.frames = 0
+  end
 end
 
 -- -------------------------------------------------------------------------- --

@@ -120,6 +120,10 @@ Quadtastic.draw = function(app, state, gui_state)
           Layout.next(gui_state, "-")
           love.graphics.setColor(255, 255, 255, 255)
           Label.draw(gui_state, nil, -3, nil, nil, string.format("%d%%", state.display.zoom * 100))
+          if os.getenv("DEBUG") then
+            Layout.next(gui_state, "-")
+            Label.draw(gui_state, nil, -3, nil, nil, string.format("%d FPS", gui_state.fps or gui_state.frames or 0))
+          end
         end Layout.finish(gui_state, "-") -- Zoom buttons
 
       end Layout.finish(gui_state, "|")
