@@ -263,8 +263,7 @@ Proceed anyways?]],
           end
         else
           QuadtasticLogic.show_dialog(string.format([[
-This group cannot be broken up since there is already an element
-called '%s'%s.]],
+This group cannot be broken up since there is already an element called '%s'%s.]],
             k, (parent_name and " in group "..parent_name) or ""))
           return
         end
