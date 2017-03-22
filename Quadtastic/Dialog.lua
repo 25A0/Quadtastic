@@ -31,8 +31,9 @@ function Dialog.show_dialog(message, buttons)
   local function draw(app, data, gui_state, w, h)
     local min_w = data.min_w or 0
     local min_h = data.min_h or 0
-    local x = (w - min_w) / 2
-    local y = (h - min_h) / 2
+    local x = data.win_x or (w - min_w) / 2
+    local y = data.win_y or (h - min_h) / 2
+    local dx, dy
     do Window.start(gui_state, x, y, min_w, min_h)
       do Layout.start(gui_state)
         Label.draw(gui_state, nil, nil,
@@ -41,7 +42,10 @@ function Dialog.show_dialog(message, buttons)
         Layout.next(gui_state, "|")
         show_buttons(app.dialog, data, gui_state, buttons)
       end Layout.finish(gui_state, "|")
-    end data.min_w, data.min_h = Window.finish(gui_state)
+    end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
+      gui_state, x, y, data.dragging)
+    if dx then data.win_x = (data.win_x or x) + dx end
+    if dy then data.win_y = (data.win_y or y) + dy end
   end
 
   assert(coroutine.running(), "This function must be run in a coroutine.")
@@ -63,8 +67,9 @@ function Dialog.query(message, input, buttons)
   local function draw(app, data, gui_state, w, h)
     local min_w = data.min_w or 0
     local min_h = data.min_h or 0
-    local x = (w - min_w) / 2
-    local y = (h - min_h) / 2
+    local x = data.win_x or (w - min_w) / 2
+    local y = data.win_y or (h - min_h) / 2
+    local dx, dy
     do Window.start(gui_state, x, y, min_w, min_h)
       do Layout.start(gui_state)
         Label.draw(gui_state, nil, nil,
@@ -78,7 +83,10 @@ function Dialog.query(message, input, buttons)
         Layout.next(gui_state, "|")
         show_buttons(app.query, data, gui_state, buttons)
       end Layout.finish(gui_state, "|")
-    end data.min_w, data.min_h = Window.finish(gui_state)
+    end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
+      gui_state, x, y, data.dragging)
+    if dx then data.win_x = (data.win_x or x) + dx end
+    if dy then data.win_y = (data.win_y or y) + dy end
     data.was_drawn = true
   end
 

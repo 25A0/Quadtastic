@@ -66,7 +66,8 @@ Quadtastic.draw = function(app, state, gui_state)
     love.graphics.getWidth(), love.graphics.getHeight()
   )
   love.graphics.clear(138, 179, 189)
-  do Window.start(gui_state, 0, 0, w, h, {margin = 2, active = true, borderless = true})
+  local win_x, win_y = 0, 0
+  do Window.start(gui_state, win_x, win_y, w, h, {margin = 2, active = true, borderless = true})
 
     do Layout.start(gui_state) -- Image editor
       do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 160, nil)
@@ -290,7 +291,7 @@ Quadtastic.draw = function(app, state, gui_state)
       state.selection:clear_selection()
     end
 
-  end Window.finish(gui_state, {active = true, borderless = true})
+  end Window.finish(gui_state, win_x, win_y, nil, {active = true, borderless = true})
 
 end
 

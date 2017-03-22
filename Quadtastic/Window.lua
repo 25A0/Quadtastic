@@ -4,6 +4,7 @@ local imgui = require(current_folder .. ".imgui")
 local Frame = require(current_folder .. ".Frame")
 
 local Window = {}
+local bordersize = 7
 
 Window.start = function(gui_state, x, y, w, h, options)
   -- Store the window's bounds in the gui state
@@ -16,7 +17,6 @@ Window.start = function(gui_state, x, y, w, h, options)
   end
 
   local margin = options and options.margin or 4
-  local bordersize = 7
   if not (options and options.borderless) then
     Frame.start(gui_state, x, y, w, h,
       {margin = margin, quads = gui_state.style.quads.window_border,
@@ -27,17 +27,35 @@ Window.start = function(gui_state, x, y, w, h, options)
   end
 end
 
-Window.finish = function(gui_state, options)
+Window.finish = function(gui_state, x, y, dragging, options)
+  local active = options and options.active or true
+
   local w = gui_state.layout.adv_x + (options and options.margin or 4) * 2
   local h = gui_state.layout.adv_y + (options and options.margin or 4) * 2
+  local dx, dy
+
   if not (options and options.borderless) then
     Frame.finish(gui_state, nil, nil, {margin = options and options.margin or 4})
+    if active then
+      -- Check if the user moved the window
+      if imgui.was_mouse_pressed(gui_state, x, y, w, bordersize)
+      then
+        dragging = true
+      elseif dragging and not (gui_state.input and gui_state.input.mouse.buttons and
+        gui_state.input.mouse.buttons[1] and gui_state.input.mouse.buttons[1].pressed)
+      then
+        dragging = false
+      end
+      if dragging and gui_state.input then
+        local mdx, mdy = gui_state.input.mouse.dx, gui_state.input.mouse.dy
+        dx, dy = gui_state.transform:unproject_dimensions(mdx, mdy)
+      end
+    end
   else
     -- Finish the window that encloses the content
     Layout.finish(gui_state)
   end
 
-  local active = options and options.active or true
   if not active then
     imgui.uncover_input(gui_state)
   end
@@ -46,7 +64,7 @@ Window.finish = function(gui_state, options)
   gui_state.window_bounds = nil
   gui_state.window_transform = nil
 
-  return w, h
+  return w, h, dx, dy, dragging
 end
 
 return Window
