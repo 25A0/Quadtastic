@@ -2,7 +2,7 @@
 
 This is a little LÖVE tool to handle sprite atlases while keeping your sanity.
 
-![Screenshot of Quadtastic](screenshots/Screen Shot 2017-03-06 at 22.03.38.png)
+![Screenshot of Quadtastic](screenshots/Screen%20Shot%202017-03-06%20at%2022.03.38.png)
 
 
 ## Usage
