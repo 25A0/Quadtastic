@@ -67,7 +67,7 @@ local function draw_elements(gui_state, state, elements, last_hovered, quad_boun
       input_consumed = clicked or pressed or hovered
 
       Text.draw(gui_state, quad_size + 3, nil, gui_state.layout.max_w, nil,
-        string.format("%s: group", tostring(name)))
+        string.format("%s", tostring(name)))
     end
     gui_state.layout.adv_x = gui_state.layout.max_w
     gui_state.layout.adv_y = 16
