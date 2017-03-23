@@ -6,10 +6,17 @@ APPVERSION = $(shell git tag -l | head -1)-$(shell git log -1 --pretty=format:%h
 APPCOPYRIGHT = 2017 Moritz Neikes
 macos-love-distname = love-0.10.2-macosx-x64
 
-.PHONY: clean test check tests/*
+.PHONY: clean test check tests/* run all app_resources run_debug
 
 all: test
-	love src
+
+run: app_resources
+	${DEBUG} love ${APPNAME}
+
+run_debug: DEBUG=DEBUG=true
+run_debug: run
+
+app_resources: ${APPNAME}/res/style.png
 
 check: ${APPNAME}/*.lua
 	@which luacheck 1>/dev/null || (echo \
@@ -19,7 +26,7 @@ check: ${APPNAME}/*.lua
 
 test: check ${TESTS}
 
-dist/${APPNAME}.love: ${APPNAME}/*
+dist/${APPNAME}.love: ${APPNAME}/* app_resources
 	cd ${APPNAME}; zip ../dist/${APPNAME}.love -Z store -FS -r . -x .\*
 	cp -R shared dist/
 
@@ -52,6 +59,10 @@ dist/res/%.icns: res/%.ase
 	./scale_icon.sh dist/res/$*.ase
 	# Run iconutil to create icns file
 	iconutil -c icns dist/res/$*.iconset
+
+aseprite=/Applications/Aseprite.app/Contents/MacOS/aseprite
+${APPNAME}/res/%.png: res/%.ase
+	${aseprite} -b res/$*.ase --save-as ${APPNAME}/res/$*.png
 
 tests/test_*.lua:
 	lua $@
