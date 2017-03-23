@@ -86,8 +86,12 @@ its rgb value.
     - [ ] Windows 64 bit
     - [ ] Linux
     - [x] Icon
-    - [ ] Show Quadtastic in title bar
+    - [x] Show Quadtastic in title bar
  - [ ] Detect when an image changed on disk
+ - [ ] Use custom file extension qua (it's lua but quads)
+ - [ ] Let OS know that Quadtastic can open qua files (if that's possible with
+       LOVE. <insert cheesy joke that there are no limits to what love can do>)
+ - [ ] Add metadata to qua file to remember which image was loaded along with it
  - [ ] Make Load button glow when file changed on disk
  - [ ] Make Export button glow when quads have changed since last export
  - [ ] Show confirmation dialog when the user would lose changes by loading a
