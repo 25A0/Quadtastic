@@ -16,7 +16,7 @@ run: app_resources
 run_debug: DEBUG=DEBUG=true
 run_debug: run
 
-app_resources: ${APPNAME}/res/style.png
+app_resources: ${APPNAME}/res/style.png ${APPNAME}/res/icon-32x32.png
 
 check: ${APPNAME}/*.lua
 	@which luacheck 1>/dev/null || (echo \
@@ -63,6 +63,9 @@ dist/res/%.icns: res/%.ase
 aseprite=/Applications/Aseprite.app/Contents/MacOS/aseprite
 ${APPNAME}/res/%.png: res/%.ase
 	${aseprite} -b res/$*.ase --save-as ${APPNAME}/res/$*.png
+
+${APPNAME}/res/icon-32x32.png: res/icon.ase
+	${aseprite} -b res/icon.ase --scale 2 --save-as ${APPNAME}/res/icon-32x32.png
 
 tests/test_*.lua:
 	lua $@
