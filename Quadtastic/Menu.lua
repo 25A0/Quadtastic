@@ -62,8 +62,8 @@ function Menu.menu_item(gui_state, label, options)
   if options.disabled then
     options.font_color = {128, 128, 128}
   elseif not options.font_color then options.font_color = {0, 0, 0, 255} end
-  if not options.bg_color_hovered then options.bg_color_hovered = {138, 179, 189} end
-  if not options.bg_color_pressed then options.bg_color_pressed = {68, 137, 156} end
+  if not options.bg_color_hovered then options.bg_color_hovered = {68, 137, 156} end
+  if not options.bg_color_pressed then options.bg_color_pressed = {42, 82, 94} end
 
   local clicked = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
     label, nil, options)
