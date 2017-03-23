@@ -37,8 +37,6 @@ function love.load()
   -- Initialize the state
   app = AppLogic(Quadtastic)
 
-  love.window.setMode(800, 600, {resizable=true, minwidth=400, minheight=300})
-
   love.graphics.setDefaultFilter("nearest", "nearest")
 
   local med_font = love.graphics.newFont("res/m5x7.ttf", 16)
