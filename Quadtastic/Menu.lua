@@ -20,26 +20,22 @@ function Menu.menu_start(gui_state, w, h, label)
   local y = gui_state.layout.next_y + 12
 
   local options = {}
-  if gui_state.current_menu == label then
+
+  local opened = imgui.is_menu_open(gui_state, label)
+
+  if opened then
     options.bg_color_default = {202, 222, 227}
   end
   -- Draw label
   local hit = Menu.menubar_item(gui_state, label, options)
   if hit then
-    -- Set the current menu item to this menu, or unset it if this is the
-    -- current item
-    if gui_state.current_menu == label then
-      gui_state.current_menu = nil
-    else
-      gui_state.current_menu = label
-    end
+    imgui.toggle_menu(gui_state, label)
   end
-
-  local opened = gui_state.current_menu == label
 
   if opened then
     love.graphics.push("all")
     love.graphics.setCanvas(gui_state.overlay_canvas)
+
     -- Draw decoration at the top
     love.graphics.setColor(255, 255, 255)
     love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu.tl, x, y)

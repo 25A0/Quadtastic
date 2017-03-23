@@ -87,7 +87,7 @@ Quadtastic.draw = function(app, state, gui_state)
       end
     end Menu.menubar_finish(gui_state)
 
-    if gui_state.current_menu then
+    if imgui.is_any_menu_open(gui_state) then
       imgui.cover_input(gui_state)
     end
 
@@ -321,7 +321,7 @@ Quadtastic.draw = function(app, state, gui_state)
       state.selection:clear_selection()
     end
 
-    if gui_state.current_menu then
+    if imgui.is_any_menu_open(gui_state) then
       imgui.uncover_input(gui_state)
     end
 

@@ -97,6 +97,8 @@ imgui.init_state = function(transform)
     layout = imgui.init_layout_state(nil), -- the current layout
     transform = transform, -- the current transform
     tooltip_time = 0, -- the time that the mouse has spent on a widget
+    menu_depth = 0, -- The menu depth will be used by menus to decide how to render
+    current_menus = {}, -- List of currently selected menu entries
   }
   return state
 end
@@ -135,6 +137,8 @@ imgui.begin_frame = function(state)
 end
 
 imgui.end_frame = function(state)
+  assert(state.menu_depth == 0, "One or more menus were not finished")
+
   -- Reset mouse deltas
   state.input.mouse.dx = 0
   state.input.mouse.dy = 0
@@ -328,6 +332,36 @@ end
 imgui.consume_key_press = function(state, key)
   if not state.input or not state.input.keyboard.keys[key] then return end
   state.input.keyboard.keys[key].presses = math.max(0, state.input.keyboard.keys[key].presses - 1)
+end
+
+-- Menu handling
+
+-- Toggles the 'open' state of the menu with the given label.
+-- The imgui state knows the current menu depth, so as long as there are no
+-- two open menus with the same label on the same level, clashing menu labels
+-- should not be a problem
+function imgui.toggle_menu(state, label)
+  -- Erase all menus on deeper level, no matter if we open or close the menu
+  -- on the current level
+  for i=state.menu_depth + 2,#state.current_menus do
+    state.current_menus[i] = nil
+  end
+
+  if imgui.is_menu_open(state, label) then
+    -- Close the menu
+    state.current_menus[state.menu_depth + 1] = nil
+  else
+    -- Open the menu
+    state.current_menus[state.menu_depth + 1] = label
+  end
+end
+
+function imgui.is_menu_open(state, label)
+  return state.current_menus[state.menu_depth + 1] == label
+end
+
+function imgui.is_any_menu_open(state)
+  return #state.current_menus > 0
 end
 
 return imgui
