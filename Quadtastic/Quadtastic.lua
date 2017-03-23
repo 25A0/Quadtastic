@@ -77,7 +77,7 @@ Quadtastic.draw = function(app, state, gui_state)
         Menu.menu_item(gui_state, "Save", {disabled = true})
         Menu.menu_item(gui_state, "Save as...", {disabled = true})
         Menu.separator(gui_state)
-        if Menu.menu_item(gui_state, "Quit") then love.quit() end
+        if Menu.menu_item(gui_state, "Quit") then love.event.quit() end
       end Menu.menu_finish(gui_state)
       if Menu.menu_start(gui_state, w/4, h - 12, "Edit") then
         Menu.menu_item(gui_state, "Undo", {disabled = true})
