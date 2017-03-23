@@ -85,7 +85,7 @@ its rgb value.
     - [ ] Windows 32 bit
     - [ ] Windows 64 bit
     - [ ] Linux
-    - [ ] Icon
+    - [x] Icon
     - [ ] Show Quadtastic in title bar
  - [ ] Detect when an image changed on disk
  - [ ] Make Load button glow when file changed on disk

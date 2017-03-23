@@ -1,3 +1,7 @@
+59c59
+< 	<string>OS X AppIcon</string>
+---
+> 	<string>icon.icns</string>
 61c61
 < 	<string>org.love2d.love</string>
 ---
