@@ -135,6 +135,8 @@ function Menu.menu_item(gui_state, label, options)
   local clicked = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
     label, nil, options)
   Layout.next(gui_state, "|")
+
+  clicked = clicked and (not options or options and not options.disabled)
   if clicked then
     imgui.close_menus(gui_state, gui_state.menu_depth)
   end
