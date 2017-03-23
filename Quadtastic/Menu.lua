@@ -7,7 +7,12 @@ local Menu = {}
 
 function Menu.menubar_start(gui_state, w, h)
   imgui.push_style(gui_state, "font", gui_state.style.small_font)
-  Layout.start(gui_state, 0, 0, w, h, {noscissor = true})
+  -- Shift the menu bar by a few pixel so that the leftmost menu has enough room
+  -- to move a bit to the left. That leads to a nice tab-like effect where
+  -- the rounded corners of the menu line up with the outline of the menubar
+  -- entries
+  local tl_w = gui_state.style.raw_quads.menu.tl.w
+  Layout.start(gui_state, tl_w, 0, w, h, {noscissor = true})
 end
 
 function Menu.menubar_finish(gui_state)
@@ -16,18 +21,33 @@ function Menu.menubar_finish(gui_state)
 end
 
 function Menu.menu_start(gui_state, w, h, label)
+  -- Cache current x and y
   local x = gui_state.layout.next_x
-  local y = gui_state.layout.next_y + 12
+  local y = gui_state.layout.next_y
 
   local options = {}
 
   local opened = imgui.is_menu_open(gui_state, label)
 
   if opened then
-    options.bg_color_default = {202, 222, 227}
+    options.bg_color_default =
+      gui_state.menu_depth == 0 and {202, 222, 227} or {68, 137, 156}
   end
-  -- Draw label
-  local hit = Menu.menubar_item(gui_state, label, options)
+  -- Draw label depending on current menu depth
+  local hit
+  if gui_state.menu_depth == 0 then
+    hit = Menu.menubar_item(gui_state, label, options)
+  else
+    hit = Menu.menu_item(gui_state, label, options)
+    love.graphics.setColor(255, 255, 255)
+    local arrow_w = gui_state.style.raw_quads.menu.arrow.w
+    local arrow_h = gui_state.style.raw_quads.menu.arrow.h
+    local arrow_x = x + w - arrow_w - 2
+    local arrow_y = y + (16 - arrow_h) / 2
+    love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu.arrow,
+      arrow_x, arrow_y)
+  end
+
   if hit then
     imgui.toggle_menu(gui_state, label)
   end
@@ -36,19 +56,34 @@ function Menu.menu_start(gui_state, w, h, label)
     love.graphics.push("all")
     love.graphics.setCanvas(gui_state.overlay_canvas)
 
-    -- Draw decoration at the top
-    love.graphics.setColor(255, 255, 255)
-    love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu.tl, x, y)
+    -- Calculate position of new menu depending on current menu depth
+    local deco_height = gui_state.style.raw_quads.menu.t.h
     local tl_w = gui_state.style.raw_quads.menu.tl.w
     local tr_w = gui_state.style.raw_quads.menu.tr.w
     local t_w = gui_state.style.raw_quads.menu.t.w
+    if gui_state.menu_depth == 0 then
+      y = y + 12
+      -- Shift menu to the left by a few pixels so that the rounded corners
+      -- of the menu line up with the outline of the menubar entry
+      x = x - tl_w
+    else
+      y = y - deco_height
+      x = x + w
+    end
+
+    -- Draw decoration at the top
+    love.graphics.setColor(255, 255, 255)
+    love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu.tl, x, y)
     assert(t_w == 1)
     love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu.t,
       x + tl_w, y, 0, w - tl_w - tr_w, 1)
     love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu.tr,
       x + w - tr_w, y)
-    local deco_height = gui_state.style.raw_quads.menu.t.h
-    Layout.start(gui_state, x, y + deco_height, w, h - 2*deco_height, {noscissor = true})
+
+    y = y + deco_height
+
+    Layout.start(gui_state, x, y, w, h - 2*deco_height, {noscissor = true})
+    gui_state.menu_depth = gui_state.menu_depth + 1
   end
 
   return opened
@@ -76,6 +111,8 @@ function Menu.menu_finish(gui_state, w, h)
   gui_state.layout.adv_y = 0
   love.graphics.setCanvas()
   love.graphics.pop()
+  assert(gui_state.menu_depth > 0, "Ending menu on menu depth 0. Did you forget menu_start?")
+  gui_state.menu_depth = gui_state.menu_depth - 1
 end
 
 local function draw_item_background(gui_state, h)
@@ -99,7 +136,16 @@ function Menu.menu_item(gui_state, label, options)
     label, nil, options)
   Layout.next(gui_state, "|")
   if clicked then
-    gui_state.current_menu = nil
+    imgui.close_menus(gui_state, gui_state.menu_depth)
+  end
+  return clicked
+end
+
+-- Behaves like a menu item, but closes all menus when clicked.
+function Menu.action_item(gui_state, label, options)
+  local clicked = Menu.menu_item(gui_state, label, options)
+  if clicked then
+    imgui.close_menus(gui_state)
   end
   return clicked
 end

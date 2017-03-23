@@ -364,4 +364,13 @@ function imgui.is_any_menu_open(state)
   return #state.current_menus > 0
 end
 
+function imgui.close_menus(state, from_level)
+  if not from_level or from_level == 0 then state.current_menus = {}
+  else
+    for i=from_level,#state.current_menus - 1 do
+      state.current_menus[i + 1] = nil
+    end
+  end
+end
+
 return imgui
