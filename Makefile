@@ -23,13 +23,13 @@ dist/${APPNAME}.love: ${APPNAME}/*
 	cd ${APPNAME}; zip ../dist/${APPNAME}.love -Z store -FS -r . -x .\*
 	cp -R shared dist/
 
-dist/macos/${APPNAME}.app: dist/res/love.app dist/${APPNAME}.love res/icon.icns
+dist/macos/${APPNAME}.app: dist/res/love.app dist/${APPNAME}.love dist/res/icon.icns
 	mkdir -p dist/macos
 	mkdir -p dist/macos/${APPNAME}.app
 	rsync -qa dist/res/love.app/ dist/macos/${APPNAME}.app/
 	cp dist/${APPNAME}.love dist/macos/${APPNAME}.app/Contents/Resources/
 	cp -R dist/shared dist/macos/${APPNAME}.app/Contents/Resources/
-	cp res/icon.icns dist/macos/${APPNAME}.app/Contents/Resources/
+	cp dist/res/icon.icns dist/macos/${APPNAME}.app/Contents/Resources/
 
 	cp res/plist.patch dist/macos/
 	sed -i -e 's/__APPIDENTIFIER/${APPIDENTIFIER}/g' dist/macos/plist.patch
@@ -45,11 +45,13 @@ dist/res/love.app:
 	wget -N https://bitbucket.org/rude/love/downloads/${macos-love-distname}.zip; \
 	unzip ${macos-love-distname}.zip
 
-res/icon.icns: res/icon.ase
+dist/res/%.icns: res/%.ase
+	mkdir -p dist/res
+	cp res/$*.ase dist/res/
 	# Create iconset folder with icon at various sizes
-	./scale_icon.sh res/icon.ase
+	./scale_icon.sh dist/res/$*.ase
 	# Run iconutil to create icns file
-	iconutil -c icns res/icon.iconset
+	iconutil -c icns dist/res/$*.iconset
 
 tests/test_*.lua:
 	lua $@
