@@ -16,15 +16,21 @@ Window.start = function(gui_state, x, y, w, h, options)
     imgui.cover_input(gui_state)
   end
 
-  local margin = options and options.margin or 4
   if not (options and options.borderless) then
     Frame.start(gui_state, x, y, w, h,
       {margin = 0, quads = gui_state.style.quads.window_border,
        bordersize = bordersize})
   end
+  local margin = options and options.margin or 4
 
   -- Enclose the window's content in a Layout
   Layout.start(gui_state, margin, margin, w - 2*margin, h - 2*margin)
+
+  if not (options and options.borderless) then
+    -- Shift content past the top border
+    gui_state.layout.adv_y = bordersize
+    Layout.next(gui_state, "|")
+  end
 
 end
 
@@ -39,6 +45,7 @@ Window.finish = function(gui_state, x, y, dragging, options)
 
   if not (options and options.borderless) then
     Frame.finish(gui_state, nil, nil, {margin = options and options.margin or 4})
+    h = h + bordersize
     if active then
       -- Check if the user moved the window
       if imgui.was_mouse_pressed(gui_state, x, y, w, bordersize)
