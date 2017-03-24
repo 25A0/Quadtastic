@@ -19,7 +19,7 @@ end
 -- Start is the time at which this toast was first drawn, duration is the
 -- total time for which the toast should be visible.
 -- THE BOUNDS ARE EXPECTED TO BE IN ABSOLUTE COORDINATES.
-function Toast.draw(gui_state, label, bounds, _, _, options)
+function Toast.draw(gui_state, label, bounds, start, duration, options)
   love.graphics.push("all")
   love.graphics.setCanvas(gui_state.overlay_canvas)
 
@@ -41,6 +41,16 @@ function Toast.draw(gui_state, label, bounds, _, _, options)
   local border_height = raw_quads.t.h + raw_quads.b.h
   local border_size = raw_quads.tl.w
   local x, y = find_toast_position(bounds, textwidth, textheight, border_width, border_height)
+
+  if start and duration and duration >= 1 then --consider animating
+    local elapsed = gui_state.t - start
+    local anim_time = .25
+    if elapsed < anim_time then
+      local d = bounds.y + bounds.h - y
+      local r = elapsed / anim_time
+      y = y + (1 - r) * d
+    end
+  end
 
   Renderutils.draw_border(gui_state.style.stylesheet, gui_state.style.quads.toast,
     x, y, textwidth + border_width, textheight + border_height, border_size)
