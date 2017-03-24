@@ -281,6 +281,7 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
   -- Label position
   local text_x = x + margin_x
 
+  local committed_content
   if state and state.input then
     local has_focus = false
     -- Check if options force keyboard focus
@@ -302,6 +303,10 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
         state.input_field.selection_end = 0
       end
       content, text_x = handle_input(state, x, y, w, h, content, text_x)
+      if imgui.was_key_pressed(state, "return") then
+        committed_content = content
+        imgui.consume_key_press(state, "return")
+      end
     else
       -- The widget does not have the keyboard focus
       if textwidth + 20 > w - 6 then
@@ -320,7 +325,7 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
 
   -- Restore state
   love.graphics.pop()
-  return content
+  return content, committed_content
 end
 
 return Inputfield
