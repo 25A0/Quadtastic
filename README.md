@@ -1,6 +1,6 @@
 # Quadtastic!
 
-This is a little LÖVE tool to handle sprite atlases while keeping your sanity.
+This is a little standalone LÖVE tool to manage sprite sheets and color palettes.
 
 ![Screenshot of Quadtastic](screenshots/screenshot.png)
 
@@ -80,6 +80,7 @@ its rgb value.
     - [x] Automatically generate change log from checked items
           in README's Roadmap. Most of the time it works every time!
     - [ ] License
+    - [ ] Licenses of used software
     - [x] Automatically put version and commit hash in plist
     - [x] MacOS
     - [ ] Windows 32 bit
@@ -133,6 +134,7 @@ its rgb value.
  - [ ] >>>>>>> TURBO-WorkflOw >>>>>
 	 - [ ] Automatically reload image when it changes on disk
 	 - [ ] Automatically export new quad file whenever quads are changed
+ - [ ] Custom exporter for people who don't want to export to lua
 
 # Credits and tools used
 
