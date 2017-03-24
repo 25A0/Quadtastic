@@ -9,7 +9,7 @@ local imgui = require(current_folder .. ".imgui")
 
 local Dialog = {}
 
-local function show_buttons(state, data, gui_state, buttons)
+local function show_buttons(state, gui_state, buttons)
   do Layout.start(gui_state)
     for key,button in pairs(buttons) do
       local button_pressed = Button.draw(gui_state, nil, nil, nil, nil, string.upper(button))
@@ -42,7 +42,7 @@ function Dialog.show_dialog(message, buttons)
                    data.message)
         Layout.next(gui_state, "|")
         imgui.pop_style(gui_state, "font")
-        show_buttons(app.dialog, data, gui_state, data.buttons)
+        show_buttons(app.dialog, gui_state, data.buttons)
       end Layout.finish(gui_state, "|")
     end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
       gui_state, x, y, data.dragging)
@@ -85,7 +85,7 @@ function Dialog.query(message, input, buttons)
                                      {forced_keyboard_focus = true,
                                       select_all = not data.was_drawn})
         Layout.next(gui_state, "|")
-        show_buttons(app.query, data, gui_state, data.buttons)
+        show_buttons(app.query, gui_state, data.buttons)
       end Layout.finish(gui_state, "|")
     end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
       gui_state, x, y, data.dragging)

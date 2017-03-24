@@ -89,7 +89,7 @@ function Menu.menu_start(gui_state, w, h, label)
   return opened
 end
 
-function Menu.menu_finish(gui_state, w, h)
+function Menu.menu_finish(gui_state, w, _)
   local x = gui_state.layout.next_x
   local y = gui_state.layout.next_y
 

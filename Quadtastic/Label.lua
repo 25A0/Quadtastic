@@ -54,7 +54,7 @@ Label.draw = function(state, x, y, w, h, label, options)
     y = y + h - total_text_height
   end
 
-  for i, line in ipairs(lines) do
+  for _, line in ipairs(lines) do
     Text.draw(state, x + margin_x, y, w - 2*margin_x, line_height, line, options)
     y = y + line_height
   end

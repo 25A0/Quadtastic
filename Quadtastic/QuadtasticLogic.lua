@@ -19,6 +19,8 @@ QuadtasticLogic.show_dialog = Dialog.show_dialog
 QuadtasticLogic.query = Dialog.query
 
 function QuadtasticLogic.transitions(interface) return {
+  -- luacheck: no unused args
+
   quit = function(app, data)
     local result = QuadtasticLogic.show_dialog("Do you really want to quit?", {"Yes", "No"})
     if result == "Yes" then
@@ -26,7 +28,6 @@ function QuadtasticLogic.transitions(interface) return {
     end
   end,
 
-  -- luacheck: no unused args
   export = function(app, data)
     if not data.image then
       QuadtasticLogic.show_dialog("Load an image first")
