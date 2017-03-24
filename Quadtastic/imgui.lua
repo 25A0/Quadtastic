@@ -100,8 +100,24 @@ imgui.init_state = function(transform)
     tooltip_time = 0, -- the time that the mouse has spent on a widget
     menu_depth = 0, -- The menu depth will be used by menus to decide how to render
     current_menus = {}, -- List of currently selected menu entries
+    toasts = {}, -- The list of toasts
   }
   return state
+end
+
+-- Will start to show a toast with the given label in the given bounds for the
+-- given duration (in seconds). This function cannot be used for toasts that
+-- should be displayed every frame. Draw the toast directly in those cases.
+-- This is intended for toasts that are triggered once on events.
+function imgui.show_toast(gui_state, label, bounds, duration)
+  bounds = bounds and gui_state.transform:project_bounds(bounds) or nil
+  table.insert(gui_state.toasts, {
+    label = label,
+    bounds = bounds,
+    start = gui_state.t,
+    duration = duration,
+    remaining = duration,
+  })
 end
 
 imgui.cover_input = function(state)

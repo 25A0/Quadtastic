@@ -91,6 +91,18 @@ function Transform.unproject_dimensions(self, w, h)
 	return w / self.scale_tbl[1], h / self.scale_tbl[2]
 end
 
+function Transform.unproject_bounds(self, bounds)
+	local x, y = Transform.unproject(self, bounds.x, bounds.y)
+	local w, h = Transform.unproject_dimensions(self, bounds.w, bounds.h)
+	return {x = x, y = y, w = w, h = h}
+end
+
+function Transform.project_bounds(self, bounds)
+	local x, y = Transform.project(self, bounds.x, bounds.y)
+	local w, h = Transform.project_dimensions(self, bounds.w, bounds.h)
+	return {x = x, y = y, w = w, h = h}
+end
+
 function Transform.clone(self)
 	return Transform(self.matrix, self.scale_tbl)
 end

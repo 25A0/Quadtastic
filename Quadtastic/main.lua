@@ -13,6 +13,7 @@ local Quadtastic = require(current_folder .. ".Quadtastic")
 local libquadtastic = require(current_folder .. ".libquadtastic")
 
 local Transform = require(current_folder .. '.Transform')
+local Toast = require(current_folder .. '.Toast')
 local transform = Transform()
 
 -- Cover love transformation functions
@@ -94,6 +95,19 @@ function love.draw()
       if not is_active then imgui.uncover_input(gui_state) end
     end
   end
+
+  -- Draw toasts
+  local remaining_toasts = {}
+  local frame_bounds = gui_state.transform:project_bounds({x = 0, y = 0, w = w, h = h})
+  for _,toast in ipairs(gui_state.toasts) do
+    toast.remaining = toast.remaining - gui_state.dt
+    Toast.draw(gui_state, toast.label, toast.bounds or frame_bounds, toast.start, toast.duration)
+    -- Keep this toast only if it should still be drawn in the next frame
+    if toast.remaining > 0 then
+      table.insert(remaining_toasts, toast)
+    end
+  end
+  gui_state.toasts = remaining_toasts
 
   love.graphics.origin()
   love.graphics.draw(gui_state.overlay_canvas)
