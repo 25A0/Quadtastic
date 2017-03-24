@@ -55,6 +55,8 @@ end
 -- end
 
 function Transform.translate(self, dx, dy)
+	dx = math.floor(dx)
+	dy = math.floor(dy)
 	self.matrix = self.matrix * affine.trans(dx, dy)
 	lgtranslate(dx, dy)
 end

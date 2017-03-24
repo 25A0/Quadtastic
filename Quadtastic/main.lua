@@ -41,7 +41,9 @@ function love.load()
   love.graphics.setDefaultFilter("nearest", "nearest")
 
   local med_font = love.graphics.newFont("res/m5x7.ttf", 16)
+  med_font:setFilter("nearest", "nearest")
   local smol_font = love.graphics.newFont("res/m3x6.ttf", 16)
+  smol_font:setFilter("nearest", "nearest")
   love.graphics.setFont(med_font)
 
   local stylesheet = love.graphics.newImage("res/style.png")
