@@ -81,13 +81,17 @@ function Dialog.query(message, input, buttons)
                    data.message)
         Layout.next(gui_state, "|")
         imgui.pop_style(gui_state, "font")
-        data.input = InputField.draw(gui_state, nil, nil,
+        local committed
+        data.input, committed = InputField.draw(gui_state, nil, nil,
                                      w/2, nil, data.input,
                                      {forced_keyboard_focus = true,
                                       select_all = not data.was_drawn})
         Layout.next(gui_state, "|")
         show_buttons(app.query, gui_state, data.buttons)
         Layout.next(gui_state, "|")
+        if committed then
+          app.query.respond("OK")
+        end
       end Layout.finish(gui_state, "|")
     end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
       gui_state, x, y, data.dragging)
