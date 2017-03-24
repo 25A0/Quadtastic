@@ -19,17 +19,20 @@ Window.start = function(gui_state, x, y, w, h, options)
   local margin = options and options.margin or 4
   if not (options and options.borderless) then
     Frame.start(gui_state, x, y, w, h,
-      {margin = margin, quads = gui_state.style.quads.window_border,
+      {margin = 0, quads = gui_state.style.quads.window_border,
        bordersize = bordersize})
-  else
-    -- Enclose the window's content in a Layout
-    Layout.start(gui_state, x + margin, y + margin, w - 2*margin, h - 2*margin)
   end
+
+  -- Enclose the window's content in a Layout
+  Layout.start(gui_state, margin, margin, w - 2*margin, h - 2*margin)
+
 end
 
 Window.finish = function(gui_state, x, y, dragging, options)
   local active = options and options.active or true
 
+  -- Finish the layout that encloses the content
+  Layout.finish(gui_state)
   local w = gui_state.layout.adv_x + (options and options.margin or 4) * 2
   local h = gui_state.layout.adv_y + (options and options.margin or 4) * 2
   local dx, dy
@@ -52,8 +55,6 @@ Window.finish = function(gui_state, x, y, dragging, options)
       end
     end
   else
-    -- Finish the window that encloses the content
-    Layout.finish(gui_state)
   end
 
   if not active then
