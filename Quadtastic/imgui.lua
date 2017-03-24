@@ -87,6 +87,7 @@ imgui.init_state = function(transform)
                            -- current cursor position to selection_end.
     },
     dt = 0, -- Time since last update
+    t = 0, -- Total time since app was started
     second = 0, -- Accumulative timer that counts up to a second
     style = {
       font = nil, -- The font that is being used
@@ -263,6 +264,7 @@ end
 imgui.update = function(state, dt)
   state.frames = 1 + (state.frames or 0)
   state.dt = dt
+  state.t = state.t + dt
   local fullsecond
   fullsecond, state.second = math.modf(state.second + dt)
   if fullsecond >= 1 then
