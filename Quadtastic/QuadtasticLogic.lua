@@ -362,7 +362,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       interface.reset_view(data)
       -- Try to read a quad file
       local quadfilename = find_lua_file(data.filepath)
-      if lfs.attributes(quadfilename) then
+      if not data.quadpath and lfs.attributes(quadfilename) then
         local should_load = QuadtasticLogic.show_dialog(string.format(
           "We found a quad file in %s.\nWould you like to load it?", quadfilename),
           {enter = "Yes", escape = "No"}
