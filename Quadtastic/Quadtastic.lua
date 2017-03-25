@@ -68,6 +68,8 @@ Quadtastic.draw = function(app, state, gui_state)
   love.graphics.clear(138, 179, 189)
   local win_x, win_y = 0, 0
   do Window.start(gui_state, win_x, win_y, w, h, {margin = 2, active = true, borderless = true})
+    local was_menu_open = imgui.is_any_menu_open(gui_state)
+
     do Menu.menubar_start(gui_state, w, 12)
       if Menu.menu_start(gui_state, w/4, h - 12, "File") then
         if Menu.action_item(gui_state, "New") then app.quadtastic.new() end
@@ -96,7 +98,7 @@ Quadtastic.draw = function(app, state, gui_state)
       end
     end Menu.menubar_finish(gui_state)
 
-    if imgui.is_any_menu_open(gui_state) then
+    if was_menu_open then
       imgui.cover_input(gui_state)
     end
 
@@ -303,7 +305,7 @@ Quadtastic.draw = function(app, state, gui_state)
       state.selection:clear_selection()
     end
 
-    if imgui.is_any_menu_open(gui_state) then
+    if was_menu_open then
       imgui.uncover_input(gui_state)
     end
 
