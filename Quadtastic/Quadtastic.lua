@@ -72,10 +72,10 @@ Quadtastic.draw = function(app, state, gui_state)
     do Menu.menubar_start(gui_state, w, 12)
       if Menu.menu_start(gui_state, w/4, h - 12, "File") then
         Menu.action_item(gui_state, "New", {disabled = true})
-        Menu.action_item(gui_state, "Open image...", {disabled = true})
-        Menu.action_item(gui_state, "Open quads...", {disabled = true})
-        Menu.action_item(gui_state, "Save", {disabled = true})
-        Menu.action_item(gui_state, "Save as...", {disabled = true})
+        if Menu.action_item(gui_state, "Open image...") then app.quadtastic.choose_image() end
+        if Menu.action_item(gui_state, "Open quads...") then app.quadtastic.choose_quad() end
+        if Menu.action_item(gui_state, "Save") then app.quadtastic.save() end
+        if Menu.action_item(gui_state, "Save as...") then app.quadtastic.save_as() end
         Menu.separator(gui_state)
         if Menu.action_item(gui_state, "Quit") then love.event.quit() end
         Menu.menu_finish(gui_state, w/4, h - 12)
@@ -95,19 +95,6 @@ Quadtastic.draw = function(app, state, gui_state)
 
     do Layout.start(gui_state) -- Image editor
       do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 160, nil)
-        do Layout.start(gui_state)
-          state.filepath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.filepath)
-          Layout.next(gui_state, "-", 2)
-
-          local pressed = Button.draw(gui_state, nil, nil, nil, nil, "Load")
-          if pressed then
-            app.quadtastic.load_image_from_path(state.filepath)
-          end
-          Tooltip.draw(gui_state, "Who's a good boy??")
-        end Layout.finish(gui_state, "-")
-
-        Layout.next(gui_state, "|", 2)
-
         do Frame.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 13)
           if state.image then
             local new_quad = ImageEditor.draw(gui_state, state)
@@ -163,20 +150,6 @@ Quadtastic.draw = function(app, state, gui_state)
 
       -- Quad list and buttons
       do Layout.start(gui_state)
-        -- Quad file
-        do Layout.start(gui_state)
-          state.quadpath = Inputfield.draw(gui_state, nil, nil, gui_state.layout.max_w - 34, nil, state.quadpath or "")
-          Layout.next(gui_state, "-", 2)
-
-          local pressed = Button.draw(gui_state, nil, nil, nil, nil, "Load")
-          if pressed then
-            app.quadtastic.load_quads_from_path(state.quadpath)
-          end
-          Tooltip.draw(gui_state, "Who's a good boy??")
-        end Layout.finish(gui_state, "-")
-
-        Layout.next(gui_state, "|", 2)
-
         -- Quad list
         do Layout.start(gui_state)
           do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 21)
@@ -268,7 +241,7 @@ Quadtastic.draw = function(app, state, gui_state)
             Layout.next(gui_state, "|")
 
             if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment_h = ":"}) then
-              app.quadtastic.export()
+              app.quadtastic.save()
             end
           end Layout.finish(gui_state, "|")
           Layout.next(gui_state, "-", 2)

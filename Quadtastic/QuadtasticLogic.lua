@@ -17,6 +17,8 @@ local QuadtasticLogic = {}
 -- so that user interaction can be simulated easily
 QuadtasticLogic.show_dialog = Dialog.show_dialog
 QuadtasticLogic.query = Dialog.query
+QuadtasticLogic.open_file = Dialog.open_file
+QuadtasticLogic.save_file = Dialog.save_file
 
 function QuadtasticLogic.transitions(interface) return {
   -- luacheck: no unused args
@@ -26,22 +28,6 @@ function QuadtasticLogic.transitions(interface) return {
     if result == "Yes" then
       return 0
     end
-  end,
-
-  export = function(app, data)
-    if not data.image then
-      QuadtasticLogic.show_dialog("Load an image first")
-      return
-    elseif not data.quadpath or data.quadpath == "" then
-      local ret, path = QuadtasticLogic.query(
-        "Where should the quad file be stored?",
-        find_lua_file(data.filepath),
-        {escape = "Cancel", enter = "OK"})
-      if ret == "OK" then
-        data.quadpath = path
-      else return end
-    end
-    QuadExport.export(data.quads, data.quadpath)
   end,
 
   rename = function(app, data, quads)
@@ -290,7 +276,34 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     end
   end,
 
-  load_quads_from_path = function(app, data, filepath)
+  save = function(app, data)
+    if not data.image then
+      QuadtasticLogic.show_dialog("Load an image first")
+      return
+    elseif not data.quadpath or data.quadpath == "" then
+      app.quadtastic.save_as()
+    else
+      QuadExport.export(data.quads, data.quadpath)
+    end
+  end,
+
+  save_as = function(app, data)
+    local ret, filepath = QuadtasticLogic.save_file(data.quadpath)
+    if ret == "Save" then
+      data.quadpath = filepath
+      app.quadtastic.save()
+    end
+  end,
+
+  choose_quad = function(app, data, basepath)
+    if not basepath then basepath = "/Users/moritz/Projects/Quadtastic/Quadtastic/res" end
+    local ret, filepath = QuadtasticLogic.open_file(basepath)
+    if ret == "Open" then
+      app.quadtastic.load_quad(filepath)
+    end
+  end,
+
+  load_quad = function(app, data, filepath)
     local success, more = pcall(function()
       local filehandle, err = io.open(filepath, "r")
       if err then
@@ -312,10 +325,17 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     else
       QuadtasticLogic.show_dialog(string.format("Could not load quads: %s", more))
     end
-
   end,
 
-  load_image_from_path = function(app, data, filepath)
+  choose_image = function(app, data, basepath)
+    if not basepath then basepath = "/Users/moritz/Projects/Quadtastic/Quadtastic/res" end
+    local ret, filepath = QuadtasticLogic.open_file(basepath)
+    if ret == "Open" then
+      app.quadtastic.load_image(filepath)
+    end
+  end,
+
+  load_image = function(app, data, filepath)
     local success, more = pcall(function()
       local filehandle, err = io.open(filepath, "rb")
       if err then
@@ -341,7 +361,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
           {enter = "Yes", escape = "No"}
         )
         if should_load == "Yes" then
-          app.quadtastic.load_quads_from_path(quadfilename)
+          app.quadtastic.load_quad(quadfilename)
         end
       end
     else
