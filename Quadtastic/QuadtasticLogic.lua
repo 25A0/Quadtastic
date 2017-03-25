@@ -285,6 +285,8 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     interface.reset_view(data)
     -- Reset list of collapsed groups
     data.collapsed_groups = {}
+
+    data.file_timestamps = {}
   end,
 
   save = function(app, data)
@@ -370,6 +372,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     if success then
       data.image = more
       data.quads._META.image_path = filepath
+      data.file_timestamps.image_loaded = lfs.attributes(filepath, "modification")
       interface.reset_view(data)
       -- Try to read a quad file
       local quadfilename = find_lua_file(filepath)

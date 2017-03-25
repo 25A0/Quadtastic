@@ -18,6 +18,8 @@ local Selection = require(current_folder .. ".Selection")
 local QuadtasticLogic = require(current_folder .. ".QuadtasticLogic")
 local Menu = require(current_folder .. ".Menu")
 
+local lfs = require("lfs")
+
 local Quadtastic = State("quadtastic",
   nil,
   -- initial data
@@ -83,6 +85,13 @@ Quadtastic.draw = function(app, state, gui_state)
       end
       if Menu.menu_start(gui_state, w/4, h - 12, "Image") then
         if Menu.action_item(gui_state, "Open image...") then app.quadtastic.choose_image() end
+        local loaded = state.file_timestamps.image_loaded
+        local latest = state.file_timestamps.image_latest
+        local can_reload = loaded and latest and loaded ~= latest
+        local disabled = not can_reload or not state.quads._META.image_path
+        if Menu.action_item(gui_state, "Reload image", {disabled = disabled}) then
+          app.quadtastic.load_image(state.quads._META.image_path)
+        end
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
     end Menu.menubar_finish(gui_state)
@@ -299,6 +308,15 @@ Quadtastic.draw = function(app, state, gui_state)
     end
 
   end Window.finish(gui_state, win_x, win_y, nil, {active = true, borderless = true})
+
+  local function refresh_image_timestamp(data)
+    if not data.quads._META.image_path then return end
+    local filepath = data.quads._META.image_path
+    data.file_timestamps.image_latest = lfs.attributes(filepath, "modification")
+    print("Image last modified at " .. data.file_timestamps.image_loaded)
+  end
+
+  imgui.every_second(gui_state, refresh_image_timestamp, state)
 
 end
 
