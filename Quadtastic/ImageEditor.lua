@@ -96,7 +96,7 @@ local function show_quad(gui_state, state, quad, quadname)
       end
       love.graphics.pop()
     end
-  else
+  elseif type(quad) == "table" then
     -- If it's not a quad then it's a list of quads
     for k,v in pairs(quad) do
       local name = quadname and quadname .. "." .. tostring(k) or tostring(k)

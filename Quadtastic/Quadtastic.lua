@@ -22,17 +22,14 @@ local Quadtastic = State("quadtastic",
   nil,
   -- initial data
   {
-    filepath = "Quadtastic/res/style.png", -- the path to the file that we want to edit
-    quadpath = "", -- path to the file containing the quad definitions
-    image = nil, -- the loaded image
     display = {
       zoom = 1, -- additional zoom factor for the displayed image
     },
     scrollpane_state = nil,
     quad_scrollpane_state = nil,
-    quads = {},
     collapsed_groups = {},
     selection = Selection(),
+    -- More fields are initialized in the new() transition.
   })
 
 function Quadtastic.reset_view(state)

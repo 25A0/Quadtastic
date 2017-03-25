@@ -37,6 +37,7 @@ local gui_state
 function love.load()
   -- Initialize the state
   app = AppLogic(Quadtastic)
+  app.quadtastic.new()
 
   love.graphics.setDefaultFilter("nearest", "nearest")
 

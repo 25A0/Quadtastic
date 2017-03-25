@@ -24,9 +24,12 @@ local function export_table_content(filehandle, table, indentation)
         filehandle:write(string.rep("  ", indentation))
         filehandle:write("}")
       end
-    elseif type(v) == "number" or type(v) == "string" then
+    elseif type(v) == "number" then
       -- Not sure why this is here, but sure, let's export it
       filehandle:write(tostring(v))
+    elseif type(v) == "string" then
+      -- Not sure why this is here, but sure, let's export it
+      filehandle:write("\"", v, "\"")
     else
       error("Cannot handle table values of type "..type(v))
     end

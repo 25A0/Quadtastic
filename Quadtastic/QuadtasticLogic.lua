@@ -277,10 +277,14 @@ This group cannot be broken up since there is already an element called '%s'%s.]
   end,
 
   new = function(app, data)
-    data.quads = {}
-    data.quadpath = nil
-    data.image = nil
-    data.filepath = nil
+    data.quads = {
+      _META = {}
+    }
+    data.quadpath = nil -- path to the file containing the quad definitions
+    data.image = nil -- the loaded image
+    interface.reset_view(data)
+    -- Reset list of collapsed groups
+    data.collapsed_groups = {}
   end,
 
   save = function(app, data)
@@ -329,6 +333,11 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       data.quads, data.quadpath = unpack(more)
       -- Reset list of collapsed groups
       data.collapsed_groups = {}
+      if not data.quads._META then data.quads._META = {} end
+      local metainfo = libquadtastic.get_metainfo(data.quads)
+      if metainfo.image_path then
+        app.quadtastic.load_image(metainfo.image_path)
+      end
     else
       QuadtasticLogic.show_dialog(string.format("Could not load quads: %s", more))
     end
@@ -358,10 +367,10 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     -- success, more = pcall(love.graphics.newImage, data)
     if success then
       data.image = more
-      data.filepath = filepath
+      data.quads._META.image_path = filepath
       interface.reset_view(data)
       -- Try to read a quad file
-      local quadfilename = find_lua_file(data.filepath)
+      local quadfilename = find_lua_file(filepath)
       if not data.quadpath and lfs.attributes(quadfilename) then
         local should_load = QuadtasticLogic.show_dialog(string.format(
           "We found a quad file in %s.\nWould you like to load it?", quadfilename),
