@@ -276,6 +276,16 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     end
   end,
 
+  offer_reload = function(app, data)
+    local image_path = data.quads._META.image_path
+    local ret = QuadtasticLogic.show_dialog(
+      string.format("The image %s has changed on disk.\nDo you want to reload it?", image_path),
+      {enter="Yes", escape="No"})
+    if ret == "YES" then
+      app.quadtastic.load_image(image_path)
+    end
+  end,
+
   new = function(app, data)
     data.quads = {
       _META = {}
@@ -373,6 +383,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       data.image = more
       data.quads._META.image_path = filepath
       data.file_timestamps.image_loaded = lfs.attributes(filepath, "modification")
+      data.file_timestamps.image_latest = data.file_timestamps.image_loaded
       interface.reset_view(data)
       -- Try to read a quad file
       local quadfilename = find_lua_file(filepath)

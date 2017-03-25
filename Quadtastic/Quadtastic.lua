@@ -309,14 +309,18 @@ Quadtastic.draw = function(app, state, gui_state)
 
   end Window.finish(gui_state, win_x, win_y, nil, {active = true, borderless = true})
 
-  local function refresh_image_timestamp(data)
+  local function refresh_image_timestamp(app, data)
     if not data.quads._META.image_path then return end
     local filepath = data.quads._META.image_path
-    data.file_timestamps.image_latest = lfs.attributes(filepath, "modification")
-    print("Image last modified at " .. data.file_timestamps.image_loaded)
+    local current_timestamp = lfs.attributes(filepath, "modification")
+    if current_timestamp ~= data.file_timestamps.image_latest then
+      app.quadtastic.offer_reload()
+    end
+    data.file_timestamps.image_latest = current_timestamp
   end
 
-  imgui.every_second(gui_state, refresh_image_timestamp, state)
+
+  imgui.every_second(gui_state, refresh_image_timestamp, app, state)
 
 end
 

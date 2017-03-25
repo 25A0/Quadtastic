@@ -88,7 +88,7 @@ its rgb value.
     - [ ] Linux
     - [x] Icon
     - [x] Show Quadtastic in title bar
- - [ ] Detect when an image changed on disk
+ - [x] Detect when an image changed on disk
  - [ ] Use custom file extension qua (it's lua but quads)
  - [ ] Let OS know that Quadtastic can open qua files (if that's possible with
        LOVE. <insert cheesy joke that there are no limits to what love can do>)
