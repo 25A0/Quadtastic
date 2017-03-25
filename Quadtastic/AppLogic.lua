@@ -121,11 +121,12 @@ function AppLogic.pop_state(self, ...)
   -- Catch up on events that happened for that state while we were in a
   -- different state, but make sure that states haven't changed since.
   if self._state.name == statename then
-    for _,event_bundle in ipairs(self._event_queue[statename]) do
+    local queued_events = self._event_queue[statename]
+    self._event_queue[statename] = nil
+    for _,event_bundle in ipairs(queued_events) do
       local f = self._state.transitions[event_bundle[1]]
       run(self, f, unpack(event_bundle[2]))
     end
-    self._event_queue[statename] = nil
   end
 end
 
