@@ -287,6 +287,7 @@ imgui.update = function(state, dt)
     state.fps = state.frames
     state.frames = 0
   end
+  state.second_mark = fullsecond >= 1
 end
 
 -- -------------------------------------------------------------------------- --
@@ -389,6 +390,14 @@ function imgui.close_menus(state, from_level)
       state.current_menus[i + 1] = nil
     end
   end
+end
+
+-- Periodic functions
+
+-- This function is run approximately once per second
+function imgui.every_second(state, f, ...)
+  if not state.second_mark then return end
+  f(...)
 end
 
 return imgui
