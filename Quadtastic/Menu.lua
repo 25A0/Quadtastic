@@ -2,6 +2,7 @@ local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
 local Layout = require(current_folder .. ".Layout")
 local imgui = require(current_folder .. ".imgui")
 local Button = require(current_folder .. ".Button")
+local Rectangle = require(current_folder .. ".Rectangle")
 
 local Menu = {}
 
@@ -75,6 +76,9 @@ function Menu.menu_start(gui_state, w, h, label)
       x = x + w
     end
 
+    local abs_x, abs_y = gui_state.transform:project(x, y)
+    gui_state.menu_bounds[gui_state.menu_depth + 1] = {x = abs_x, y = abs_y}
+
     -- Draw decoration at the top
     love.graphics.setColor(255, 255, 255)
     love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu.tl, x, y)
@@ -96,27 +100,53 @@ end
 function Menu.menu_finish(gui_state, w, _)
   local x = gui_state.layout.next_x
   local y = gui_state.layout.next_y
+  assert(gui_state.menu_depth > 0, "Ending menu on menu depth 0. Did you forget menu_start?")
+  gui_state.menu_depth = gui_state.menu_depth - 1
 
   -- Draw decoration at the bottom
   love.graphics.setColor(255, 255, 255)
   love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu.bl, x, y)
-  local tl_w = gui_state.style.raw_quads.menu.bl.w
-  local tr_w = gui_state.style.raw_quads.menu.br.w
-  local t_w = gui_state.style.raw_quads.menu.b.w
-  assert(t_w == 1)
+  local deco_height = gui_state.style.raw_quads.menu.b.h
+  local bl_w = gui_state.style.raw_quads.menu.bl.w
+  local br_w = gui_state.style.raw_quads.menu.br.w
+  local b_w = gui_state.style.raw_quads.menu.b.w
+  assert(b_w == 1)
   love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu.b,
-    x + tl_w, y, 0, w - tl_w - tr_w, 1)
+    x + bl_w, y, 0, w - bl_w - br_w, 1)
   love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu.br,
-    x + w - tr_w, y)
+    x + w - br_w, y)
 
   Layout.finish(gui_state, "|")
+
+  gui_state.layout.adv_y = gui_state.layout.adv_y + 2*deco_height
+  local abs_w, abs_h = gui_state.transform:project_dimensions(gui_state.layout.adv_x, gui_state.layout.adv_y)
+  local bounds = gui_state.menu_bounds[gui_state.menu_depth + 1]
+  bounds.w, bounds.h = abs_w, abs_h
 
   gui_state.layout.adv_x = 0
   gui_state.layout.adv_y = 0
   love.graphics.setCanvas()
   love.graphics.pop()
-  assert(gui_state.menu_depth > 0, "Ending menu on menu depth 0. Did you forget menu_start?")
-  gui_state.menu_depth = gui_state.menu_depth - 1
+
+  -- If this was the last menu to finish, check if the user clicked anywhere
+  -- outside the menu bounds. In that case close all windows
+  if gui_state.menu_depth == 0 and gui_state.input and
+     gui_state.input.mouse.buttons[1] and
+     gui_state.input.mouse.buttons[1].releases > 0
+  then
+    local mx = gui_state.input.mouse.buttons[1].at_x
+    local my = gui_state.input.mouse.buttons[1].at_y
+    local contained = false
+    for _, bounds in ipairs(gui_state.menu_bounds) do
+      if Rectangle.contains(bounds, mx, my) then
+        contained = true
+        break
+      end
+    end
+    if not contained then
+      imgui.close_menus(gui_state)
+    end
+  end
 end
 
 local function draw_item_background(gui_state, h)

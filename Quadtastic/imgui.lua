@@ -100,6 +100,7 @@ imgui.init_state = function(transform)
     tooltip_time = 0, -- the time that the mouse has spent on a widget
     menu_depth = 0, -- The menu depth will be used by menus to decide how to render
     current_menus = {}, -- List of currently selected menu entries
+    menu_bounds = {}, -- Dimensions of menus on each menu level
     toasts = {}, -- The list of toasts
   }
   return state
@@ -155,6 +156,7 @@ end
 
 imgui.end_frame = function(state)
   assert(state.menu_depth == 0, "One or more menus were not finished")
+  state.menu_bounds = {}
 
   -- Reset mouse deltas
   state.input.mouse.dx = 0
