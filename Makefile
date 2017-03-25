@@ -17,6 +17,8 @@ run_debug: DEBUG=DEBUG=true
 run_debug: run
 
 app_resources: ${APPNAME}/res/style.png ${APPNAME}/res/icon-32x32.png
+	# Store version info in ${APPNAME}/res
+	echo v${APPVERSION} > ${APPNAME}/res/version.txt
 
 check: ${APPNAME}/*.lua
 	@which luacheck 1>/dev/null || (echo \

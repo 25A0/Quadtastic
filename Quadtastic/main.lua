@@ -35,6 +35,9 @@ local app
 local gui_state
 
 function love.load()
+  local version_info = love.filesystem.read("res/version.txt")
+  love.window.setTitle(love.window.getTitle() .. " " .. version_info)
+
   -- Initialize the state
   app = AppLogic(Quadtastic)
   app.quadtastic.new()
