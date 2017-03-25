@@ -74,8 +74,12 @@ Quadtastic.draw = function(app, state, gui_state)
       if Menu.menu_start(gui_state, w/4, h - 12, "File") then
         if Menu.action_item(gui_state, "New") then app.quadtastic.new() end
         if Menu.action_item(gui_state, "Open...") then app.quadtastic.choose_quad() end
-        if Menu.action_item(gui_state, "Save") then app.quadtastic.save() end
-        if Menu.action_item(gui_state, "Save as...") then app.quadtastic.save_as() end
+        if Menu.action_item(gui_state, "Save") then
+          app.quadtastic.save(imgui.show_toast, gui_state, "Saved", nil, 2)
+        end
+        if Menu.action_item(gui_state, "Save as...") then
+          app.quadtastic.save_as(imgui.show_toast, gui_state, "Saved", nil, 2)
+        end
         Menu.separator(gui_state)
         if Menu.action_item(gui_state, "Quit") then love.event.quit() end
         Menu.menu_finish(gui_state, w/4, h - 12)
@@ -269,7 +273,7 @@ Quadtastic.draw = function(app, state, gui_state)
             Layout.next(gui_state, "|")
 
             if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment_h = ":"}) then
-              app.quadtastic.save()
+              app.quadtastic.save(imgui.show_toast, gui_state, "Saved", nil, 2)
             end
           end Layout.finish(gui_state, "|")
           Layout.next(gui_state, "-", 2)

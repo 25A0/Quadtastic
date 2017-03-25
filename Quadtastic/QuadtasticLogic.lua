@@ -299,7 +299,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     data.file_timestamps = {}
   end,
 
-  save = function(app, data)
+  save = function(app, data, callback, ...)
     if not data.image then
       QuadtasticLogic.show_dialog("Load an image first")
       return
@@ -307,14 +307,15 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       app.quadtastic.save_as()
     else
       QuadExport.export(data.quads, data.quadpath)
+      if callback then callback(...) end
     end
   end,
 
-  save_as = function(app, data)
+  save_as = function(app, data, callback, ...)
     local ret, filepath = QuadtasticLogic.save_file(data.quadpath)
     if ret == "Save" then
       data.quadpath = filepath
-      app.quadtastic.save()
+      app.quadtastic.save(callback, ...)
     end
   end,
 
