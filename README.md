@@ -117,7 +117,7 @@ its rgb value.
     - [ ] The Border tool to create border quads
     - [ ] The Strip tool to create strips of equally sized quads
  - [ ] Undo/Redo history
- - [ ] Export quads in consistent order. The current export method is somewhat
+ - [x] Export quads in consistent order. The current export method is somewhat
        random, which causes the output to change even if the quad definitions
        stayed the same
  - [ ] Overhaul dialog texts

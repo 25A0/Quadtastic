@@ -6,8 +6,18 @@ local function export_quad(filehandle, quadtable)
     quadtable.x, quadtable.y, quadtable.w, quadtable.h))
 end
 
-local function export_table_content(filehandle, table, indentation)
-  for k, v in pairs(table) do
+local function export_table_content(filehandle, tab, indentation)
+  local numeric_keys = {}
+  local string_keys = {}
+  for k, v in pairs(tab) do
+    if type(k) == "number" then table.insert(numeric_keys, k)
+    elseif type(k) == "string" then table.insert(string_keys, k) end
+  end
+
+  table.sort(numeric_keys)
+  table.sort(string_keys)
+
+  local function export_pair(k, v)
     filehandle:write(string.rep("  ", indentation))
     if type(k) == "string" then
       filehandle:write(string.format("%s = ", k))
@@ -34,6 +44,16 @@ local function export_table_content(filehandle, table, indentation)
       error("Cannot handle table values of type "..type(v))
     end
     filehandle:write(",\n")
+  end
+
+  for _, k in ipairs(numeric_keys) do
+    local v = tab[k]
+    export_pair(k, v)
+  end
+
+  for _, k in ipairs(string_keys) do
+    local v = tab[k]
+    export_pair(k, v)
   end
 end
 
