@@ -111,6 +111,7 @@ Quadtastic.draw = function(app, state, gui_state)
             local new_quad = ImageEditor.draw(gui_state, state)
             if new_quad then
               table.insert(state.quads, new_quad)
+              state.selection:set_selection({new_quad})
               QuadList.move_quad_into_view(state.quad_scrollpane_state, new_quad)
             end
           else
