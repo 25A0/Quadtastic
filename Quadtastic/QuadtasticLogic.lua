@@ -344,7 +344,9 @@ This group cannot be broken up since there is already an element called '%s'%s.]
   end,
 
   choose_image = function(app, data, basepath)
-    if not basepath then basepath = "/Users/moritz/Projects/Quadtastic/Quadtastic/res" end
+    if not basepath and data.quads and data.quads._META then
+      basepath = data.quads._META.image_path
+    end
     local ret, filepath = QuadtasticLogic.open_file(basepath)
     if ret == "Open" then
       app.quadtastic.load_image(filepath)

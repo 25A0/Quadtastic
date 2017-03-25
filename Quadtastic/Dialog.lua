@@ -244,7 +244,25 @@ function Dialog.open_file(basepath, suffix_filter)
     end
 
     if not data.filelist then
-      local success, err = switch_to(app, data, data.basepath)
+      local success
+      -- The given basepath might be a file. In that case set the basepath to
+      -- the containing directory, and set the rest as the chosen file
+      local mode, err = lfs.attributes(data.basepath, "mode")
+      if mode then
+        if mode == "file" then
+          local basepath, filename = string.gmatch(data.basepath, "(.*/)([^/]*)")()
+          success, err = switch_to(app, data, basepath)
+          if success then
+            data.chosen_file = {
+              type = "file",
+              name = filename
+            }
+          end
+        elseif mode == "directory" then
+          success, err = switch_to(app, data, data.basepath)
+        end
+      end
+
       -- If switching to the basepath doesn't work the first time the file
       -- dialog is drawn, switch to the file root
       if not success then
