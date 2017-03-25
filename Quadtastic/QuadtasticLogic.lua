@@ -281,7 +281,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     local ret = QuadtasticLogic.show_dialog(
       string.format("The image %s has changed on disk.\nDo you want to reload it?", image_path),
       {enter="Yes", escape="No"})
-    if ret == "YES" then
+    if ret == "Yes" then
       app.quadtastic.load_image(image_path)
     end
   end,
