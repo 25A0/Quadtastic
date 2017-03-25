@@ -136,6 +136,7 @@ function Menu.menu_item(gui_state, label, options)
   if not options.bg_color_hovered then options.bg_color_hovered = {68, 137, 156} end
   if not options.bg_color_pressed then options.bg_color_pressed = {42, 82, 94} end
 
+  options.trigger_on_release = true
   local clicked, _, hovered = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
     label, nil, options)
   Layout.next(gui_state, "|")
@@ -176,6 +177,7 @@ function Menu.menubar_item(gui_state, label, options)
   else
     options.font_color = {0, 0, 0, 255}
   end
+  options.trigger_on_release = true
   local clicked, _, hovered = Button.draw_flat(gui_state, nil, nil, nil, gui_state.layout.max_h,
     label, nil, options)
   clicked = clicked and (not options or options and not options.disabled)

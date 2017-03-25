@@ -7,7 +7,7 @@ local Button = {}
 
 -- Returns, in this order, if the button was just pressed, if the button is still
 -- being pressed, and if the button is hovered.
-local function handle_input(state, x, y, w, h)
+local function handle_input(state, x, y, w, h, options)
   assert(state.input)
   if imgui.is_mouse_in_rect(state, x, y, w, h) then
     local pressed
@@ -17,9 +17,15 @@ local function handle_input(state, x, y, w, h)
       pressed = false
     end
     -- We consider this button clicked when the mouse is in the button's area
-    -- and the left mouse button was just clicked
-    return state.input.mouse.buttons[1] and state.input.mouse.buttons[1].presses > 0,
-      pressed, true
+    -- and the left mouse button was just clicked, or released
+    local clicked = state.input.mouse.buttons[1]
+    if options and options.trigger_on_release then
+      clicked = clicked and state.input.mouse.buttons[1].releases > 0
+    else
+      clicked = clicked and state.input.mouse.buttons[1].presses > 0
+    end
+
+    return clicked, pressed, true
   end
 end
 
@@ -79,7 +85,7 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
 
   -- Highlight if mouse is over button
   if state and state.input and not (options and options.disabled) then
-    local clicked, pressed, hovered = handle_input(state, x, y, w, h)
+    local clicked, pressed, hovered = handle_input(state, x, y, w, h, options)
     if pressed then
       love.graphics.setColor(0, 0, 0, 70)
     elseif hovered then
@@ -118,7 +124,7 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
   -- Handle input before drawing so that we can decide which quad should be drawn
   local clicked, pressed, hovered
   if state and state.input and not (options and options.disabled) then
-    clicked, pressed, hovered = handle_input(state, x, y, w, h)
+    clicked, pressed, hovered = handle_input(state, x, y, w, h, options)
     if pressed then
       local pressed_color = options and options.bg_color_pressed or {0, 0, 0, 90}
       love.graphics.setColor(pressed_color)
