@@ -276,6 +276,13 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     end
   end,
 
+  new = function(app, data)
+    data.quads = {}
+    data.quadpath = nil
+    data.image = nil
+    data.filepath = nil
+  end,
+
   save = function(app, data)
     if not data.image then
       QuadtasticLogic.show_dialog("Load an image first")

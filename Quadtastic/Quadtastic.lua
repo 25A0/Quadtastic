@@ -71,7 +71,7 @@ Quadtastic.draw = function(app, state, gui_state)
   do Window.start(gui_state, win_x, win_y, w, h, {margin = 2, active = true, borderless = true})
     do Menu.menubar_start(gui_state, w, 12)
       if Menu.menu_start(gui_state, w/4, h - 12, "File") then
-        Menu.action_item(gui_state, "New", {disabled = true})
+        if Menu.action_item(gui_state, "New") then app.quadtastic.new() end
         if Menu.action_item(gui_state, "Open...") then app.quadtastic.choose_quad() end
         if Menu.action_item(gui_state, "Save") then app.quadtastic.save() end
         if Menu.action_item(gui_state, "Save as...") then app.quadtastic.save_as() end
