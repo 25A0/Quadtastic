@@ -34,11 +34,11 @@ function Menu.menu_start(gui_state, w, h, label)
       gui_state.menu_depth == 0 and {202, 222, 227} or {68, 137, 156}
   end
   -- Draw label depending on current menu depth
-  local hit
+  local hit, hovered
   if gui_state.menu_depth == 0 then
-    hit = Menu.menubar_item(gui_state, label, options)
+    hit, hovered = Menu.menubar_item(gui_state, label, options)
   else
-    hit = Menu.menu_item(gui_state, label, options)
+    hit, hovered = Menu.menu_item(gui_state, label, options)
     love.graphics.setColor(255, 255, 255)
     local arrow_w = gui_state.style.raw_quads.menu.arrow.w
     local arrow_h = gui_state.style.raw_quads.menu.arrow.h
@@ -48,7 +48,11 @@ function Menu.menu_start(gui_state, w, h, label)
       arrow_x, arrow_y)
   end
 
-  if hit then
+  -- The menu is toggled when the user clicks on it, or when there is already a
+  -- menu open, and the user now hovers over a different menu
+  if hit or hovered and imgui.is_any_menu_open(gui_state) and
+    not imgui.is_menu_open(gui_state, label)
+  then
     imgui.toggle_menu(gui_state, label)
   end
 
@@ -132,15 +136,16 @@ function Menu.menu_item(gui_state, label, options)
   if not options.bg_color_hovered then options.bg_color_hovered = {68, 137, 156} end
   if not options.bg_color_pressed then options.bg_color_pressed = {42, 82, 94} end
 
-  local clicked = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
+  local clicked, _, hovered = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
     label, nil, options)
   Layout.next(gui_state, "|")
 
   clicked = clicked and (not options or options and not options.disabled)
+  hovered = hovered and (not options or options and not options.disabled)
   if clicked then
     imgui.close_menus(gui_state, gui_state.menu_depth)
   end
-  return clicked
+  return clicked, hovered
 end
 
 -- Behaves like a menu item, but closes all menus when clicked.
@@ -171,10 +176,12 @@ function Menu.menubar_item(gui_state, label, options)
   else
     options.font_color = {0, 0, 0, 255}
   end
-  local clicked = Button.draw_flat(gui_state, nil, nil, nil, gui_state.layout.max_h,
+  local clicked, _, hovered = Button.draw_flat(gui_state, nil, nil, nil, gui_state.layout.max_h,
     label, nil, options)
+  clicked = clicked and (not options or options and not options.disabled)
+  hovered = hovered and (not options or options and not options.disabled)
   Layout.next(gui_state, "-", 1)
-  return clicked
+  return clicked, hovered
 end
 
 return Menu

@@ -71,7 +71,7 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
   state.layout.adv_y = h
 
   -- Highlight if mouse is over button
-  if state and state.input then
+  if state and state.input and not (options and options.disabled) then
     local clicked, pressed, hovered = handle_input(state, x, y, w, h)
     if pressed then
       love.graphics.setColor(0, 0, 0, 70)
@@ -110,7 +110,7 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
 
   -- Handle input before drawing so that we can decide which quad should be drawn
   local clicked, pressed, hovered
-  if state and state.input then
+  if state and state.input and not (options and options.disabled) then
     clicked, pressed, hovered = handle_input(state, x, y, w, h)
     if pressed then
       local pressed_color = options and options.bg_color_pressed or {0, 0, 0, 90}
