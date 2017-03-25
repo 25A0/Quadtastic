@@ -48,7 +48,14 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
 
   -- Draw border
   love.graphics.setColor(255, 255, 255, 255)
-  renderutils.draw_border(state.style.stylesheet, state.style.quads.button_border, x, y, w, h, 3)
+  local quads
+  if options and options.disabled then
+    quads = state.style.quads.button_border_disabled
+  else
+    quads = state.style.quads.button_border
+  end
+
+  renderutils.draw_border(state.style.stylesheet, quads, x, y, w, h, 3)
 
   -- Print label
   if not options then options = {} end
