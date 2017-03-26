@@ -31,6 +31,7 @@ function QuadtasticLogic.transitions(interface) return {
   end,
 
   rename = function(app, data, quads)
+    if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return
     elseif #quads > 1 then
       QuadtasticLogic.show_dialog("You cannot rename more than one element at once.")
@@ -106,6 +107,7 @@ function QuadtasticLogic.transitions(interface) return {
   end,
 
   sort = function(app, data, quads)
+    if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end
     -- Find the shared parent of the selected quads.
     local first_keys = {table.find_key(data.quads, quads[1])}
@@ -161,6 +163,7 @@ function QuadtasticLogic.transitions(interface) return {
   end,
 
   remove = function(app, data, quads)
+    if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then
       return
     else
@@ -178,6 +181,7 @@ function QuadtasticLogic.transitions(interface) return {
   end,
 
   group = function(app, data, quads)
+    if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end
     -- Find the shared parent of the selected quads.
     local first_keys = {table.find_key(data.quads, quads[1])}
@@ -218,6 +222,7 @@ function QuadtasticLogic.transitions(interface) return {
   end,
 
   ungroup = function(app, data, quads)
+    if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end
     if #quads > 1 then
       QuadtasticLogic.show_dialog("You can only break up one group at a time")
