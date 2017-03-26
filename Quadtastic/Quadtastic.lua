@@ -62,6 +62,10 @@ Quadtastic.transitions = QuadtasticLogic.transitions(interface)
 --                           DRAWING
 -- -------------------------------------------------------------------------- --
 Quadtastic.draw = function(app, state, gui_state)
+  local save_toast_callback = function(path)
+    imgui.show_toast(gui_state, "Saved as " .. path, nil, 2)
+  end
+
   local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
@@ -75,10 +79,10 @@ Quadtastic.draw = function(app, state, gui_state)
         if Menu.action_item(gui_state, "New") then app.quadtastic.new() end
         if Menu.action_item(gui_state, "Open...") then app.quadtastic.choose_quad() end
         if Menu.action_item(gui_state, "Save") then
-          app.quadtastic.save(imgui.show_toast, gui_state, "Saved", nil, 2)
+          app.quadtastic.save(save_toast_callback)
         end
         if Menu.action_item(gui_state, "Save as...") then
-          app.quadtastic.save_as(imgui.show_toast, gui_state, "Saved", nil, 2)
+          app.quadtastic.save_as(save_toast_callback)
         end
         Menu.separator(gui_state)
         if Menu.action_item(gui_state, "Quit") then love.event.quit() end
@@ -273,7 +277,7 @@ Quadtastic.draw = function(app, state, gui_state)
             Layout.next(gui_state, "|")
 
             if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment_h = ":"}) then
-              app.quadtastic.save(imgui.show_toast, gui_state, "Saved", nil, 2)
+              app.quadtastic.save(save_toast_callback)
             end
           end Layout.finish(gui_state, "|")
           Layout.next(gui_state, "-", 2)
