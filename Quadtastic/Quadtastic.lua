@@ -17,6 +17,7 @@ local table = require(current_folder .. ".tableplus")
 local Selection = require(current_folder .. ".Selection")
 local QuadtasticLogic = require(current_folder .. ".QuadtasticLogic")
 local Menu = require(current_folder .. ".Menu")
+local Keybindings = require(current_folder .. ".Keybindings")
 
 local lfs = require("lfs")
 
@@ -346,8 +347,27 @@ Quadtastic.draw = function(app, state, gui_state)
     data.file_timestamps.image_latest = current_timestamp
   end
 
-
   imgui.every_second(gui_state, refresh_image_timestamp, app, state)
+
+  local function is_pressed(keybinding)
+    if not keybinding then return false end
+    local triggered = imgui.was_key_pressed(gui_state, keybinding[1])
+    triggered = triggered and imgui.are_exact_modifiers_pressed(gui_state, keybinding[2])
+    return triggered
+  end
+
+  if gui_state.input then
+    if is_pressed(Keybindings.open) then app.quadtastic.choose_quad() end
+    if is_pressed(Keybindings.save) then app.quadtastic.save(save_toast_callback) end
+    if is_pressed(Keybindings.save_as) then app.quadtastic.save_as(save_toast_callback) end
+    if is_pressed(Keybindings.quit) then app.quadtastic.quit() end
+    if is_pressed(Keybindings.new) then app.quadtastic.new() end
+
+    if is_pressed(Keybindings.delete) then app.quadtastic.remove() end
+    if is_pressed(Keybindings.rename) then app.quadtastic.rename() end
+    if is_pressed(Keybindings.group) then app.quadtastic.group() end
+    if is_pressed(Keybindings.ungroup) then app.quadtastic.ungroup() end
+  end
 
 end
 

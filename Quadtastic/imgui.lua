@@ -350,6 +350,41 @@ imgui.is_key_pressed = function(state, key)
   return state.input.keyboard.keys[key] and state.input.keyboard.keys[key].pressed
 end
 
+local all_modifiers = {"numlock", "capslock", "scrolllock", "rshift", "lshift",
+                       "rctrl", "lctrl", "ralt", "lalt", "rgui", "lgui", "mode"}
+
+imgui.are_exact_modifiers_pressed = function(gui_state, modifiers)
+  if not modifiers then return true end
+  local wanted_modifiers = {}
+  -- First check if all wanted modifiers are present
+  local pressed = true
+  for _, modifier in ipairs(modifiers) do
+    if not pressed then break end
+    -- Check for group modifiers like *shift
+    local group = string.gmatch(modifier, "%*(.+)")()
+    if group ~= "" then
+      pressed = pressed and (
+        imgui.is_key_pressed(gui_state, "l"..group) or
+        imgui.is_key_pressed(gui_state, "r"..group))
+      wanted_modifiers["l"..group] = true
+      wanted_modifiers["r"..group] = true
+    else
+      pressed = pressed and imgui.is_key_pressed(gui_state, modifier)
+      wanted_modifiers[modifier] = true
+    end
+  end
+  if not pressed then return false end
+  -- Now check if any of the other modifiers is pressed, but not desired.
+  -- This is necessary to prevent that CTRL-s triggers when CTRL-shift-s is
+  -- pressed
+  for _, v in ipairs(all_modifiers) do
+    if not wanted_modifiers[v] then
+      if imgui.is_key_pressed(gui_state, v) then return false end
+    end
+  end
+  return pressed
+end
+
 imgui.consume_key_press = function(state, key)
   if not state.input or not state.input.keyboard.keys[key] then return end
   state.input.keyboard.keys[key].presses = math.max(0, state.input.keyboard.keys[key].presses - 1)

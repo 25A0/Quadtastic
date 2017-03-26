@@ -92,7 +92,7 @@ its rgb value.
  - [x] Select newly created quads to speed up workflow
  - [x] Add new quads to currently selected group, or to group of currently
        selected quad
- - [ ] Keybindings to rename, delete, open, save etc.
+ - [x] Keybindings to rename, delete, open, save etc.
  - [ ] Use custom file extension qua (it's lua but quads)
  - [ ] Let OS know that Quadtastic can open qua files (if that's possible with
        LOVE. <insert cheesy joke that there are no limits to what love can do>)
