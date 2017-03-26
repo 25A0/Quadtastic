@@ -183,7 +183,7 @@ Quadtastic.draw = function(app, state, gui_state)
 
       end Layout.finish(gui_state, "|")
 
-      Layout.next(gui_state, "-", 2)
+      Layout.next(gui_state, "-")
 
       -- Quad list and buttons
       do Layout.start(gui_state)
@@ -281,7 +281,7 @@ Quadtastic.draw = function(app, state, gui_state)
               app.quadtastic.save(save_toast_callback)
             end
           end Layout.finish(gui_state, "|")
-          Layout.next(gui_state, "-", 2)
+          Layout.next(gui_state, "-")
 
           -- Draw button column
           do Layout.start(gui_state)
