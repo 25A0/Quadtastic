@@ -180,6 +180,28 @@ function QuadtasticLogic.transitions(interface) return {
     end
   end,
 
+  create = function(app, state, new_quad)
+    -- If a group is currently selected, add the new quad to that group
+    -- If a quad is currently selected, add the new quad to the same
+    -- group.
+    local selection = state.selection:get_selection()
+    if #selection == 1 then
+      local keys = {table.find_key(state.quads, selection[1])}
+      if libquadtastic.is_quad(selection[1]) then
+        -- Remove the last key so that the new quad is added to the
+        -- group that contains the currently selected quad
+        table.remove(keys)
+      end
+      local group = table.get(state.quads, unpack(keys))
+      table.insert(group, new_quad)
+    else
+      -- Just add it to the root
+      table.insert(state.quads, new_quad)
+    end
+    state.selection:set_selection({new_quad})
+    interface.move_quad_into_view(state.quad_scrollpane_state, new_quad)
+  end,
+
   group = function(app, data, quads)
     if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end
