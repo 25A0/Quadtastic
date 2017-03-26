@@ -302,6 +302,8 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     data.collapsed_groups = {}
 
     data.file_timestamps = {}
+
+    data.toolstate = { type = "create"}
   end,
 
   save = function(app, data, callback)

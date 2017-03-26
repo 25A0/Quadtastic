@@ -144,6 +144,13 @@ return {
     tl = {x = 0, y = 57, w = 2, h = 2},
     tr = {x = 5, y = 57, w = 2, h = 2},
   },
+  tools = {
+    add = {x = 32, y = 48, w = 13, h = 13},
+    border = {x = 64, y = 48, w = 13, h = 13},
+    create = {x = 48, y = 48, w = 13, h = 13},
+    select = {x = 64, y = 64, w = 13, h = 13},
+    strip = {x = 80, y = 48, w = 13, h = 13},
+  },
   tooltip = {
     border = {
       b = {x = 2, y = 51, w = 1, h = 2},

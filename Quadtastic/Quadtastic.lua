@@ -114,6 +114,51 @@ Quadtastic.draw = function(app, state, gui_state)
     Layout.next(gui_state, "|")
 
     do Layout.start(gui_state) -- Image editor
+      -- Toolbar
+      do Layout.start(gui_state)
+        if Button.draw(gui_state, nil, nil, nil, nil, nil,
+                       gui_state.style.quads.tools.select,
+                       {pressed = state.toolstate.type == "select"})
+        then
+          state.toolstate.type = "select"
+        end
+        Tooltip.draw(gui_state, "Select, move and resize quads")
+        Layout.next(gui_state, "|")
+
+        if Button.draw(gui_state, nil, nil, nil, nil, nil,
+                       gui_state.style.quads.tools.create,
+                       {pressed = state.toolstate.type == "create"})
+        then
+          state.toolstate.type = "create"
+
+        end
+        Tooltip.draw(gui_state, "Create new quads quads")
+        Layout.next(gui_state, "|")
+
+        if Button.draw(gui_state, nil, nil, nil, nil, nil,
+                       gui_state.style.quads.tools.border,
+                       {pressed = state.toolstate.type == "border"})
+        then
+          state.toolstate.type = "border"
+          imgui.show_toast(gui_state, "NYI", nil, 2)
+        end
+        Tooltip.draw(gui_state, "Create quads for a border")
+        Layout.next(gui_state, "|")
+
+        if Button.draw(gui_state, nil, nil, nil, nil, nil,
+                       gui_state.style.quads.tools.strip,
+                       {pressed = state.toolstate.type == "strip"})
+        then
+          state.toolstate.type = "strip"
+          imgui.show_toast(gui_state, "NYI", nil, 2)
+        end
+        Tooltip.draw(gui_state, "Create a strip of similar quads")
+        Layout.next(gui_state, "|")
+
+      end Layout.finish(gui_state, "|")
+
+      Layout.next(gui_state, "-")
+
       do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 160, nil)
         do Frame.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 13)
           if state.image then

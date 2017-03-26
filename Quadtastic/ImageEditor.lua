@@ -140,7 +140,7 @@ local function get_dragged_rect(state, gui_state, img_w, img_h)
   end
 end
 
-local function handle_input(gui_state, state, img_w, img_h)
+local function create_tool(gui_state, state, img_w, img_h)
     -- Draw a bright pixel where the mouse is
     love.graphics.setColor(255, 255, 255, 255)
     if gui_state.input then
@@ -175,6 +175,14 @@ local function handle_input(gui_state, state, img_w, img_h)
           new_quad = rect
         end
       end
+    end
+    return new_quad
+end
+
+local function handle_input(gui_state, state, img_w, img_h)
+    local new_quad
+    if state.toolstate.type == "create" then
+      new_quad = create_tool(gui_state, state, img_w, img_h)
     end
 
     -- If the middle mouse button was dragged in this scrollpane, pan the image
