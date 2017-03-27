@@ -140,7 +140,7 @@ local function get_dragged_rect(state, gui_state, img_w, img_h)
   end
 end
 
-local function create_tool(gui_state, state, img_w, img_h)
+local function create_tool(app, gui_state, state, img_w, img_h)
     -- Draw a bright pixel where the mouse is
     love.graphics.setColor(255, 255, 255, 255)
     if gui_state.input then
@@ -164,7 +164,6 @@ local function create_tool(gui_state, state, img_w, img_h)
 
     -- If the mouse was dragged and released in this scrollpane then add a
     -- new quad
-    local new_quad
     do
       -- Check if the lmb was released
       if gui_state.input and gui_state.input.mouse.buttons[1] and
@@ -172,17 +171,15 @@ local function create_tool(gui_state, state, img_w, img_h)
       then
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect and rect.w > 0 and rect.h > 0 then
-          new_quad = rect
+          app.quadtastic.create(rect)
         end
       end
     end
-    return new_quad
 end
 
-local function handle_input(gui_state, state, img_w, img_h)
-    local new_quad
+local function handle_input(app, gui_state, state, img_w, img_h)
     if state.toolstate.type == "create" then
-      new_quad = create_tool(gui_state, state, img_w, img_h)
+      create_tool(app, gui_state, state, img_w, img_h)
     end
 
     -- If the middle mouse button was dragged in this scrollpane, pan the image
@@ -210,10 +207,9 @@ local function handle_input(gui_state, state, img_w, img_h)
       -- Consume mousewheel movement
       gui_state.input.mouse.wheel_dy = 0
     end
-    return new_quad
 end
 
-ImageEditor.draw = function(gui_state, state, x, y, w, h)
+ImageEditor.draw = function(app, gui_state, state, x, y, w, h)
   local content_w, content_h
   local new_quad
   do state.scrollpane_state = Scrollpane.start(gui_state, x, y, w, h,
@@ -230,7 +226,7 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
     love.graphics.draw(state.image)
 
     if gui_state and gui_state.input then
-      new_quad = handle_input(gui_state, state, img_w, img_h)
+      handle_input(app, gui_state, state, img_w, img_h)
     end
 
     -- Draw the outlines of all quads
@@ -241,7 +237,6 @@ ImageEditor.draw = function(gui_state, state, x, y, w, h)
     content_w = img_w * state.display.zoom
     content_h = img_h * state.display.zoom
   end Scrollpane.finish(gui_state, state.scrollpane_state, content_w, content_h)
-  return new_quad
 end
 
 return ImageEditor

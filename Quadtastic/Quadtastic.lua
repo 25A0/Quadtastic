@@ -162,10 +162,7 @@ Quadtastic.draw = function(app, state, gui_state)
       do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 160, nil)
         do Frame.start(gui_state, nil, nil, nil, gui_state.layout.max_h - 13)
           if state.image then
-            local new_quad = ImageEditor.draw(gui_state, state)
-            if new_quad then
-              app.quadtastic.create(new_quad)
-            end
+            ImageEditor.draw(app, gui_state, state)
           else
             -- Put a label in the center of the frame
             Label.draw(gui_state, nil, nil, gui_state.layout.max_w, gui_state.layout.max_h,
