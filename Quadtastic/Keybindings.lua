@@ -37,7 +37,7 @@ local keybindings = {
 	save_as = {"s", {mac and "*gui" or "*ctrl", "*shift"}},
 	quit    = mac and {"q", {"*gui"}} or
 	          linux and {"q", {"*ctrl"}} or
-	          windows and {"f4", {"*alt"}} or nil,
+	          win and {"f4", {"*alt"}} or nil,
 	new     = {"n", {mac and "*gui" or "*ctrl"}},
 }
 
