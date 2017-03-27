@@ -137,8 +137,8 @@ function Menu.menu_finish(gui_state, w, _)
     local mx = gui_state.input.mouse.buttons[1].at_x
     local my = gui_state.input.mouse.buttons[1].at_y
     local contained = false
-    for _, bounds in ipairs(gui_state.menu_bounds) do
-      if Rectangle.contains(bounds, mx, my) then
+    for _, menu_bounds in ipairs(gui_state.menu_bounds) do
+      if Rectangle.contains(menu_bounds, mx, my) then
         contained = true
         break
       end

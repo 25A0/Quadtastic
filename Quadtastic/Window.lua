@@ -61,7 +61,6 @@ Window.finish = function(gui_state, x, y, dragging, options)
         dx, dy = gui_state.transform:unproject_dimensions(mdx, mdy)
       end
     end
-  else
   end
 
   if not active then

@@ -41,8 +41,12 @@ local function show_buttons(gui_state, buttons, options)
 end
 
 local function show_filelist(gui_state, scrollpane_state, filelist, chosen_file)
+  local options = {}
+  options.font_color = {202, 222, 227}
+  options.alignment_v = "-"
+
   local committed_file
-  do Frame.start(gui_state, nil, nil, intended_width, 150)
+  do Frame.start(gui_state, nil, nil, nil, 150)
     do scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, scrollpane_state)
       do Layout.start(gui_state, nil, nil, nil, nil, {noscissor = true})
         for _, file in ipairs(filelist) do
@@ -206,7 +210,7 @@ function Dialog.query(message, input, buttons)
   return coroutine.yield(query_state)
 end
 
-local function switch_to(app, data, new_basepath)
+local function switch_to(data, new_basepath)
   local function create_filelist()
     local filelist = {}
     for file in lfs.dir(".") do
@@ -230,7 +234,7 @@ local function switch_to(app, data, new_basepath)
   end
 end
 
-function Dialog.open_file(basepath, suffix_filter)
+function Dialog.open_file(basepath)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
     local min_w = data.min_w or 0
@@ -250,8 +254,8 @@ function Dialog.open_file(basepath, suffix_filter)
       local mode, err = lfs.attributes(data.basepath, "mode")
       if mode then
         if mode == "file" then
-          local basepath, filename = string.gmatch(data.basepath, "(.*/)([^/]*)")()
-          success, err = switch_to(app, data, basepath)
+          local prev_basepath, filename = string.gmatch(data.basepath, "(.*/)([^/]*)")()
+          success, err = switch_to(data, prev_basepath)
           if success then
             data.chosen_file = {
               type = "file",
@@ -259,7 +263,7 @@ function Dialog.open_file(basepath, suffix_filter)
             }
           end
         elseif mode == "directory" then
-          success, err = switch_to(app, data, data.basepath)
+          success, err = switch_to(data, data.basepath)
         end
       end
 
@@ -267,7 +271,7 @@ function Dialog.open_file(basepath, suffix_filter)
       -- dialog is drawn, switch to the file root
       if not success then
         app.open_file.err(err)
-        switch_to(app, data, "/")
+        switch_to(data, "/")
       end
     end
 
@@ -280,9 +284,6 @@ function Dialog.open_file(basepath, suffix_filter)
       data.editing_basepath, new_basepath = InputField.draw(gui_state,
         nil, nil, intended_width, nil, data.editing_basepath or data.basepath)
       Layout.next(gui_state, "|")
-      local options = {}
-      options.font_color = {202, 222, 227}
-      options.alignment_v = "-"
 
       data.chosen_file, data.committed_file, data.scrollpane_state = show_filelist(
         gui_state, data.scrollpane_state, data.filelist, data.chosen_file)
@@ -317,7 +318,7 @@ function Dialog.open_file(basepath, suffix_filter)
     if dy then data.win_y = (data.win_y or y) + dy end
 
     if new_basepath then
-      local success, err = switch_to(app, data, new_basepath)
+      local success, err = switch_to(data, new_basepath)
       if not success then
         app.open_file.err(err)
       end
@@ -339,9 +340,8 @@ function Dialog.open_file(basepath, suffix_filter)
   }
 
   local file_state = State("open_file", transitions,
-                             {basepath = basepath or "/", title = title or "",
-                              buttons = buttons or {escape = "Cancel", enter = "Open"},
-                              suffix_filter = suffix_filter,
+                             {basepath = basepath or "/",
+                              buttons = {escape = "Cancel", enter = "Open"},
                              })
 
   -- Store the draw function in the state
@@ -370,10 +370,10 @@ function Dialog.save_file(basepath)
       local mode, err = lfs.attributes(data.basepath, "mode")
       if mode then
         if mode == "file" then
-          local basepath, filename = string.gmatch(
+          local prev_basepath, filename = string.gmatch(
             data.basepath, "(.*/)([^/]*)"
           )()
-          success, err = switch_to(app, data, basepath)
+          success, err = switch_to(data, prev_basepath)
           if success then
             data.chosen_file = {
               type = "file",
@@ -381,7 +381,7 @@ function Dialog.save_file(basepath)
             }
           end
         elseif mode == "directory" then
-          success, err = switch_to(app, data, data.basepath)
+          success, err = switch_to(data, data.basepath)
         end
       end
 
@@ -389,7 +389,7 @@ function Dialog.save_file(basepath)
       -- dialog is drawn, switch to the file root
       if not success or err then
         app.save_file.err(err)
-        switch_to(app, data, "/")
+        switch_to(data, "/")
       end
     end
 
@@ -402,9 +402,6 @@ function Dialog.save_file(basepath)
       data.editing_basepath, new_basepath = InputField.draw(gui_state,
         nil, nil, intended_width, nil, data.editing_basepath or data.basepath)
       Layout.next(gui_state, "|")
-      local options = {}
-      options.font_color = {202, 222, 227}
-      options.alignment_v = "-"
 
       local last_chosen_file = data.chosen_file
       data.chosen_file, data.committed_file, data.scrollpane_state = show_filelist(
@@ -474,7 +471,7 @@ function Dialog.save_file(basepath)
     if dy then data.win_y = (data.win_y or y) + dy end
 
     if new_basepath then
-      local success, err = switch_to(app, data, new_basepath)
+      local success, err = switch_to(data, new_basepath)
       if not success then
         app.save_file.err(err)
       end
@@ -508,9 +505,8 @@ function Dialog.save_file(basepath)
   }
 
   local file_state = State("save_file", transitions,
-                             {basepath = basepath or "/", title = title or "",
-                              buttons = buttons or {escape = "Cancel", enter = "Save"},
-                              suffix_filter = suffix_filter,
+                             {basepath = basepath or "/",
+                              buttons = {escape = "Cancel", enter = "Save"},
                              })
 
   -- Store the draw function in the state

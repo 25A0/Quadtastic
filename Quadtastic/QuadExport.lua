@@ -9,7 +9,7 @@ end
 local function export_table_content(filehandle, tab, indentation)
   local numeric_keys = {}
   local string_keys = {}
-  for k, v in pairs(tab) do
+  for k in pairs(tab) do
     if type(k) == "number" then table.insert(numeric_keys, k)
     elseif type(k) == "string" then table.insert(string_keys, k) end
   end

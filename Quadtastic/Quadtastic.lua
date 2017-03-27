@@ -3,7 +3,6 @@ local State = require(current_folder .. ".State")
 
 local imgui = require(current_folder .. ".imgui")
 local Button = require(current_folder .. ".Button")
-local Inputfield = require(current_folder .. ".Inputfield")
 local Label = require(current_folder .. ".Label")
 local Frame = require(current_folder .. ".Frame")
 local Layout = require(current_folder .. ".Layout")
@@ -361,7 +360,7 @@ Quadtastic.draw = function(app, state, gui_state)
 
   end Window.finish(gui_state, win_x, win_y, nil, {active = true, borderless = true})
 
-  local function refresh_image_timestamp(app, data)
+  local function refresh_image_timestamp(data)
     if not data.quads._META.image_path then return end
     local filepath = data.quads._META.image_path
     local current_timestamp = lfs.attributes(filepath, "modification")
@@ -371,7 +370,7 @@ Quadtastic.draw = function(app, state, gui_state)
     data.file_timestamps.image_latest = current_timestamp
   end
 
-  imgui.every_second(gui_state, refresh_image_timestamp, app, state)
+  imgui.every_second(gui_state, refresh_image_timestamp, state)
 
   local function is_pressed(keybinding)
     if not keybinding then return false end

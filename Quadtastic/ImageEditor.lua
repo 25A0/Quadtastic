@@ -211,7 +211,6 @@ end
 
 ImageEditor.draw = function(app, gui_state, state, x, y, w, h)
   local content_w, content_h
-  local new_quad
   do state.scrollpane_state = Scrollpane.start(gui_state, x, y, w, h,
     state.scrollpane_state
   )
