@@ -1,5 +1,6 @@
 local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
 local Rectangle = require(current_folder .. ".Rectangle")
+local os = require(current_folder .. ".os")
 
 local imgui = {}
 
@@ -92,14 +93,7 @@ imgui.init_state = function(transform)
     style = {
       font = nil, -- The font that is being used
       stylesheet = nil, -- A texture atlas with gui styles
-      default_cursor = love.mouse.getSystemCursor("arrow"),
-      text_cursor = love.mouse.getSystemCursor("ibeam"),
-      move_cursor = love.mouse.getSystemCursor("sizeall"),
-      hand_cursor = love.mouse.getSystemCursor("hand"),
-      resize_ns = love.mouse.getSystemCursor("sizens"),
-      resize_we = love.mouse.getSystemCursor("sizewe"),
-      resize_nesw = love.mouse.getSystemCursor("sizenesw"),
-      resize_nwse = love.mouse.getSystemCursor("sizenwse"),
+      cursors = os.cursors,
     },
     layout = imgui.init_layout_state(nil), -- the current layout
     transform = transform, -- the current transform
@@ -158,7 +152,7 @@ end
 imgui.begin_frame = function(state)
   love.graphics.origin()
   -- Reset cursor
-  love.mouse.setCursor(state.style.default_cursor)
+  love.mouse.setCursor(state.style.cursors.default_cursor)
 end
 
 imgui.end_frame = function(state)

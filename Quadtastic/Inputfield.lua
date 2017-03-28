@@ -275,7 +275,7 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
     imgui.is_mouse_in_rect(state, x, y, w, h)
   then
     -- Change cursor to indicate editable text
-    love.mouse.setCursor(state.style.text_cursor)
+    love.mouse.setCursor(state.style.cursors.text_cursor)
   end
 
   -- Label position

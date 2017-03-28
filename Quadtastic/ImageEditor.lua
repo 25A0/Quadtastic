@@ -244,7 +244,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
       end
     end
 
-    -- Check if the mous was pressed on the border of a selected quad
+    -- Check if the mouse was pressed on the border of a selected quad
     local direction
     if state.hovered and state.selection:is_selected(state.hovered) then
       direction = get_resize_directions(state.hovered)
@@ -262,15 +262,15 @@ local function select_tool(app, gui_state, state, img_w, img_h)
       state.toolstate.dragging = nil
       -- Set the cursor
       if direction.n and direction.e or direction.s and direction.w then
-        cursor_string = "resize_nesw"
+        cursor_string = "sizenesw"
       elseif direction.n and direction.w or direction.s and direction.e then
-        cursor_string = "resize_nwse"
+        cursor_string = "sizenwse"
       elseif direction.n or direction.s then
-        cursor_string = "resize_ns"
+        cursor_string = "sizens"
       elseif direction.w or direction.e then
-        cursor_string = "resize_we"
+        cursor_string = "sizewe"
       end
-      love.mouse.setCursor(gui_state.style[cursor_string])
+      love.mouse.setCursor(gui_state.style.cursors[cursor_string])
     end
 
   end
@@ -282,7 +282,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     -- If the hovered quad is already selected, show the movement cursor, and
     -- move the quads when the mouse is dragged
     if state.selection:is_selected(state.hovered) then
-      love.mouse.setCursor(gui_state.style.hand_cursor)
+      love.mouse.setCursor(gui_state.style.cursors.hand_cursor)
       if gui_state.input.mouse.buttons[1] and gui_state.input.mouse.buttons[1].pressed then
         state.toolstate.dragging = true
       end
