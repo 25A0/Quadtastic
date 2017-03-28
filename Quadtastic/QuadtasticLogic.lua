@@ -3,6 +3,7 @@ local Dialog = require(current_folder.. ".Dialog")
 local QuadExport = require(current_folder.. ".QuadExport")
 local table = require(current_folder.. ".tableplus")
 local libquadtastic = require(current_folder.. ".libquadtastic")
+local common = require(current_folder.. ".common")
 
 -- Shared library
 local lfs = require("lfs")
@@ -451,17 +452,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
   end,
 
   load_image = function(app, data, filepath)
-    local success, more = pcall(function()
-      local filehandle, err = io.open(filepath, "rb")
-      if err then
-        error(err)
-      end
-      local filecontent = filehandle:read("*a")
-      filehandle:close()
-      local imagedata = love.image.newImageData(
-        love.filesystem.newFileData(filecontent, 'img', 'file'))
-      return love.graphics.newImage(imagedata)
-    end)
+    local success, more = pcall(common.load_image, filepath)
 
     -- success, more = pcall(love.graphics.newImage, data)
     if success then
