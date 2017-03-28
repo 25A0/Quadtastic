@@ -202,6 +202,61 @@ function QuadtasticLogic.transitions(interface) return {
     interface.move_quad_into_view(state.quad_scrollpane_state, new_quad)
   end,
 
+  move_quads = function(app, data, quads, dx, dy)
+    if not quads then quads = data.selection:get_selection() end
+    if #quads == 0 then return end
+
+    for _,quad in ipairs(quads) do
+      if libquadtastic.is_quad(quad) then
+        quad.x = quad.x + dx
+        quad.y = quad.y + dy
+      end
+    end
+  end,
+
+  -- Resizes all given quads by the given amount, in the given direction.
+  -- The direction is a string that identifies which side or corner is
+  -- changed, and should be a table containing the keys n, e, s, w when
+  -- the quads are resized in the respective direction. For example, if a
+  -- quad is resized at the south-east corner, then direction.s and direction.e
+  -- should be set to `true`. All other keys should be `false` or `nil`.
+  -- The image dimensions are needed so that the position and size of the quads
+  -- can be restricted.
+  resize_quads = function(app, data, quads, direction, dx, dy, img_w, img_h)
+    dx, dy = dx or 0, dy or 0
+    -- All quads have their position in the upper left corner, and their
+    -- size extends to the lower right corner.
+
+    -- The change in position to be applied to all quads
+    local dpx, dpy = 0, 0
+
+    -- The change in size to be applied to all quads
+    local dw, dh = 0, 0
+
+    if direction.n and dy ~= 0 then
+      dpy = dy -- move the quad by the given amount
+      dh = -dy -- but reduce the height accordingly
+    elseif direction.s and dy ~= 0 then
+      dh = dy
+    end
+
+    if direction.w and dx ~= 0 then
+      dpx = dx -- move the quad by the given amount
+      dw = -dx -- but reduce the height accordingly
+    elseif direction.e and dx ~= 0 then
+      dw = dx
+    end
+
+    -- Now apply all changes
+    for _,quad in pairs(quads) do
+      -- Resize the quads, but restrict their dimensions and position
+      quad.x = math.max(0, math.min(img_w, quad.x + dpx))
+      quad.y = math.max(0, math.min(img_h, quad.y + dpy))
+      quad.w = math.max(1, math.min(img_w - quad.x, quad.w + dw))
+      quad.h = math.max(1, math.min(img_h - quad.y, quad.h + dh))
+    end
+  end,
+
   group = function(app, data, quads)
     if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end

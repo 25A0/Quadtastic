@@ -108,7 +108,7 @@ its rgb value.
  - [x] Add "Toast"-like feature for things like successful saving
  - [x] Show a "Saved" toast when the quads were written to disk successfully
  - [ ] Add info next to zoom level: size of currently drawn quad
- - [ ] Resize overlay canvas on resize, otherwise things might break subtly
+ - [x] Resize overlay canvas on resize, otherwise things might break subtly
  - [x] Add text area that wraps at layout boundary automatically
  - [ ] Outline quads with a color that maximizes contrast (i.e. white for darker
        areas, black for brighter areas). The most efficient way to do this is
@@ -117,9 +117,10 @@ its rgb value.
        draw the the outline, we use a shader that samples the pre-processed
        image. The outline uses the color of the pixel that is being outlined.
  - [ ] Add toolbar with tools:
-    - [ ] The Create tool to create new quads
-    - [ ] The Select tool to select, move and resize quads
-    - [ ] The Border tool to create border quads
+    - [x] The Create tool to create new quads
+    - [x] The Select tool to select, move and resize quads
+    - [ ] The Border tool to create border quads:
+          The border tool creates a list of quads automatically 
     - [ ] The Strip tool to create strips of equally sized quads
  - [ ] Undo/Redo history
  - [ ] Allow user to drag .qua file onto window

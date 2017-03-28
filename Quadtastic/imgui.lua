@@ -94,6 +94,12 @@ imgui.init_state = function(transform)
       stylesheet = nil, -- A texture atlas with gui styles
       default_cursor = love.mouse.getSystemCursor("arrow"),
       text_cursor = love.mouse.getSystemCursor("ibeam"),
+      move_cursor = love.mouse.getSystemCursor("sizeall"),
+      hand_cursor = love.mouse.getSystemCursor("hand"),
+      resize_ns = love.mouse.getSystemCursor("sizens"),
+      resize_we = love.mouse.getSystemCursor("sizewe"),
+      resize_nesw = love.mouse.getSystemCursor("sizenesw"),
+      resize_nwse = love.mouse.getSystemCursor("sizenwse"),
     },
     layout = imgui.init_layout_state(nil), -- the current layout
     transform = transform, -- the current transform
@@ -318,9 +324,20 @@ imgui.was_mouse_pressed = function(state, x, y, w, h, button)
   if not button_state then return false end
   if button_state.presses < 1 then return false end
   local mx, my = button_state.at_x, button_state.at_y
-  local transform = state.transform
-  return Rectangle.contains({x = x, y = y, w = w, h = h},
-                            transform:unproject(mx, my))
+  return imgui.is_mouse_in_rect(state, x, y, w, h, mx, my)
+end
+
+imgui.was_mouse_released = function(state, x, y, w, h, button)
+  if not state.input then return false end
+  local button_state
+  if button then
+    button_state = state.input.mouse.buttons[button]
+  else
+    button_state = state.input.mouse.buttons[1]
+  end
+  if not button_state then return false end
+  if button_state.releases < 1 then return false end
+  return imgui.is_mouse_in_rect(state, x, y, w, h)
 end
 
 imgui.is_mouse_pressed = function(state, x, y, w, h, button)
@@ -334,10 +351,7 @@ imgui.is_mouse_pressed = function(state, x, y, w, h, button)
   if not button_state then return false end
   if button_state.presses < 1 then return false end
   local mx, my = button_state.at_x, button_state.at_y
-  local transform = state.transform
-  return button_state.pressed and
-         Rectangle.contains({x = x, y = y, w = w, h = h},
-                            transform:unproject(mx, my))
+  return imgui.is_mouse_in_rect(state, x, y, w, h, mx, my)
 end
 
 imgui.was_key_pressed = function(state, key)
