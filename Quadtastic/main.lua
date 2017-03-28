@@ -14,6 +14,7 @@ local libquadtastic = require(current_folder .. ".libquadtastic")
 
 local Transform = require(current_folder .. '.Transform')
 local Toast = require(current_folder .. '.Toast')
+local Text = require(current_folder .. '.Text')
 local transform = Transform()
 
 -- Cover love transformation functions
@@ -114,6 +115,24 @@ function love.draw()
     end
   end
   gui_state.toasts = remaining_toasts
+
+  -- Draw string next to mouse cursor
+  if gui_state.mousestring then
+    love.graphics.push("all")
+    love.graphics.setCanvas(gui_state.overlay_canvas)
+    local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
+    local x, y = gui_state.transform:unproject(mx + 10, my + 10)
+    -- Draw dark background for better readability
+    love.graphics.setColor(53, 53, 53, 192)
+    love.graphics.rectangle("fill", x-2, y + 2,
+                            Text.min_width(gui_state, gui_state.mousestring) + 4, 12)
+    love.graphics.setColor(255, 255, 255)
+    Text.draw(gui_state, x, y, nil, nil, gui_state.mousestring)
+    love.graphics.setCanvas()
+    love.graphics.pop()
+    gui_state.mousestring = nil
+  end
+
 
   love.graphics.origin()
   love.graphics.draw(gui_state.overlay_canvas)

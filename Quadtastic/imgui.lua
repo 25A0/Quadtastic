@@ -108,6 +108,7 @@ imgui.init_state = function(transform)
     current_menus = {}, -- List of currently selected menu entries
     menu_bounds = {}, -- Dimensions of menus on each menu level
     toasts = {}, -- The list of toasts
+    mousestring = nil, -- string drawn next to the mouse cursor
   }
   return state
 end

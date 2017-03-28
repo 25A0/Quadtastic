@@ -103,20 +103,7 @@ local function show_quad(gui_state, state, quad, quadname)
        not state.toolstate.selecting
     then
       if imgui.is_mouse_in_rect(gui_state, quad.x, quad.y, quad.w, quad.h) then
-        love.graphics.push("all")
-        love.graphics.setCanvas(gui_state.overlay_canvas)
-        love.graphics.scale(1/state.display.zoom, 1/state.display.zoom)
-        local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
-        local x, y = gui_state.transform:unproject(mx + 10, my + 10)
-        -- Draw dark background for better readability
-        love.graphics.setColor(53, 53, 53, 192)
-        love.graphics.rectangle("fill", x-2, y + 2,
-                                Text.min_width(gui_state, quadname) + 4, 12)
-        love.graphics.setColor(255, 255, 255)
-        Text.draw(gui_state, x, y, nil, nil, quadname)
-        love.graphics.setCanvas()
-        love.graphics.pop()
-
+        gui_state.mousestring = quadname
         -- Set this quad as the hovered quad in the application state
         state.hovered = quad
       end
