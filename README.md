@@ -107,7 +107,7 @@ its rgb value.
  - [x] Add background to text drawn next to mouse cursor for better readability
  - [x] Add "Toast"-like feature for things like successful saving
  - [x] Show a "Saved" toast when the quads were written to disk successfully
- - [ ] Add info next to zoom level: size of currently drawn quad
+ - [x] Show size of currently drawn quad next to mouse cursor
  - [x] Resize overlay canvas on resize, otherwise things might break subtly
  - [x] Add text area that wraps at layout boundary automatically
  - [ ] Outline quads with a color that maximizes contrast (i.e. white for darker

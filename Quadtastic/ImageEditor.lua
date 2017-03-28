@@ -197,6 +197,7 @@ local function create_tool(app, gui_state, state, img_w, img_h)
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
           show_quad(gui_state, state, rect)
+          gui_state.mousestring = string.format("%dx%d", rect.w, rect.h)
         end
       end
     end
