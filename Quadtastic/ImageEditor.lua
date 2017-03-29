@@ -219,7 +219,7 @@ end
 
 local function select_tool(app, gui_state, state, img_w, img_h)
   -- Check if we should start resizing a quad
-  if not state.toolstate.resizing then
+  if not state.toolstate.mode then
     local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
     mx, my = gui_state.transform:unproject(mx, my)
 
@@ -257,9 +257,8 @@ local function select_tool(app, gui_state, state, img_w, img_h)
       end
     end
     if direction then
-      state.toolstate.resizing = direction
-      state.toolstate.selecting = nil
-      state.toolstate.dragging = nil
+      state.toolstate.mode = "resizing"
+      state.toolstate.direction = direction
       -- Set the cursor
       if direction.n and direction.e or direction.s and direction.w then
         cursor_string = "sizenesw"
@@ -276,15 +275,12 @@ local function select_tool(app, gui_state, state, img_w, img_h)
   end
 
   local f = fun.partial(imgui.is_key_pressed, gui_state)
-  if state.hovered and not state.toolstate.selecting and
-     not state.toolstate.resizing
-  then
+  if state.hovered and not state.toolstate.mode then
     -- If the hovered quad is already selected, show the movement cursor, and
     -- move the quads when the mouse is dragged
     if state.selection:is_selected(state.hovered) then
       if gui_state.input.mouse.buttons[1] and gui_state.input.mouse.buttons[1].pressed then
-        love.mouse.setCursor(gui_state.style.cursors.move_cursor)
-        state.toolstate.dragging = true
+        state.toolstate.mode = "dragging"
       else
         love.mouse.setCursor(gui_state.style.cursors.hand_cursor)
       end
@@ -306,13 +302,13 @@ local function select_tool(app, gui_state, state, img_w, img_h)
   -- selection box
   elseif gui_state.input.mouse.buttons[1] and
         gui_state.input.mouse.buttons[1].pressed and
-        not state.toolstate.resizing
+        (not state.toolstate.mode or state.toolstate.mode == "selecting")
   then
     -- If neither shift or ctrl is pressed, clear the selection
     if not fun.any(f, {"lshift", "rshift", "lctrl", "rctrl"}) then
       state.selection:clear_selection()
     end
-    state.toolstate.selecting = true
+    state.toolstate.mode = "selecting"
 
     local rect = get_dragged_rect(state, gui_state)
     love.graphics.setColor(255, 255, 255, 255)
@@ -336,9 +332,8 @@ local function select_tool(app, gui_state, state, img_w, img_h)
   if not (gui_state.input.mouse.buttons[1] and
           gui_state.input.mouse.buttons[1].pressed)
   then
-    state.toolstate.dragging = nil
 
-    if state.toolstate.selecting then
+    if state.toolstate.mode == "selecting" then
       -- Add all quads to the selection that are enclosed in the dragged rect
       local rect = get_dragged_rect(state, gui_state)
       local keys, quad = iter_quads(state.quads)
@@ -349,8 +344,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
         keys, quad = iter_quads(state.quads, keys)
       end
     end
-    state.toolstate.selecting = nil
-    state.toolstate.resizing = nil
+    state.toolstate.mode = nil
   end
 
   -- dragged movement in sprite pixels
@@ -365,14 +359,15 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     dpy = math.modf(acc_dy + dy) - math.modf(acc_dy)
   end
 
-  if state.toolstate.dragging then
+  if state.toolstate.mode == "dragging" then
+    love.mouse.setCursor(gui_state.style.cursors.move_cursor)
     -- Move the quads by the dragged amount
     if dpx ~= 0 or dpy ~= 0 then
       app.quadtastic.move_quads(state.selection:get_selection(), dpx, dpy)
     end
-  elseif state.toolstate.resizing and (dpx ~= 0 or dpy ~= 0) then
+  elseif state.toolstate.mode == "resizing" and (dpx ~= 0 or dpy ~= 0) then
     app.quadtastic.resize_quads(state.selection:get_selection(),
-                                state.toolstate.resizing,
+                                state.toolstate.direction,
                                 dpx, dpy, img_w, img_h)
   end
 
