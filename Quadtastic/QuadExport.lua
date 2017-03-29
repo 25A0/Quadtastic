@@ -1,61 +1,7 @@
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local common = require(current_folder.. ".common")
+
 local QuadExport = {}
-
-local function export_quad(filehandle, quadtable)
-  filehandle:write(string.format(
-    "{x = %d, y = %d, w = %d, h = %d}",
-    quadtable.x, quadtable.y, quadtable.w, quadtable.h))
-end
-
-local function export_table_content(filehandle, tab, indentation)
-  local numeric_keys = {}
-  local string_keys = {}
-  for k in pairs(tab) do
-    if type(k) == "number" then table.insert(numeric_keys, k)
-    elseif type(k) == "string" then table.insert(string_keys, k) end
-  end
-
-  table.sort(numeric_keys)
-  table.sort(string_keys)
-
-  local function export_pair(k, v)
-    filehandle:write(string.rep("  ", indentation))
-    if type(k) == "string" then
-      filehandle:write(string.format("%s = ", k))
-    elseif type(k) ~= "number" then
-      error("Cannot handle table keys of type "..type(k))
-    end
-    if type(v) == "table" then
-      -- Check if it is a quad table, in which case we use a simpler function
-      if v.x and v.y and v.w and v.h then
-        export_quad(filehandle, v)
-      else
-        filehandle:write("{\n")
-        export_table_content(filehandle, v, indentation+1)
-        filehandle:write(string.rep("  ", indentation))
-        filehandle:write("}")
-      end
-    elseif type(v) == "number" then
-      -- Not sure why this is here, but sure, let's export it
-      filehandle:write(tostring(v))
-    elseif type(v) == "string" then
-      -- Not sure why this is here, but sure, let's export it
-      filehandle:write("\"", v, "\"")
-    else
-      error("Cannot handle table values of type "..type(v))
-    end
-    filehandle:write(",\n")
-  end
-
-  for _, k in ipairs(numeric_keys) do
-    local v = tab[k]
-    export_pair(k, v)
-  end
-
-  for _, k in ipairs(string_keys) do
-    local v = tab[k]
-    export_pair(k, v)
-  end
-end
 
 QuadExport.export = function(quads, filepath_or_filehandle)
   assert(quads and type(quads) == "table")
@@ -73,10 +19,7 @@ QuadExport.export = function(quads, filepath_or_filehandle)
     error("Cannot access filepath or filehandle")
   end
 
-  filehandle:write("return {\n")
-  export_table_content(filehandle, quads, 1)
-  filehandle:write("}\n")
-  filehandle:close()
+  common.export_table_to_file(filehandle, quads)
 end
 
 return QuadExport
