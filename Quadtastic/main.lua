@@ -149,6 +149,17 @@ function love.quit()
   end
 end
 
+-- Override isActive function to snooze app when it is not in focus.
+-- This is only noticeable in that the dashed lines around selected quads will
+-- stop changing.
+local has_focus = true
+local isActive = love.graphics.isActive
+function love.graphics.isActive() return isActive() and has_focus end
+
+function love.focus(f)
+  has_focus = f
+end
+
 function love.filedropped(file)
   app.quadtastic.load_image_from_path(file:getFilename())
 end

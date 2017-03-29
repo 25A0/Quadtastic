@@ -112,7 +112,7 @@ its rgb value.
  - [x] Save recently opened file and show them in menu
  - [ ] Add line under image editor to let user know that they can drag images
        onto the window to load it
- - [ ] Idle application while not in focus
+ - [x] Idle application while not in focus
  - [x] Resize overlay canvas on resize, otherwise things might break subtly
  - [x] Add text area that wraps at layout boundary automatically
  - [ ] Outline quads with a color that maximizes contrast (i.e. white for darker
