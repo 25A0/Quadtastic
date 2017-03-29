@@ -363,7 +363,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     love.mouse.setCursor(gui_state.style.cursors.move_cursor)
     -- Move the quads by the dragged amount
     if dpx ~= 0 or dpy ~= 0 then
-      app.quadtastic.move_quads(state.selection:get_selection(), dpx, dpy)
+      app.quadtastic.move_quads(state.selection:get_selection(), dpx, dpy, img_w, img_h)
     end
   elseif state.toolstate.mode == "resizing" and (dpx ~= 0 or dpy ~= 0) then
     app.quadtastic.resize_quads(state.selection:get_selection(),

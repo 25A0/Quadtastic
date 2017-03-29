@@ -203,14 +203,14 @@ function QuadtasticLogic.transitions(interface) return {
     interface.move_quad_into_view(state.quad_scrollpane_state, new_quad)
   end,
 
-  move_quads = function(app, data, quads, dx, dy)
+  move_quads = function(app, data, quads, dx, dy, img_w, img_h)
     if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end
 
     for _,quad in ipairs(quads) do
       if libquadtastic.is_quad(quad) then
-        quad.x = quad.x + dx
-        quad.y = quad.y + dy
+        quad.x = math.max(0, math.min(img_w - quad.w, quad.x + dx))
+        quad.y = math.max(0, math.min(img_h - quad.h, quad.y + dy))
       end
     end
   end,
