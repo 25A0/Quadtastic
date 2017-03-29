@@ -1,5 +1,4 @@
 local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
-local Dialog = require(current_folder.. ".Dialog")
 local QuadExport = require(current_folder.. ".QuadExport")
 local table = require(current_folder.. ".tableplus")
 local libquadtastic = require(current_folder.. ".libquadtastic")
@@ -14,18 +13,11 @@ end
 
 local QuadtasticLogic = {}
 
--- These methods will be replaced while testing,
--- so that user interaction can be simulated easily
-QuadtasticLogic.show_dialog = Dialog.show_dialog
-QuadtasticLogic.query = Dialog.query
-QuadtasticLogic.open_file = Dialog.open_file
-QuadtasticLogic.save_file = Dialog.save_file
-
 function QuadtasticLogic.transitions(interface) return {
   -- luacheck: no unused args
 
   quit = function(app, data)
-    local result = QuadtasticLogic.show_dialog("Do you really want to quit?", {"Yes", "No"})
+    local result = interface.show_dialog("Do you really want to quit?", {"Yes", "No"})
     if result == "Yes" then
       return 0
     end
@@ -35,7 +27,7 @@ function QuadtasticLogic.transitions(interface) return {
     if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return
     elseif #quads > 1 then
-      QuadtasticLogic.show_dialog("You cannot rename more than one element at once.")
+      interface.show_dialog("You cannot rename more than one element at once.")
       return
     else
       local quad = quads[1]
@@ -43,7 +35,7 @@ function QuadtasticLogic.transitions(interface) return {
       local old_key = table.concat(current_keys, ".")
       local new_key = old_key
       local ret
-      ret, new_key = QuadtasticLogic.query(
+      ret, new_key = interface.query(
         "Name:", new_key, {escape = "Cancel", enter = "OK"})
 
       local function replace(tab, old_keys, new_keys, element)
@@ -53,7 +45,7 @@ function QuadtasticLogic.transitions(interface) return {
         for i=1,#new_keys do
           if type(current_table) == "table" and libquadtastic.is_quad(current_table) then
             local keys_so_far = table.concat(new_keys, ".", 1, i)
-            QuadtasticLogic.show_dialog(string.format(
+            interface.show_dialog(string.format(
               "The element %s is a quad, and can therefore not have nested quads.",
               keys_so_far))
             return
@@ -85,7 +77,7 @@ function QuadtasticLogic.transitions(interface) return {
         end
         -- Check if that key already exists
         if table.get(data.quads, unpack(new_keys)) then
-          local action = QuadtasticLogic.show_dialog(
+          local action = interface.show_dialog(
             string.format("The element '%s' already exists.", new_key),
             {"Cancel", "Swap", "Replace"})
           if action == "Swap" then
@@ -122,7 +114,7 @@ function QuadtasticLogic.transitions(interface) return {
       -- This is an N^2 search and it sucks, but it probably won't matter.
       local key = table.find_key(shared_parent, v)
       if not key then
-        QuadtasticLogic.show_dialog("You cannot sort quads across different groups")
+        interface.show_dialog("You cannot sort quads across different groups")
         return
       else
         individual_keys[v] = key
@@ -132,7 +124,7 @@ function QuadtasticLogic.transitions(interface) return {
       end
     end
     if numeric_quads == 0 then
-      QuadtasticLogic.show_dialog("Only unnamed quads can be sorted")
+      interface.show_dialog("Only unnamed quads can be sorted")
       return
     end
 
@@ -272,7 +264,7 @@ function QuadtasticLogic.transitions(interface) return {
       -- This is an N^2 search and it sucks, but it probably won't matter.
       local key = table.find_key(shared_parent, v)
       if not key then
-        QuadtasticLogic.show_dialog("You cannot group quads across different groups")
+        interface.show_dialog("You cannot group quads across different groups")
         return
       else
         individual_keys[v] = key
@@ -303,7 +295,7 @@ function QuadtasticLogic.transitions(interface) return {
     if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end
     if #quads > 1 then
-      QuadtasticLogic.show_dialog("You can only break up one group at a time")
+      interface.show_dialog("You can only break up one group at a time")
       return
     end
     if libquadtastic.is_quad(quads[1]) then
@@ -327,7 +319,7 @@ function QuadtasticLogic.transitions(interface) return {
           parent_name = (parent_name and (parent_name .. ".") or "") .. tostring(v)
         end
         if type(k) == "number" and not ignore_numeric_clash then
-          local ret = QuadtasticLogic.show_dialog(string.format([[
+          local ret = interface.show_dialog(string.format([[
 Breaking up this group will change some numeric indices of the
 elements in that group. In particular, the index %d already exists%s.
 Proceed anyways?]],
@@ -339,7 +331,7 @@ Proceed anyways?]],
             return
           end
         else
-          QuadtasticLogic.show_dialog(string.format([[
+          interface.show_dialog(string.format([[
 This group cannot be broken up since there is already an element called '%s'%s.]],
             k, (parent_name and " in group "..parent_name) or ""))
           return
@@ -361,7 +353,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
 
   offer_reload = function(app, data)
     local image_path = data.quads._META.image_path
-    local ret = QuadtasticLogic.show_dialog(
+    local ret = interface.show_dialog(
       string.format("The image %s has changed on disk.\nDo you want to reload it?", image_path),
       {enter="Yes", escape="No"})
     if ret == "Yes" then
@@ -386,7 +378,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
 
   save = function(app, data, callback)
     if not data.image then
-      QuadtasticLogic.show_dialog("Load an image first")
+      interface.show_dialog("Load an image first")
       return
     elseif not data.quadpath or data.quadpath == "" then
       app.quadtastic.save_as()
@@ -397,7 +389,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
   end,
 
   save_as = function(app, data, callback)
-    local ret, filepath = QuadtasticLogic.save_file(data.quadpath)
+    local ret, filepath = interface.save_file(data.quadpath)
     if ret == "Save" then
       data.quadpath = filepath
       app.quadtastic.save(callback)
@@ -410,7 +402,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     else
       basepath = love.filesystem.getUserDirectory()
     end
-    local ret, filepath = QuadtasticLogic.open_file(basepath)
+    local ret, filepath = interface.open_file(basepath)
     if ret == "Open" then
       app.quadtastic.load_quad(filepath)
     end
@@ -456,7 +448,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       data.settings.latest_qua = common.split(filepath)
       interface.store_settings(data.settings)
     else
-      QuadtasticLogic.show_dialog(string.format("Could not load quads: %s", more))
+      interface.show_dialog(string.format("Could not load quads: %s", more))
     end
   end,
 
@@ -470,7 +462,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
         basepath = love.filesystem.getUserDirectory()
       end
     end
-    local ret, filepath = QuadtasticLogic.open_file(basepath)
+    local ret, filepath = interface.open_file(basepath)
     if ret == "Open" then
       app.quadtastic.load_image(filepath)
     end
@@ -494,7 +486,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       -- Try to read a quad file
       local quadfilename = find_lua_file(filepath)
       if not data.quadpath and lfs.attributes(quadfilename) then
-        local should_load = QuadtasticLogic.show_dialog(string.format(
+        local should_load = interface.show_dialog(string.format(
           "We found a quad file in %s.\nWould you like to load it?", quadfilename),
           {enter = "Yes", escape = "No"}
         )
@@ -503,7 +495,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
         end
       end
     else
-      QuadtasticLogic.show_dialog(string.format("Could not load image: %s", more))
+      interface.show_dialog(string.format("Could not load image: %s", more))
     end
   end,
 

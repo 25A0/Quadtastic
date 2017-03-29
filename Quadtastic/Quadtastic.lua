@@ -16,6 +16,7 @@ local table = require(current_folder .. ".tableplus")
 local common = require(current_folder .. ".common")
 local Selection = require(current_folder .. ".Selection")
 local QuadtasticLogic = require(current_folder .. ".QuadtasticLogic")
+local Dialog = require(current_folder .. ".Dialog")
 local Menu = require(current_folder .. ".Menu")
 local Keybindings = require(current_folder .. ".Keybindings")
 
@@ -84,6 +85,10 @@ local interface = {
   reset_view = Quadtastic.reset_view,
   move_quad_into_view = QuadList.move_quad_into_view,
   store_settings = store_settings,
+  show_dialog = Dialog.show_dialog,
+  query = Dialog.query,
+  open_file = Dialog.open_file,
+  save_file = Dialog.save_file,
 }
 
 Quadtastic.transitions = QuadtasticLogic.transitions(interface)

@@ -44,7 +44,7 @@ end
 do
   local data = test_data()
   local logic = QuadtasticLogic.transitions(interface_stub)
-  QuadtasticLogic.query = function(_, existing_key, _)
+  interface_stub.query = function(_, existing_key, _)
     assert(existing_key == "foo.bar")
     return "OK", "foo.new"
   end
@@ -56,11 +56,11 @@ end
 do
   local data = test_data()
   local logic = QuadtasticLogic.transitions(interface_stub)
-  QuadtasticLogic.query = function(_, existing_key, _)
+  interface_stub.query = function(_, existing_key, _)
     assert(existing_key == "foo.bar")
     return "OK", "foo.baz"
   end
-  QuadtasticLogic.show_dialog = function(_, options)
+  interface_stub.show_dialog = function(_, options)
     assert(options[1] == "Cancel")
     assert(options[2] == "Swap")
     assert(options[3] == "Replace")
