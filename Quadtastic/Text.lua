@@ -14,7 +14,7 @@ function Text.break_at(state, text, width)
   local lines = {}
   local line = {}
   local line_length = 0
-  local separators = {"\n", " ", "-", "/", "\\", "."}
+  local separators = {" ", "-", "/", "\\", "."}
   local function complete_line(separator)
     local new_line = table.concat(line, separator)
     table.insert(lines, new_line)
@@ -42,19 +42,14 @@ function Text.break_at(state, text, width)
     end
     -- Add any outstanding words
     if #line > 0 then
-      if separator == "\n" then
-        for _,v in ipairs(line) do
-          table.insert(lines, v)
-        end
-        line, line_length = {}, 0
-      else
-        complete_line(separator)
-        line, line_length = {}, 0
-      end
+      complete_line(separator)
+      line, line_length = {}, 0
     end
   end
 
-  break_up(text, 1)
+  for line in string.gmatch(text, "[^\n]+") do
+    break_up(line, 1)
+  end
   return lines
 end
 
