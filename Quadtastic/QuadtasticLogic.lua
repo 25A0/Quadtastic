@@ -409,7 +409,14 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     local ret, filepath = QuadtasticLogic.open_file(basepath)
     if ret == "Open" then
       app.quadtastic.load_quad(filepath)
-      table.insert(data.settings.recent, 1, filepath)
+      -- Remove duplicates from recent files
+      local remaining_files = {filepath}
+      for _,v in ipairs(data.settings.recent) do
+        if v ~= filepath then
+          table.insert(remaining_files, v)
+        end
+      end
+      data.settings.recent = remaining_files
       interface.store_settings(data.settings)
     end
   end,
