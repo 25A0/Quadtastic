@@ -34,6 +34,7 @@ return {
     sort = {x = 112, y = 64, w = 13, h = 13},
     ungroup = {x = 112, y = 48, w = 13, h = 13},
   },
+  crosshair = {x = 64, y = 32, w = 9, h = 9},
   filebrowser = {
     directory = {x = 8, y = 80, w = 8, h = 11},
     file = {x = 0, y = 80, w = 8, h = 11},

@@ -196,9 +196,31 @@ Quadtastic.draw = function(app, state, gui_state)
 
           love.graphics.setColor(255, 255, 255, 255)
           Label.draw(gui_state, nil, -3, nil, nil, string.format("%d%%", state.display.zoom * 100))
-          if os.getenv("DEBUG") then
+          Layout.next(gui_state, "-")
+
+          if gui_state.input and Scrollpane.is_mouse_inside_widget(gui_state,
+             state.scrollpane_state)
+          then
+            local margin_y = (16 - gui_state.style.raw_quads.crosshair.h) / 2
+            love.graphics.draw(gui_state.style.stylesheet,
+                               gui_state.style.quads.crosshair,
+                               gui_state.layout.next_x,
+                               gui_state.layout.next_y - 2 + margin_y)
+            gui_state.layout.adv_x = gui_state.style.raw_quads.crosshair.w
+            gui_state.layout.adv_y = 16
             Layout.next(gui_state, "-")
+            local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
+            mx, my = state.scrollpane_state.transform:unproject(mx, my)
+            mx = mx + state.scrollpane_state.x
+            my = my + state.scrollpane_state.y
+            mx, my = mx / state.display.zoom, my / state.display.zoom
+            Label.draw(gui_state, nil, -3, nil, nil, string.format("%d %d", mx, my))
+            Layout.next(gui_state, "-")
+          end
+
+          if os.getenv("DEBUG") then
             Label.draw(gui_state, nil, -3, nil, nil, string.format("%d FPS", gui_state.fps or gui_state.frames or 0))
+            Layout.next(gui_state, "-")
           end
           imgui.pop_style(gui_state, "font")
 
