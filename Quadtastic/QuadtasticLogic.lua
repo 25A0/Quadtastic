@@ -405,7 +405,11 @@ This group cannot be broken up since there is already an element called '%s'%s.]
   end,
 
   choose_quad = function(app, data, basepath)
-    if not basepath then basepath = "/Users/moritz/Projects/Quadtastic/Quadtastic/res" end
+    if not basepath and data.settings.latest_qua then
+      basepath = data.settings.latest_qua
+    else
+      basepath = love.filesystem.getUserDirectory()
+    end
     local ret, filepath = QuadtasticLogic.open_file(basepath)
     if ret == "Open" then
       app.quadtastic.load_quad(filepath)
@@ -448,6 +452,8 @@ This group cannot be broken up since there is already an element called '%s'%s.]
         end
       end
       data.settings.recent = remaining_files
+      -- Update latest qua dir
+      data.settings.latest_qua = common.split(filepath)
       interface.store_settings(data.settings)
     else
       QuadtasticLogic.show_dialog(string.format("Could not load quads: %s", more))
@@ -458,6 +464,10 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     if not basepath then
       if data.quads and data.quads._META and data.quads._META.image_path then
         basepath = data.quads._META.image_path
+      elseif data.settings.latest_img then
+        basepath = data.settings.latest_img
+      else
+        basepath = love.filesystem.getUserDirectory()
       end
     end
     local ret, filepath = QuadtasticLogic.open_file(basepath)
@@ -473,6 +483,11 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     if success then
       data.image = more
       data.quads._META.image_path = filepath
+
+      -- Update latest image dir
+      data.settings.latest_img = common.split(filepath)
+      interface.store_settings(data.settings)
+
       data.file_timestamps.image_loaded = lfs.attributes(filepath, "modification")
       data.file_timestamps.image_latest = data.file_timestamps.image_loaded
       interface.reset_view(data)
