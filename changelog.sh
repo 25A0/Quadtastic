@@ -8,7 +8,7 @@
 # `sed -E` to `sed -r`. Sorry for that                         #
 ################################################################
 
-current_version=`git tag -l | head -1`
+current_version=`git describe --abbrev=0 --tags`
 last_tagged_commit=`git tag -v ${current_version} 2>/dev/null |\
 	head -1 | sed -e 's/object //'`
 
