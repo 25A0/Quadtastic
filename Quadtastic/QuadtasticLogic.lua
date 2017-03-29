@@ -441,6 +441,8 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       -- Remove duplicates from recent files
       local remaining_files = {filepath}
       for _,v in ipairs(data.settings.recent) do
+        -- Limit the number of recent files to 10
+        if #remaining_files >= 10 then break end
         if v ~= filepath then
           table.insert(remaining_files, v)
         end
