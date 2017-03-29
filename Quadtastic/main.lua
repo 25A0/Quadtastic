@@ -1,5 +1,5 @@
 local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
-package.cpath = package.cpath .. string.format(";%s/shared/?.so", love.filesystem.getSourceBaseDirectory())
+package.cpath = package.cpath .. string.format(";%s/shared/%s/?.so", love.filesystem.getSourceBaseDirectory(), love.system.getOS())
 
 if os.getenv("DEBUG") then
   -- require("lib/lovedebug/lovedebug")
