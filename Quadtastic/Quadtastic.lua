@@ -13,12 +13,41 @@ local ImageEditor = require(current_folder .. ".ImageEditor")
 local QuadList = require(current_folder .. ".QuadList")
 local libquadtastic = require(current_folder .. ".libquadtastic")
 local table = require(current_folder .. ".tableplus")
+local common = require(current_folder .. ".common")
 local Selection = require(current_folder .. ".Selection")
 local QuadtasticLogic = require(current_folder .. ".QuadtasticLogic")
 local Menu = require(current_folder .. ".Menu")
 local Keybindings = require(current_folder .. ".Keybindings")
 
 local lfs = require("lfs")
+
+local savefile_name = "settings"
+local savefile_path = love.filesystem.getSaveDirectory() .. "/" .. savefile_name
+
+local function load_settings()
+  local success, more = pcall(function()
+    return require(savefile_name)
+  end)
+
+  if success then
+    return more
+  else
+    print("Warning: Could not load settings. " .. more)
+    return nil
+  end
+end
+
+local function store_settings(settings)
+  local success, more = pcall(function()
+    local content = common.serialize_table(settings)
+    love.filesystem.write(savefile_name .. ".lua", content)
+  end)
+
+  if not success then
+    print("Warning: Could not store settings. " .. more)
+  end
+  return success, more
+end
 
 local Quadtastic = State("quadtastic",
   nil,
@@ -29,6 +58,7 @@ local Quadtastic = State("quadtastic",
     },
     scrollpane_state = nil,
     quad_scrollpane_state = nil,
+    settings = load_settings() or {recent = {}},
     collapsed_groups = {},
     selection = Selection(),
     -- More fields are initialized in the new() transition.
@@ -54,6 +84,7 @@ end
 local interface = {
   reset_view = Quadtastic.reset_view,
   move_quad_into_view = QuadList.move_quad_into_view,
+  store_settings = store_settings,
 }
 
 Quadtastic.transitions = QuadtasticLogic.transitions(interface)
@@ -83,6 +114,15 @@ Quadtastic.draw = function(app, state, gui_state)
         end
         if Menu.action_item(gui_state, "Save as...") then
           app.quadtastic.save_as(save_toast_callback)
+        end
+        if #state.settings.recent > 0 then
+          if Menu.menu_start(gui_state, w/4, h - 12, "Recent") then
+            for _, file in ipairs(state.settings.recent) do
+              local filename = string.gmatch(file, ".*/([^/]*)")()
+              if Menu.action_item(gui_state, filename) then app.quadtastic.load_quad(file) end
+            end
+            Menu.menu_finish(gui_state, w/4, h - 12)
+          end
         end
         Menu.separator(gui_state)
         if Menu.action_item(gui_state, "Quit") then love.event.quit() end

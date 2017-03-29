@@ -409,6 +409,8 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     local ret, filepath = QuadtasticLogic.open_file(basepath)
     if ret == "Open" then
       app.quadtastic.load_quad(filepath)
+      table.insert(data.settings.recent, 1, filepath)
+      interface.store_settings(data.settings)
     end
   end,
 

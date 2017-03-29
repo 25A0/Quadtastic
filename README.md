@@ -109,7 +109,7 @@ its rgb value.
  - [x] Show a "Saved" toast when the quads were written to disk successfully
  - [x] Show size of currently drawn quad next to mouse cursor
  - [x] Show cursors position in status bar
- - [ ] Save recently opened file and show them in menu
+ - [x] Save recently opened file and show them in menu
  - [ ] Add line under image editor to let user know that they can drag images
        onto the window to load it
  - [ ] Idle application while not in focus
