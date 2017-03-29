@@ -20,6 +20,13 @@ function common.load_image(filepath)
   return love.graphics.newImage(imagedata)
 end
 
+-- Split a filepath into the path of the containing directory and a filename.
+-- Note that a trailing slash will result in an empty filename
+function common.split(filepath)
+  local dirname, basename = string.gmatch(filepath, "(.*/)([^/]*)")()
+  return dirname, basename
+end
+
 local function export_quad(handle, quadtable)
   handle(string.format(
     "{x = %d, y = %d, w = %d, h = %d}",

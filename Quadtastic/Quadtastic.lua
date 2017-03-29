@@ -118,7 +118,7 @@ Quadtastic.draw = function(app, state, gui_state)
         if #state.settings.recent > 0 then
           if Menu.menu_start(gui_state, w/4, h - 12, "Open recent") then
             for _, file in ipairs(state.settings.recent) do
-              local filename = string.gmatch(file, ".*/([^/]*)")()
+              local _, filename = common.split(file)
               if Menu.action_item(gui_state, filename) then app.quadtastic.load_quad(file) end
             end
             Menu.menu_finish(gui_state, w/4, h - 12)
