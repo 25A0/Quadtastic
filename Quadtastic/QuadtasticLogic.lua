@@ -409,15 +409,6 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     local ret, filepath = QuadtasticLogic.open_file(basepath)
     if ret == "Open" then
       app.quadtastic.load_quad(filepath)
-      -- Remove duplicates from recent files
-      local remaining_files = {filepath}
-      for _,v in ipairs(data.settings.recent) do
-        if v ~= filepath then
-          table.insert(remaining_files, v)
-        end
-      end
-      data.settings.recent = remaining_files
-      interface.store_settings(data.settings)
     end
   end,
 
@@ -445,6 +436,17 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       if metainfo.image_path then
         app.quadtastic.load_image(metainfo.image_path)
       end
+
+      -- Insert new file into list of recently loaded files
+      -- Remove duplicates from recent files
+      local remaining_files = {filepath}
+      for _,v in ipairs(data.settings.recent) do
+        if v ~= filepath then
+          table.insert(remaining_files, v)
+        end
+      end
+      data.settings.recent = remaining_files
+      interface.store_settings(data.settings)
     else
       QuadtasticLogic.show_dialog(string.format("Could not load quads: %s", more))
     end
