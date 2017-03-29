@@ -204,8 +204,12 @@ Quadtastic.draw = function(app, state, gui_state)
             ImageEditor.draw(app, gui_state, state)
           else
             -- Put a label in the center of the frame
-            Label.draw(gui_state, nil, nil, gui_state.layout.max_w, gui_state.layout.max_h,
-                       "no image :(", {alignment_h = ":", alignment_v = "-"})
+            imgui.push_style(gui_state, "font", gui_state.style.small_font)
+            Label.draw(gui_state, nil, nil,
+              gui_state.layout.max_w, gui_state.layout.max_h,
+              "no image :(\nDrag an image into this window to load it",
+              {alignment_h = ":", alignment_v = "-"})
+            imgui.pop_style(gui_state, "font")
           end
         end Frame.finish(gui_state)
 

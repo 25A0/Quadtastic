@@ -111,7 +111,7 @@ its rgb value.
  - [x] Show size of currently drawn quad next to mouse cursor
  - [x] Show cursors position in status bar
  - [x] Save recently opened file and show them in menu
- - [ ] Add line under image editor to let user know that they can drag images
+ - [x] Add line under image editor to let user know that they can drag images
        onto the window to load it
  - [x] Idle application while not in focus
  - [x] Resize overlay canvas on resize, otherwise things might break subtly
