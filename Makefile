@@ -76,7 +76,7 @@ clean:
 	rm -rf dist
 
 # Build as $ make release-0.2.0
-release-%:
+release-%: test
 	# Releasing $*
 	@# Only proceed if that version doesn't already exist
 	@test ! -f .git/refs/tags/$* || \
