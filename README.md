@@ -129,7 +129,7 @@ its rgb value.
           The border tool creates a list of quads automatically 
     - [ ] The Strip tool to create strips of equally sized quads
  - [ ] Undo/Redo history
- - [ ] Allow user to drag .qua file onto window
+ - [x] Allow user to drag .qua file onto window
  - [x] Export quads in consistent order. The current export method is somewhat
        random, which causes the output to change even if the quad definitions
        stayed the same

@@ -506,6 +506,17 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       QuadtasticLogic.show_dialog(string.format("Could not load image: %s", more))
     end
   end,
+
+  load_dropped_file = function(app, data, filepath)
+    -- Determine how to treat this file depending on its extensions
+    local _, extension = common.split_extension(filepath)
+    if extension == "lua" or extension == "qua" then
+      app.quadtastic.load_quad(filepath)
+    else
+      -- Try to load this as an image
+      app.quadtastic.load_image(filepath)
+    end
+  end,
 }
 end
 

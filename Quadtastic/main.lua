@@ -161,7 +161,9 @@ function love.focus(f)
 end
 
 function love.filedropped(file)
-  app.quadtastic.load_image_from_path(file:getFilename())
+  -- Override focus
+  has_focus = true
+  app.quadtastic.load_dropped_file(file:getFilename())
 end
 
 function love.mousepressed(x, y, button)
