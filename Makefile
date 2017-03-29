@@ -8,7 +8,7 @@ macos-love-distname = love-0.10.2-macosx-x64
 
 .PHONY: clean test check tests/* run all app_resources run_debug
 
-all: test
+all: run_debug
 
 run: app_resources
 	${DEBUG} love ${APPNAME}
@@ -74,3 +74,28 @@ tests/test_*.lua:
 
 clean:
 	rm -rf dist
+
+# Build as $ make release-0.2.0
+release-%:
+	# Releasing $*
+	@# Only proceed if that version doesn't already exist
+	@test ! -f .git/refs/tags/$* || \
+	(echo "Version $* is already released"; exit 1)
+
+	@# Prepare tag message
+	@echo 'Release $*\n' > .tagmessage
+	@printf "\
+	# Write a message for release $*\n\
+	# Lines starting with # will be ignored\n\n\
+	" >> .tagmessage
+	@./changelog.sh >> .tagmessage
+
+	@# Open the tag message in the editor before creating the tag.
+	# If you're using sublime text as your editor, make sure to pass the -w
+	# flag so that sublime text doesn't return until you close the edited
+	# tag message.
+	@${EDITOR} .tagmessage
+
+	# Signing tag
+	@git tag -s $* -F .tagmessage
+	@rm .tagmessage

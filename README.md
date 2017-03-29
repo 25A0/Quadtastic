@@ -88,6 +88,7 @@ its rgb value.
     - [ ] Linux
     - [x] Icon
     - [x] Show Quadtastic in title bar
+    - [x] Makefile recipe for tagging releases
  - [x] Detect when an image changed on disk
  - [x] Select newly created quads to speed up workflow
  - [x] Add new quads to currently selected group, or to group of currently
