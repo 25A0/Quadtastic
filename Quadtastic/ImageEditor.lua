@@ -2,7 +2,6 @@ local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
 local Scrollpane = require(current_folder .. ".Scrollpane")
 local libquadtastic = require(current_folder .. ".libquadtastic")
 local imgui = require(current_folder .. ".imgui")
-local Text = require(current_folder .. ".Text")
 local Rectangle = require(current_folder .. ".Rectangle")
 local QuadList = require(current_folder .. ".QuadList")
 local fun = require(current_folder .. ".fun")
@@ -260,6 +259,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
       state.toolstate.mode = "resizing"
       state.toolstate.direction = direction
       -- Set the cursor
+      local cursor_string
       if direction.n and direction.e or direction.s and direction.w then
         cursor_string = "sizenesw"
       elseif direction.n and direction.w or direction.s and direction.e then

@@ -47,8 +47,8 @@ function Text.break_at(state, text, width)
     end
   end
 
-  for line in string.gmatch(text, "[^\n]+") do
-    break_up(line, 1)
+  for l in string.gmatch(text, "[^\n]+") do
+    break_up(l, 1)
   end
   return lines
 end

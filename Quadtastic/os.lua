@@ -23,10 +23,11 @@ os.cursors = {
 
 if os.mac then
   -- LOVE doesn't seem to support all system cursors on MacOS.
-  -- So we try to load additional cursors manually from
-  -- /System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/HIServices.framework/Versions/A/Resources/cursors
-  -- (found on http://einserver.de/blog/resources-for-cursors-in-mac-os-x)
-  local basepath = "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/Frameworks/HIServices.framework/Versions/A/Resources/cursors/"
+  -- So we try to load additional cursors manually (found on
+  -- http://einserver.de/blog/resources-for-cursors-in-mac-os-x)
+  local basepath =
+    "/System/Library/Frameworks/ApplicationServices.framework/Versions/A/"..
+    "Frameworks/HIServices.framework/Versions/A/Resources/cursors/"
   local cursors = {
     sizenesw = {
       dict = "resizenortheastsouthwest",

@@ -21,12 +21,11 @@ local Keybindings = require(current_folder .. ".Keybindings")
 
 local lfs = require("lfs")
 
-local savefile_name = "settings"
-local savefile_path = love.filesystem.getSaveDirectory() .. "/" .. savefile_name
+local settings_filename = "settings"
 
 local function load_settings()
   local success, more = pcall(function()
-    return require(savefile_name)
+    return require(settings_filename)
   end)
 
   if success then
@@ -40,7 +39,7 @@ end
 local function store_settings(settings)
   local success, more = pcall(function()
     local content = common.serialize_table(settings)
-    love.filesystem.write(savefile_name .. ".lua", content)
+    love.filesystem.write(settings_filename .. ".lua", content)
   end)
 
   if not success then
