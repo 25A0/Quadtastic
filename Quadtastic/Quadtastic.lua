@@ -119,7 +119,7 @@ Quadtastic.draw = function(app, state, gui_state)
                        gui_state.style.quads.tools.select,
                        {pressed = state.toolstate.type == "select"})
         then
-          state.toolstate.type = "select"
+          state.toolstate = {type = "select"}
         end
         Tooltip.draw(gui_state, "Select, move and resize quads")
         Layout.next(gui_state, "|")
@@ -128,7 +128,7 @@ Quadtastic.draw = function(app, state, gui_state)
                        gui_state.style.quads.tools.create,
                        {pressed = state.toolstate.type == "create"})
         then
-          state.toolstate.type = "create"
+          state.toolstate = {type = "create"}
 
         end
         Tooltip.draw(gui_state, "Create new quads quads")
@@ -138,7 +138,7 @@ Quadtastic.draw = function(app, state, gui_state)
                        gui_state.style.quads.tools.border,
                        {pressed = state.toolstate.type == "border"})
         then
-          state.toolstate.type = "border"
+          state.toolstate = {type = "border"}
           imgui.show_toast(gui_state, "NYI", nil, 2)
         end
         Tooltip.draw(gui_state, "Create quads for a border")
@@ -148,7 +148,7 @@ Quadtastic.draw = function(app, state, gui_state)
                        gui_state.style.quads.tools.strip,
                        {pressed = state.toolstate.type == "strip"})
         then
-          state.toolstate.type = "strip"
+          state.toolstate = {type = "strip"}
           imgui.show_toast(gui_state, "NYI", nil, 2)
         end
         Tooltip.draw(gui_state, "Create a strip of similar quads")
