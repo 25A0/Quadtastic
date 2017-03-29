@@ -282,9 +282,11 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     -- If the hovered quad is already selected, show the movement cursor, and
     -- move the quads when the mouse is dragged
     if state.selection:is_selected(state.hovered) then
-      love.mouse.setCursor(gui_state.style.cursors.hand_cursor)
       if gui_state.input.mouse.buttons[1] and gui_state.input.mouse.buttons[1].pressed then
+        love.mouse.setCursor(gui_state.style.cursors.move_cursor)
         state.toolstate.dragging = true
+      else
+        love.mouse.setCursor(gui_state.style.cursors.hand_cursor)
       end
     -- Else select it on click
     elseif imgui.was_mouse_released(gui_state, state.hovered.x, state.hovered.y,
