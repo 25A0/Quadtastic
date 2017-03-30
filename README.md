@@ -77,6 +77,7 @@ its rgb value.
  - [x] Use Esc to clear selection of text or elements
  - [x] Resize dialogs automatically so that they use up as little space as possible
  - [x] Add About dialog
+ - [x] Add menu to help users report bugs easily via GitHub or email
  - [ ] Distribution:
     - [x] Automatically generate change log from checked items
           in README's Roadmap. Most of the time it works every time!

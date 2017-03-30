@@ -150,8 +150,46 @@ Quadtastic.draw = function(app, state, gui_state)
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
       if Menu.menu_start(gui_state, w/4, h - 12, "Help") then
+
         if Menu.action_item(gui_state, "GitHub") then
           love.system.openURL("https://www.github.com/25A0/Quadtastic")
+        end
+        if Menu.menu_start(gui_state, w/4, h - 12, "Report a bug") then
+          local function compose_body(version_info)
+            local issuebody = [[
+[Describe the bug]
+
+### Steps to reproduce
+ 1. 
+
+###  Expected behaviour
+
+
+### Actual behaviour :scream:
+
+
+---
+Affects: %s]]
+            issuebody = string.format(issuebody, version_info)
+            issuebody = string.gsub(issuebody, "\n", "%%0A")
+            issuebody = string.gsub(issuebody, " ", "%%20")
+            issuebody = string.gsub(issuebody, "#", "%%23")
+            return issuebody
+          end
+
+          if Menu.action_item(gui_state, "via GitHub") then
+            local version_info = love.filesystem.read("res/version.txt")
+            local body = compose_body(version_info)
+            love.system.openURL("https://www.github.com/25A0/Quadtastic/issues/new?body="..body)
+          end
+          if Menu.action_item(gui_state, "via email") then
+            local version_info = love.filesystem.read("res/version.txt")
+            local subject = "Bug in Quadtastic " .. version_info
+            local body = compose_body(version_info)
+            love.system.openURL("mailto:moritz@25a0.com?subject="..subject..
+                                "&body="..body)
+          end
+          Menu.menu_finish(gui_state, w/4, h-12)
         end
         if Menu.action_item(gui_state, "About") then
           app.quadtastic.show_about_dialog()
