@@ -6,7 +6,7 @@ APPVERSION = $(shell git describe --abbrev=0 --tags)-$(shell git log -1 --pretty
 APPCOPYRIGHT = 2017 Moritz Neikes
 macos-love-distname = love-0.10.2-macosx-x64
 
-.PHONY: clean test check tests/* run all app_resources run_debug
+.PHONY: clean test check tests/* run all app_resources run_debug update_license release*
 
 all: run_debug
 
@@ -75,8 +75,16 @@ tests/test_*.lua:
 clean:
 	rm -rf dist
 
+firstyear=2017
+thisyear=$(shell date "+%Y")
+update_license:
+	cp res/raw_mit_license.txt LICENSE.txt
+	test ${firstyear} = ${thisyear} && \
+	sed -i -e 's/\[years\]/${thisyear}/' LICENSE.txt || \
+	sed -i -e 's/\[years\]/${firstyear}-${thisyear}/' LICENSE.txt
+
 # Build as $ make release-0.2.0
-release-%: test
+release-%: test update_license
 	# Releasing $*
 	@# Only proceed if that version doesn't already exist
 	@test ! -f .git/refs/tags/$* || \
