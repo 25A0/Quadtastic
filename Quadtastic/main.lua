@@ -52,6 +52,7 @@ function love.load()
   love.graphics.setFont(med_font)
 
   local stylesheet = love.graphics.newImage("res/style.png")
+  local icon = love.graphics.newImage("res/icon-32x32.png")
 
   love.keyboard.setKeyRepeat(true)
   gui_state = imgui.init_state(transform)
@@ -59,6 +60,7 @@ function love.load()
   gui_state.style.med_font = med_font
   gui_state.style.font = med_font
   gui_state.style.stylesheet = stylesheet
+  gui_state.style.icon = icon
   gui_state.style.raw_quads = require("res/style")
   gui_state.style.quads = libquadtastic.import_quads(gui_state.style.raw_quads,
     stylesheet:getWidth(), stylesheet:getHeight())

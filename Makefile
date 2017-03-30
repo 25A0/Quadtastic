@@ -16,7 +16,7 @@ run: app_resources
 run_debug: DEBUG=DEBUG=true
 run_debug: run
 
-app_resources: ${APPNAME}/res/style.png ${APPNAME}/res/icon-32x32.png
+app_resources: ${APPNAME}/res/style.png ${APPNAME}/res/icon-32x32.png update_license
 	# Store version info in ${APPNAME}/res
 	echo v${APPVERSION} > ${APPNAME}/res/version.txt
 
@@ -82,6 +82,7 @@ update_license:
 	test ${firstyear} = ${thisyear} && \
 	sed -i -e 's/\[years\]/${thisyear}/' LICENSE.txt || \
 	sed -i -e 's/\[years\]/${firstyear}-${thisyear}/' LICENSE.txt
+	head -1 LICENSE.txt > Quadtastic/res/copyright.txt
 
 # Build as $ make release-0.2.0
 release-%: test update_license

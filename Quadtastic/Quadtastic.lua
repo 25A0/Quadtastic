@@ -89,6 +89,7 @@ local interface = {
   query = Dialog.query,
   open_file = Dialog.open_file,
   save_file = Dialog.save_file,
+  show_about_dialog = Dialog.show_about_dialog,
 }
 
 Quadtastic.transitions = QuadtasticLogic.transitions(interface)
@@ -145,6 +146,15 @@ Quadtastic.draw = function(app, state, gui_state)
         local disabled = not can_reload or not state.quads._META.image_path
         if Menu.action_item(gui_state, "Reload image", {disabled = disabled}) then
           app.quadtastic.load_image(state.quads._META.image_path)
+        end
+        Menu.menu_finish(gui_state, w/4, h - 12)
+      end
+      if Menu.menu_start(gui_state, w/4, h - 12, "Help") then
+        if Menu.action_item(gui_state, "GitHub") then
+          love.system.openURL("https://www.github.com/25A0/Quadtastic")
+        end
+        if Menu.action_item(gui_state, "About") then
+          app.quadtastic.show_about_dialog()
         end
         Menu.menu_finish(gui_state, w/4, h - 12)
       end

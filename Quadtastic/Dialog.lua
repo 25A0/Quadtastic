@@ -514,4 +514,50 @@ function Dialog.save_file(basepath)
   return coroutine.yield(file_state)
 end
 
+function Dialog.show_about_dialog()
+  local version_info = love.filesystem.read("res/version.txt")
+  local copyright_info = love.filesystem.read("res/copyright.txt")
+
+  -- Draw the dialog
+  local function draw(app, data, gui_state, w, h)
+    local min_w = data.min_w or 0
+    local min_h = data.min_h or 0
+    local x = data.win_x or (w - min_w) / 2
+    local y = data.win_y or (h - min_h) / 2
+    local dx, dy
+    do Window.start(gui_state, x, y, min_w, min_h)
+      do Layout.start(gui_state)
+
+        local icon_w, icon_h = 32, 32
+        local x = gui_state.layout.next_x + (gui_state.layout.max_w - icon_w) / 2
+        local y = gui_state.layout.next_y
+        love.graphics.draw(gui_state.style.icon, x, y)
+        gui_state.layout.adv_x, gui_state.layout.adv_y = icon_w, icon_h
+        Layout.next(gui_state, "|")
+
+        Label.draw(gui_state, nil, nil, nil, nil, "Quadtastic " .. version_info)
+        Layout.next(gui_state, "|")
+        Label.draw(gui_state, nil, nil, nil, nil, copyright_info)
+        Layout.next(gui_state, "|")
+        if Button.draw(gui_state, nil, nil, nil, nil, "Close") then
+          app.about_dialog.close()
+        end
+      end Layout.finish(gui_state, "|")
+    end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
+      gui_state, x, y, data.dragging)
+    if dx then data.win_x = (data.win_x or x) + dx end
+    if dy then data.win_y = (data.win_y or y) + dy end
+  end
+
+  assert(coroutine.running(), "This function must be run in a coroutine.")
+  local transitions = {
+    -- luacheck: no unused args
+    close = function(app, data) return "close" end,
+  }
+  local dialog_state = State("about_dialog", transitions, {})
+  -- Store the draw function in the state
+  dialog_state.draw = draw
+  return coroutine.yield(dialog_state)
+end
+
 return Dialog

@@ -509,6 +509,10 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       app.quadtastic.load_image(filepath)
     end
   end,
+
+  show_about_dialog = function(app, data)
+    interface.show_about_dialog()
+  end,
 }
 end
 
