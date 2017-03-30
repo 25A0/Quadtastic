@@ -9,6 +9,7 @@ local Label = require(current_folder .. ".Label")
 local Text = require(current_folder .. ".Text")
 local Window = require(current_folder .. ".Window")
 local imgui = require(current_folder .. ".imgui")
+local licenses = require(current_folder .. ".res.licenses")
 
 -- Shared library
 local lfs = require("lfs")
@@ -555,6 +556,71 @@ function Dialog.show_about_dialog()
     close = function(app, data) return "close" end,
   }
   local dialog_state = State("about_dialog", transitions, {})
+  -- Store the draw function in the state
+  dialog_state.draw = draw
+  return coroutine.yield(dialog_state)
+end
+
+function Dialog.show_ack_dialog()
+  -- Draw the dialog
+  local function draw(app, data, gui_state, w, h)
+    local min_w = data.min_w or 0
+    local min_h = data.min_h or 0
+    local x = data.win_x or (w - min_w) / 2
+    local y = data.win_y or (h - min_h) / 2
+    local dx, dy
+    do Window.start(gui_state, x, y, min_w, min_h)
+      imgui.push_style(gui_state, "font", gui_state.style.small_font)
+      do Layout.start(gui_state)
+        Label.draw(gui_state, nil, nil, nil, nil, "Quadtastic uses the following open-source software projects:")
+        Layout.next(gui_state, "|")
+
+        do Frame.start(gui_state, nil, nil, 320, 150)
+          imgui.push_style(gui_state, "font_color", {202, 222, 227})
+          do scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, scrollpane_state)
+            do Layout.start(gui_state, nil, nil, nil, nil, {noscissor = true})
+            for i, software in ipairs(licenses) do
+              imgui.push_style(gui_state, "font", gui_state.style.med_font)
+              Label.draw(gui_state, nil, nil, nil, nil, software.name)
+              imgui.pop_style(gui_state, "font")
+              Layout.next(gui_state, "|")
+              Label.draw(gui_state, nil, nil, nil, nil, software.license)
+              Layout.next(gui_state, "|")
+              if next(licenses, i) then
+                Label.draw(gui_state, nil, nil, nil, nil, "--------------------")
+                Layout.next(gui_state, "|")
+              end
+            end
+
+            end Layout.finish(gui_state, "|")
+            -- Restrict the viewport's position to the visible content as good as
+            -- possible
+            scrollpane_state.min_x = 0
+            scrollpane_state.min_y = 0
+            scrollpane_state.max_x = gui_state.layout.adv_x
+            scrollpane_state.max_y = math.max(gui_state.layout.adv_y, gui_state.layout.max_h)
+          end Scrollpane.finish(gui_state, scrollpane_state)
+          imgui.pop_style(gui_state, "font_color")
+        end Frame.finish(gui_state)
+        Layout.next(gui_state, "|")
+
+        if Button.draw(gui_state, nil, nil, nil, nil, "Close") then
+          app.ack_dialog.close()
+        end
+      end Layout.finish(gui_state, "|")
+      imgui.pop_style(gui_state, "font")
+    end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
+      gui_state, x, y, data.dragging)
+    if dx then data.win_x = (data.win_x or x) + dx end
+    if dy then data.win_y = (data.win_y or y) + dy end
+  end
+
+  assert(coroutine.running(), "This function must be run in a coroutine.")
+  local transitions = {
+    -- luacheck: no unused args
+    close = function(app, data) return "close" end,
+  }
+  local dialog_state = State("ack_dialog", transitions, {})
   -- Store the draw function in the state
   dialog_state.draw = draw
   return coroutine.yield(dialog_state)

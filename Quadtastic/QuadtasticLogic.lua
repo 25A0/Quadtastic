@@ -513,6 +513,10 @@ This group cannot be broken up since there is already an element called '%s'%s.]
   show_about_dialog = function(app, data)
     interface.show_about_dialog()
   end,
+
+  show_ack_dialog = function(app, data)
+    interface.show_ack_dialog()
+  end,
 }
 end
 

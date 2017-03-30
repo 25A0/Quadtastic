@@ -90,6 +90,7 @@ local interface = {
   open_file = Dialog.open_file,
   save_file = Dialog.save_file,
   show_about_dialog = Dialog.show_about_dialog,
+  show_ack_dialog = Dialog.show_ack_dialog,
 }
 
 Quadtastic.transitions = QuadtasticLogic.transitions(interface)
@@ -190,6 +191,10 @@ Affects: %s]]
                                 "&body="..body)
           end
           Menu.menu_finish(gui_state, w/4, h-12)
+        end
+        Menu.separator(gui_state)
+        if Menu.action_item(gui_state, "Acknowledgements") then
+          app.quadtastic.show_ack_dialog()
         end
         if Menu.action_item(gui_state, "About") then
           app.quadtastic.show_about_dialog()
