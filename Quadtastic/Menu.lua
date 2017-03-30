@@ -173,7 +173,7 @@ function Menu.menu_item(gui_state, label, options)
 
   clicked = clicked and (not options or options and not options.disabled)
   hovered = hovered and (not options or options and not options.disabled)
-  if clicked then
+  if clicked or hovered then
     imgui.close_menus(gui_state, gui_state.menu_depth)
   end
   return clicked, hovered
