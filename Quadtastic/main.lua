@@ -59,6 +59,7 @@ function love.load()
   gui_state.style.small_font = smol_font
   gui_state.style.med_font = med_font
   gui_state.style.font = med_font
+  gui_state.style.font_color = {32, 63, 73}
   gui_state.style.stylesheet = stylesheet
   gui_state.style.icon = icon
   gui_state.style.raw_quads = require("res/style")

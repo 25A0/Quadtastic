@@ -85,6 +85,7 @@ Text.draw = function(state, x, y, w, h, text, options)
   x = math.floor(x)
   y = math.floor(y)
   love.graphics.setFont(state.style.font)
+  love.graphics.setColor(state.style.font_color)
   -- Print Text
   if options and options.font_color then
     love.graphics.setColor(unpack(options.font_color))
