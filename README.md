@@ -163,7 +163,6 @@ its rgb value.
  - [luafilesystem](https://github.com/keplerproject/luafilesystem)
  - [lovedebug](https://github.com/Ranguna/LOVEDEBUG) by kalle2990, maintained by Ranguna
  - [Nuklear](https://github.com/vurtun/nuklear) for guidance on how to write IMGUI
- - [inspect.lua](http://github.com/kikito/inspect.lua) by kikito
  - affine for reverse transformation by [Minh Ngo](https://github.com/markandgo/simple-transform)
  - xform by [pgimeno](https://love2d.org/forums/viewtopic.php?p=201884#p201884)
    for practical ideas related to reverse transformation
