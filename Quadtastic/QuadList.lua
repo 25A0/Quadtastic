@@ -112,6 +112,7 @@ QuadList.draw = function(gui_state, state, x, y, w, h, last_hovered)
   local quad_bounds = {}
   do Frame.start(gui_state, x, y, w, h)
     imgui.push_style(gui_state, "font", gui_state.style.small_font)
+    imgui.push_style(gui_state, "font_color", {202, 222, 227})
     do state.quad_scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, state.quad_scrollpane_state)
       do Layout.start(gui_state, nil, nil, nil, nil, {noscissor = true})
         clicked, hovered = draw_elements(gui_state, state, state.quads, last_hovered, quad_bounds)
@@ -124,6 +125,7 @@ QuadList.draw = function(gui_state, state, x, y, w, h, last_hovered)
       state.quad_scrollpane_state.max_y = math.max(gui_state.layout.adv_y, gui_state.layout.max_h)
     end Scrollpane.finish(gui_state, state.quad_scrollpane_state)
     imgui.pop_style(gui_state, "font")
+    imgui.pop_style(gui_state, "font_color")
   end Frame.finish(gui_state)
 
   -- Move viewport to focus quad if necessary

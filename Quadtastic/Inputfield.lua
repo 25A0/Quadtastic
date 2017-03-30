@@ -319,9 +319,12 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
   local text = content
   if #content == 0 and options and options.ghost_text then
     text = options.ghost_text
-    options.font_color = {255, 255, 255, 128}
+    imgui.push_style(state, "font_color", {202, 222, 227, 128})
+  else
+    imgui.push_style(state, "font_color", {202, 222, 227})
   end
   Text.draw(state, text_x, y + margin_y, nil, nil, text, options)
+  imgui.pop_style(state, "font_color")
 
   -- Restore state
   love.graphics.pop()
