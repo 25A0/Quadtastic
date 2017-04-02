@@ -66,6 +66,20 @@ function tableplus.values(tab)
   return values
 end
 
+-- Returns a new table that contains the values of a and b without duplicates
+function tableplus.union(a, b)
+  local union = {}
+  local seen = {}
+  for _, v in pairs(a) do
+    table.insert(union, v)
+    seen[v] = true
+  end
+  for _, v in pairs(b) do
+    if not seen[v] then table.insert(union, v) end
+  end
+  return union
+end
+
 -- Compares the contents of the two tables in a shallow manner. That is, it will
 -- make sure that the two tables have the same number of arguments, the same
 -- numeric values, and that the keys and values of both tables are equal.

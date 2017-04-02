@@ -123,3 +123,19 @@ do
 
   assert(equal_content(expected, found))
 end
+
+-- Test union
+do
+  local a = {1, 2, 3}
+  local b = {2, 3, 4}
+  local union = table.union(a, b)
+  assert(#union == 4)
+  local seen = {}
+  for _,v in pairs(union) do
+    seen[v] = (seen[v] or 0) + 1
+  end
+  assert(seen[1] == 1)
+  assert(seen[2] == 1)
+  assert(seen[3] == 1)
+  assert(seen[4] == 1)
+end
