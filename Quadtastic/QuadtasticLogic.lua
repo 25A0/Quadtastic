@@ -64,10 +64,23 @@ function QuadtasticLogic.transitions(interface) return {
           end
         end
 
-        -- Remove the entry under the old key
-        table.set(data.quads, nil, unpack(old_keys))
-        -- Add the entry under the new key
-        table.set(data.quads, element, unpack(new_keys))
+        local do_action = function()
+          -- Remove the entry under the old key
+          table.set(data.quads, nil, unpack(old_keys))
+          -- Add the entry under the new key
+          table.set(data.quads, element, unpack(new_keys))
+        end
+
+        local undo_action = function()
+          -- Remove the entry under the new key
+          table.set(data.quads, nil, unpack(new_keys))
+          -- Add the entry under the old key
+          table.set(data.quads, element, unpack(old_keys))
+        end
+
+        data.history:add(do_action, undo_action)
+        do_action()
+
       end
 
       if ret == "OK" then
@@ -84,8 +97,19 @@ function QuadtasticLogic.transitions(interface) return {
             {"Cancel", "Swap", "Replace"})
           if action == "Swap" then
             local old_value = table.get(data.quads, unpack(new_keys))
-            table.set(data.quads, old_value, unpack(current_keys))
-            table.set(data.quads, quad, unpack(new_keys))
+            local do_action = function()
+              table.set(data.quads, old_value, unpack(current_keys))
+              table.set(data.quads, quad, unpack(new_keys))
+            end
+
+            local undo_action = function()
+              table.set(data.quads, old_value, unpack(new_keys))
+              table.set(data.quads, quad, unpack(current_keys))
+            end
+
+            data.history:add(do_action, undo_action)
+            do_action()
+
           elseif action == "Replace" then
             replace(data.quads, current_keys, new_keys, quad)
           else -- Cancel option
@@ -112,6 +136,7 @@ function QuadtasticLogic.transitions(interface) return {
     local shared_parent = table.get(data.quads, unpack(shared_keys))
     local individual_keys = {}
     local numeric_quads = 0
+    local new_group = {}
     for _,v in ipairs(quads) do
       -- This is an N^2 search and it sucks, but it probably won't matter.
       local key = table.find_key(shared_parent, v)
@@ -121,7 +146,7 @@ function QuadtasticLogic.transitions(interface) return {
       else
         individual_keys[v] = key
       end
-      if type(key) == "number" then
+      if type(key) == "number" and libquadtastic.is_quad(v) then
         numeric_quads = numeric_quads + 1
       end
     end
@@ -131,7 +156,6 @@ function QuadtasticLogic.transitions(interface) return {
     end
 
     -- Filter out non-quad elements and elements with non-numeric keys
-    local new_group = {}
     for _,v in ipairs(quads) do
       if libquadtastic.is_quad(v) and type(individual_keys[v]) == "number" then
         table.insert(new_group, v)
@@ -144,17 +168,33 @@ function QuadtasticLogic.transitions(interface) return {
     end
     table.sort(new_group, sort)
 
-    -- Remove the quads from their parent
-    for _,v in ipairs(new_group) do
-      local key = individual_keys[v]
-      -- Remove the element from the shared parent
-      shared_parent[key] = nil
+    local do_action = function()
+      -- Remove the quads from their parent
+      for _,v in ipairs(new_group) do
+        local key = individual_keys[v]
+        -- Remove the element from the shared parent
+        shared_parent[key] = nil
+      end
+
+      -- Now add the quads to the parent in order
+      for _,v in ipairs(new_group) do
+        table.insert(shared_parent, v)
+      end
     end
 
-    -- Now add the quads to the parent in order
-    for _,v in ipairs(new_group) do
-      table.insert(shared_parent, v)
+    local undo_action = function()
+      for _,v in ipairs(new_group) do
+        -- Remove the quad from its shared parent, starting at the end
+        table.remove(shared_parent)
+        -- Add the quads to its parent at its original position
+        local key = individual_keys[v]
+        shared_parent[key] = v
+      end
     end
+
+    data.history:add(do_action, undo_action)
+    do_action()
+
   end,
 
   remove = function(app, data, quads)
@@ -162,16 +202,49 @@ function QuadtasticLogic.transitions(interface) return {
     if #quads == 0 then
       return
     else
-      data.selection:deselect(quads)
-      for _,quad in ipairs(quads) do
-        local keys = {table.find_key(data.quads, quad)}
-        if #keys > 0 then
-          table.set(data.quads, nil, unpack(keys))
-          -- Remove the element from the list of collapsed groups. This will have
-          -- no effect if the element was a quad.
-          data.collapsed_groups[quad] = nil
+      local was_collapsed = {}
+      local selected_elements = {}
+      local keys = {}
+      for _,element in ipairs(quads) do
+        if data.selection:is_selected(element) then
+          table.insert(selected_elements, element)
+        end
+        was_collapsed[element] = data.collapsed_groups[element]
+        keys[element] = {table.find_key(data.quads, quad)}
+      end
+
+      local do_action = function()
+        -- Deselect those elements
+        data.selection:deselect(quads)
+
+        for _,element in ipairs(quads) do
+          if #keys[element] > 0 then
+            -- Remove the elements from the quad tree
+            table.set(data.quads, nil, unpack(keys[element]))
+            -- Remove the element from the list of collapsed groups. This will have
+            -- no effect if the element was a quad.
+            data.collapsed_groups[element] = nil
+          end
         end
       end
+
+      local undo_action = function()
+        -- Select those quads
+        data.selection:set_selection(selected_elements)
+
+        for _,element in ipairs(quads) do
+          if #keys[element] > 0 then
+            -- Restore the elements from the quad tree
+            table.set(data.quads, element, unpack(keys[element]))
+            -- Restore their entries from the list of collapsed groups
+            data.collapsed_groups[element] = was_collapsed[element]
+          end
+        end
+      end
+
+      data.history:add(do_action, undo_action)
+      do_action()
+
     end
   end,
 
@@ -180,6 +253,7 @@ function QuadtasticLogic.transitions(interface) return {
     -- If a quad is currently selected, add the new quad to the same
     -- group.
     local selection = state.selection:get_selection()
+    local group -- the group to which the new quad will be added
     if #selection == 1 then
       local keys = {table.find_key(state.quads, selection[1])}
       if libquadtastic.is_quad(selection[1]) then
@@ -187,12 +261,23 @@ function QuadtasticLogic.transitions(interface) return {
         -- group that contains the currently selected quad
         table.remove(keys)
       end
-      local group = table.get(state.quads, unpack(keys))
-      table.insert(group, new_quad)
+      group = table.get(state.quads, unpack(keys))
     else
       -- Just add it to the root
-      table.insert(state.quads, new_quad)
+      group = state.quads
     end
+
+    local new_index = #group + 1
+    local do_action = function()
+      group[new_index] = new_quad
+    end
+    local undo_action = function()
+      group[new_index] = nil
+    end
+
+    state.history:add(do_action, undo_action)
+    do_action()
+
     state.selection:set_selection({new_quad})
     interface.move_quad_into_view(state.quad_scrollpane_state, new_quad)
   end,
@@ -278,8 +363,6 @@ function QuadtasticLogic.transitions(interface) return {
     local num_index = 1 -- a counter for numeric indices
     for _,v in ipairs(quads) do
       local key = individual_keys[v]
-      -- Remove the element from the shared parent
-      shared_parent[key] = nil
       -- No point in preserving a numeric key
       if type(key) == "number" then
         key = num_index
@@ -287,10 +370,34 @@ function QuadtasticLogic.transitions(interface) return {
       end
       new_group[key] = v
     end
-    table.insert(shared_parent, new_group)
 
-    -- Focus quad list on new group
-    interface.move_quad_into_view(data.quad_scrollpane_state, new_group)
+    local do_action = function()
+      for _,v in ipairs(quads) do
+        -- Remove the element from the shared parent
+        local key = individual_keys[v]
+        shared_parent[key] = nil
+      end
+      table.insert(shared_parent, new_group)
+
+      -- Focus quad list on new group
+      interface.move_quad_into_view(data.quad_scrollpane_state, new_group)
+    end
+
+    local undo_action = function()
+      for _,v in ipairs(quads) do
+        -- Restore the element in its original position in shared parent
+        local key = individual_keys[v]
+        shared_parent[key] = v
+      end
+      -- We used a simple insert to add the new group to the parent.
+      -- Therefore the group was inserted at the very end of the parent, and
+      -- can be removed with table.remove
+      table.remove(shared_parent)
+    end
+
+    data.history:add(do_action, undo_action)
+    do_action()
+
   end,
 
   ungroup = function(app, data, quads)
@@ -341,16 +448,36 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       end
     end
 
-    -- Remove group from parent
-    parent[group_key] = nil
-    data.collapsed_groups[group_key] = nil
-    for k,v in pairs(group) do
-      if type(k) == "number" then
-        table.insert(parent, v)
-      else
-        parent[k] = v
+    local do_action = function()
+      -- Remove group from parent
+      parent[group_key] = nil
+
+      data.collapsed_groups[group_key] = nil
+      for k,v in pairs(group) do
+        if type(k) == "number" then
+          table.insert(parent, v)
+        else
+          parent[k] = v
+        end
       end
     end
+
+    local undo_action = function()
+      -- Remove the group's elements from the parent
+      for k,v in pairs(group) do
+        if type(k) == "number" then
+          table.remove(parent)
+        else
+          parent[k] = nil
+        end
+      end
+
+      -- Add the group to the parent
+      parent[group_key] = group
+    end
+    data.history:add(do_action, undo_action)
+    do_action()
+
   end,
 
   offer_reload = function(app, data)
