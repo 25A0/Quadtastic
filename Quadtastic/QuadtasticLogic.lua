@@ -1,5 +1,6 @@
 local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
 local QuadExport = require(current_folder.. ".QuadExport")
+local History = require(current_folder.. ".History")
 local table = require(current_folder.. ".tableplus")
 local libquadtastic = require(current_folder.. ".libquadtastic")
 local common = require(current_folder.. ".common")
@@ -17,6 +18,7 @@ function QuadtasticLogic.transitions(interface) return {
   -- luacheck: no unused args
 
   quit = function(app, data)
+    if not app.quadtastic.proceed_despite_unsaved_changes() then return end
     local result = interface.show_dialog("Do you really want to quit?", {"Yes", "No"})
     if result == "Yes" then
       return 0
@@ -362,6 +364,9 @@ This group cannot be broken up since there is already an element called '%s'%s.]
   end,
 
   new = function(app, data)
+    local proceed = app.quadtastic.proceed_despite_unsaved_changes()
+    if not proceed then return end
+
     data.quads = {
       _META = {}
     }
@@ -372,6 +377,9 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     data.collapsed_groups = {}
 
     data.file_timestamps = {}
+    data.history = History()
+    data.history:mark() -- A new file doesn't have any changes worth saving
+                        -- until the user actually does something
 
     data.toolstate = { type = "create"}
   end,
@@ -384,6 +392,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       app.quadtastic.save_as(callback)
     else
       QuadExport.export(data.quads, data.quadpath)
+      data.history:mark()
       if callback then callback(data.quadpath) end
     end
   end,
@@ -408,7 +417,28 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     end
   end,
 
+  -- Checks with the user how they want to handle unsaved changes before an
+  -- action is executed that would override those changes.
+  -- The user can save or discard the changes, or cancel the action.
+  -- This function returns whether the user chose an action that indicates that
+  -- they want to go ahead with the action (i.e. the function returns true if
+  -- the user pressed save or discard, false otherwise).
+  -- This function will also return true if there are no unsaved changes.
+  proceed_despite_unsaved_changes = function(app, data)
+    -- Return true if there are no unsaved changes
+    if not data.history or data.history:is_marked() then return true end
+
+    -- Otherwise check with the user
+    local ret = interface.show_dialog("Do you want to save the changes you made in the current file?",
+      {"Cancel", "Discard", "Save"})
+    if ret == "Save" then
+      app.quadtastic.save()
+    end
+    return ret == "Save" or ret == "Discard"
+  end,
+
   load_quad = function(app, data, filepath)
+    if not app.quadtastic.proceed_despite_unsaved_changes() then return end
     local success, more = pcall(function()
       local filehandle, err = io.open(filepath, "r")
       if err then
@@ -427,6 +457,9 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       data.quads, data.quadpath = unpack(more)
       -- Reset list of collapsed groups
       data.collapsed_groups = {}
+      data.history = History()
+      -- A newly loaded project has no unsaved changes
+      data.history:mark()
       if not data.quads._META then data.quads._META = {} end
       local metainfo = libquadtastic.get_metainfo(data.quads)
       if metainfo.image_path then
