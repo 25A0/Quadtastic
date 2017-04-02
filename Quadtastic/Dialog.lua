@@ -523,10 +523,10 @@ function Dialog.show_about_dialog()
   local function draw(app, data, gui_state, w, h)
     local min_w = data.min_w or 0
     local min_h = data.min_h or 0
-    local x = data.win_x or (w - min_w) / 2
-    local y = data.win_y or (h - min_h) / 2
+    local win_x = data.win_x or (w - min_w) / 2
+    local win_y = data.win_y or (h - min_h) / 2
     local dx, dy
-    do Window.start(gui_state, x, y, min_w, min_h)
+    do Window.start(gui_state, win_x, win_y, min_w, min_h)
       do Layout.start(gui_state)
 
         local icon_w, icon_h = 32, 32
@@ -545,9 +545,9 @@ function Dialog.show_about_dialog()
         end
       end Layout.finish(gui_state, "|")
     end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
-      gui_state, x, y, data.dragging)
-    if dx then data.win_x = (data.win_x or x) + dx end
-    if dy then data.win_y = (data.win_y or y) + dy end
+      gui_state, win_x, win_y, data.dragging)
+    if dx then data.win_x = (data.win_x or win_x) + dx end
+    if dy then data.win_y = (data.win_y or win_y) + dy end
   end
 
   assert(coroutine.running(), "This function must be run in a coroutine.")
@@ -577,7 +577,7 @@ function Dialog.show_ack_dialog()
 
         do Frame.start(gui_state, nil, nil, 320, 150)
           imgui.push_style(gui_state, "font_color", {202, 222, 227})
-          do scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, scrollpane_state)
+          do data.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, data.scrollpane_state)
             do Layout.start(gui_state, nil, nil, nil, nil, {noscissor = true})
             for i, software in ipairs(licenses) do
               imgui.push_style(gui_state, "font", gui_state.style.med_font)
@@ -595,11 +595,11 @@ function Dialog.show_ack_dialog()
             end Layout.finish(gui_state, "|")
             -- Restrict the viewport's position to the visible content as good as
             -- possible
-            scrollpane_state.min_x = 0
-            scrollpane_state.min_y = 0
-            scrollpane_state.max_x = gui_state.layout.adv_x
-            scrollpane_state.max_y = math.max(gui_state.layout.adv_y, gui_state.layout.max_h)
-          end Scrollpane.finish(gui_state, scrollpane_state)
+            data.scrollpane_state.min_x = 0
+            data.scrollpane_state.min_y = 0
+            data.scrollpane_state.max_x = gui_state.layout.adv_x
+            data.scrollpane_state.max_y = math.max(gui_state.layout.adv_y, gui_state.layout.max_h)
+          end Scrollpane.finish(gui_state, data.scrollpane_state)
           imgui.pop_style(gui_state, "font_color")
         end Frame.finish(gui_state)
         Layout.next(gui_state, "|")
