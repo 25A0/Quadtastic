@@ -381,7 +381,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       interface.show_dialog("Load an image first")
       return
     elseif not data.quadpath or data.quadpath == "" then
-      app.quadtastic.save_as()
+      app.quadtastic.save_as(callback)
     else
       QuadExport.export(data.quads, data.quadpath)
       if callback then callback(data.quadpath) end
