@@ -135,8 +135,16 @@ Quadtastic.draw = function(app, state, gui_state)
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
       if Menu.menu_start(gui_state, w/4, h - 12, "Edit") then
-        Menu.action_item(gui_state, "Undo", {disabled = true})
-        Menu.action_item(gui_state, "Redo", {disabled = true})
+        if Menu.action_item(gui_state, "Undo",
+                            {disabled = not state.history:can_undo()})
+        then
+          app.quadtastic.undo()
+        end
+        if Menu.action_item(gui_state, "Redo",
+                            {disabled = not state.history:can_redo()})
+        then
+          app.quadtastic.redo()
+        end
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
       if Menu.menu_start(gui_state, w/4, h - 12, "Image") then

@@ -363,6 +363,18 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     end
   end,
 
+  undo = function(app, data)
+    assert(data.history:can_undo())
+    local undo_action = data.history:undo()
+    undo_action()
+  end,
+
+  redo = function(app, data)
+    assert(data.history:can_redo())
+    local redo_action = data.history:redo()
+    redo_action()
+  end,
+
   new = function(app, data)
     local proceed = app.quadtastic.proceed_despite_unsaved_changes()
     if not proceed then return end
