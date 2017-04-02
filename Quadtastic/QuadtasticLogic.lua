@@ -210,7 +210,7 @@ function QuadtasticLogic.transitions(interface) return {
           table.insert(selected_elements, element)
         end
         was_collapsed[element] = data.collapsed_groups[element]
-        keys[element] = {table.find_key(data.quads, quad)}
+        keys[element] = {table.find_key(data.quads, element)}
       end
 
       local do_action = function()
