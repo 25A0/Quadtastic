@@ -20,6 +20,7 @@ local function run(self, f, ...)
     end
   else
     co = coroutine.create(f)
+    self._state.coroutine = co
     ret = {coroutine.resume(co, self, self._state.data, ...)}
   end
   -- Print errors if there are any
@@ -43,7 +44,10 @@ local function run(self, f, ...)
     -- If this is the only state, then the app will exit with the
     -- returned integer as exit code.
     if #ret > 1 then
-      if #self._state_stack > 0 then
+      if self._state.coroutine then
+        -- In this case we can return the return values directly
+        return select(2, unpack(ret))
+      elseif #self._state_stack > 0 then
         self:pop_state(select(2, unpack(ret)))
       else
         self._should_quit = true
@@ -73,7 +77,7 @@ setmetatable(AppLogic, {
           return setmetatable({}, {__index = function(_, event)
             local f = self._state.transitions[event]
             return function(...)
-              run(self, f, ...)
+              return run(self, f, ...)
             end
           end})
         -- Otherwise queue that call for later if we have a queue for it
