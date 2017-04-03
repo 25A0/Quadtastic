@@ -430,17 +430,19 @@ function QuadtasticLogic.transitions(interface) return {
         for _,v in ipairs(parent_keys) do
           parent_name = (parent_name and (parent_name .. ".") or "") .. tostring(v)
         end
-        if type(k) == "number" and not ignore_numeric_clash then
-          local ret = interface.show_dialog(string.format([[
-Breaking up this group will change some numeric indices of the
-elements in that group. In particular, the index %d already exists%s.
-Proceed anyways?]],
-            k, (parent_name and " in group "..parent_name) or ""),
-            {"Yes", "No"})
-          if ret == "Yes" then
-            ignore_numeric_clash = true
-          else
-            return
+        if type(k) == "number" then
+          if not ignore_numeric_clash then
+            local ret = interface.show_dialog(string.format([[
+  Breaking up this group will change some numeric indices of the
+  elements in that group. In particular, the index %d already exists%s.
+  Proceed anyways?]],
+              k, (parent_name and " in group "..parent_name) or ""),
+              {"Yes", "No"})
+            if ret == "Yes" then
+              ignore_numeric_clash = true
+            else
+              return
+            end
           end
         else
           interface.show_dialog(string.format([[
