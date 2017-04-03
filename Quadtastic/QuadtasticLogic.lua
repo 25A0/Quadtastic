@@ -186,6 +186,9 @@ function QuadtasticLogic.transitions(interface) return {
       for _,v in ipairs(new_group) do
         -- Remove the quad from its shared parent, starting at the end
         table.remove(shared_parent)
+      end
+      -- We cannot do this in a single pass since these actions can interfere
+      for _,v in ipairs(new_group) do
         -- Add the quads to its parent at its original position
         local key = individual_keys[v]
         shared_parent[key] = v
