@@ -603,6 +603,10 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       data.history:mark()
       if not data.quads._META then data.quads._META = {} end
       local metainfo = libquadtastic.get_metainfo(data.quads)
+
+      -- Remove the current image from the application state
+      data.image = nil
+
       if metainfo.image_path then
         app.quadtastic.load_image(metainfo.image_path)
       end
