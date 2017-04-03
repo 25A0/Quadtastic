@@ -12,6 +12,23 @@ local function find_lua_file(filepath)
   return string.gsub(filepath, "%.(%w+)$", ".lua")
 end
 
+local function add_path_to_recent_files(interface, data, filepath)
+  -- Insert new file into list of recently loaded files
+  -- Remove duplicates from recent files
+  local remaining_files = {filepath}
+  for _,v in ipairs(data.settings.recent) do
+    -- Limit the number of recent files to 10
+    if #remaining_files >= 10 then break end
+    if v ~= filepath then
+      table.insert(remaining_files, v)
+    end
+  end
+  data.settings.recent = remaining_files
+  -- Update latest qua dir
+  data.settings.latest_qua = common.split(filepath)
+  interface.store_settings(data.settings)
+end
+
 local QuadtasticLogic = {}
 
 function QuadtasticLogic.transitions(interface) return {
@@ -543,6 +560,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     if ret == "Save" then
       data.quadpath = filepath
       app.quadtastic.save(callback)
+      add_path_to_recent_files(interface, data, filepath)
     end
   end,
 
@@ -611,20 +629,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
         app.quadtastic.load_image(metainfo.image_path)
       end
 
-      -- Insert new file into list of recently loaded files
-      -- Remove duplicates from recent files
-      local remaining_files = {filepath}
-      for _,v in ipairs(data.settings.recent) do
-        -- Limit the number of recent files to 10
-        if #remaining_files >= 10 then break end
-        if v ~= filepath then
-          table.insert(remaining_files, v)
-        end
-      end
-      data.settings.recent = remaining_files
-      -- Update latest qua dir
-      data.settings.latest_qua = common.split(filepath)
-      interface.store_settings(data.settings)
+      add_path_to_recent_files(interface, data, filepath)
     else
       interface.show_dialog(string.format("Could not load quads: %s", more))
     end
