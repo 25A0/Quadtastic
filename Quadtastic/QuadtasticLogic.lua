@@ -529,10 +529,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
   end,
 
   save = function(app, data, callback)
-    if not data.image then
-      interface.show_dialog("Load an image first")
-      return
-    elseif not data.quadpath or data.quadpath == "" then
+    if not data.quadpath or data.quadpath == "" then
       app.quadtastic.save_as(callback)
     else
       QuadExport.export(data.quads, data.quadpath)
