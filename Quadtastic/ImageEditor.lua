@@ -365,6 +365,12 @@ local function select_tool(app, gui_state, state, img_w, img_h)
         end
         keys, quad = iter_quads(state.quads, keys)
       end
+    elseif state.toolstate.mode == "dragging" then
+      app.quadtastic.commit_movement(state.selection:get_selection(),
+                                     state.toolstate.original_pos)
+    elseif state.toolstate.mode == "resizing" then
+      app.quadtastic.commit_resizing(state.selection:get_selection(),
+                                     state.toolstate.original_quad)
     end
     state.toolstate.mode = nil
   end

@@ -342,6 +342,47 @@ function QuadtasticLogic.transitions(interface) return {
     end
   end,
 
+  -- Finishes moving the given quad. Without calling this function the movements
+  -- that were made with move_quads are not added to the undo history.
+  -- The table original_pos should follow the same format as documented in
+  -- move_quads.
+  commit_movement = function(app, data, quads, original_pos)
+    local deltas = {} -- table containing for each quad how far it was moved
+    assert(#quads == #original_pos)
+
+    for i=1,#quads do
+      if libquadtastic.is_quad(quads[i]) then
+        deltas[i] = {
+          x = quads[i].x - original_pos[i].x,
+          y = quads[i].y - original_pos[i].y
+        }
+      end
+    end
+
+    local do_action = function()
+      for i=1,#quads do
+        if libquadtastic.is_quad(quads[i]) then
+          quads[i].x = quads[i].x + deltas[i].x
+          quads[i].y = quads[i].y + deltas[i].y
+        end
+      end
+    end
+
+    local undo_action = function()
+      for i=1,#quads do
+        if libquadtastic.is_quad(quads[i]) then
+          quads[i].x = quads[i].x - deltas[i].x
+          quads[i].y = quads[i].y - deltas[i].y
+        end
+      end
+    end
+
+    data.history:add(do_action, undo_action)
+    -- Note that we deliberately do not call the do_action here, since the quads
+    -- are already at the position where the user wants them.
+
+  end,
+
   -- Resizes all given quads by the given amount, in the given direction.
   -- The direction should be a table containing the keys n, e, s, w when
   -- the quads are resized in the respective direction. For example, if a
@@ -386,6 +427,48 @@ function QuadtasticLogic.transitions(interface) return {
       quad.w = math.max(1, math.min(img_w - ox, ow + dw))
       quad.h = math.max(1, math.min(img_h - oy, oh + dh))
     end
+  end,
+
+  commit_resizing = function(app, data, quads, original_quad)
+    local deltas = {}
+    assert(#quads == #original_quad)
+    for i=1,#quads do
+      if libquadtastic.is_quad(quads[i]) then
+        deltas[i] = {
+          x = quads[i].x - original_quad[i].x,
+          y = quads[i].y - original_quad[i].y,
+          w = quads[i].w - original_quad[i].w,
+          h = quads[i].h - original_quad[i].h,
+        }
+      end
+    end
+
+    local do_action = function()
+      for i=1,#quads do
+        if libquadtastic.is_quad(quads[i]) then
+          quads[i].x = quads[i].x + deltas[i].x
+          quads[i].y = quads[i].y + deltas[i].y
+          quads[i].w = quads[i].w + deltas[i].w
+          quads[i].h = quads[i].h + deltas[i].h
+        end
+      end
+    end
+
+    local undo_action = function()
+      for i=1,#quads do
+        if libquadtastic.is_quad(quads[i]) then
+          quads[i].x = quads[i].x - deltas[i].x
+          quads[i].y = quads[i].y - deltas[i].y
+          quads[i].w = quads[i].w - deltas[i].w
+          quads[i].h = quads[i].h - deltas[i].h
+        end
+      end
+    end
+
+    data.history:add(do_action, undo_action)
+    -- Note that we deliberately do not call the do_action here, since the quads
+    -- are already resized to the size that the user wants.
+
   end,
 
   group = function(app, data, quads)
