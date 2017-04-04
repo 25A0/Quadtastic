@@ -424,8 +424,10 @@ function QuadtasticLogic.transitions(interface) return {
       -- Resize the quads, but restrict their dimensions and position
       quad.x = math.max(0, math.min(img_w, ox + math.min(ow - 1, dpx)))
       quad.y = math.max(0, math.min(img_h, oy + math.min(oh - 1, dpy)))
-      quad.w = math.max(1, math.min(img_w - ox, ow + dw))
-      quad.h = math.max(1, math.min(img_h - oy, oh + dh))
+      quad.w = math.max(1, math.min(img_w - quad.x,
+                                    ow + (direction.w and math.min(ox, dw) or dw)))
+      quad.h = math.max(1, math.min(img_h - quad.y,
+                                    oh + (direction.n and math.min(oy, dh) or dh)))
     end
   end,
 
