@@ -222,14 +222,373 @@ do
   assert(data.quads[5] == yet_another_quad)
 end
 
--- move_quads
+--[[
+                                                  _
+ _ __ ___   _____   _____    __ _ _   _  __ _  __| |___
+| '_ ` _ \ / _ \ \ / / _ \  / _` | | | |/ _` |/ _` / __|
+| | | | | | (_) \ V /  __/ | (_| | |_| | (_| | (_| \__ \
+|_| |_| |_|\___/ \_/ \___|  \__, |\__,_|\__,_|\__,_|___/
+                               |_|
+]]
 do
-  -- NYI
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {
+    {x = 10, y = 10, w = 50, h = 50}
+  }
+  local orig_pos = {{x = 10, y = 10}}
+  logic.move_quads(app_stub, data, {data.quads[1]}, orig_pos, 5, 15, 100, 100)
+  assert(data.quads[1].x == 15)
+  assert(data.quads[1].y == 25)
+
+  -- Now we move the quads again with a different delta. This should apply
+  -- the delta to the original position, rather than to the quad's current
+  -- position.
+  logic.move_quads(app_stub, data, {data.quads[1]}, orig_pos, 10, -5, 100, 100)
+  assert(data.quads[1].x == 20)
+  assert(data.quads[1].y == 5)
+
+  -- Now we commit the movement, which should not change the quad's position
+  logic.commit_movement(app_stub, data, {data.quads[1]}, orig_pos)
+  assert(data.quads[1].x == 20)
+  assert(data.quads[1].y == 5)
+
+  -- And if we now undo the action, the quad should return to its old position
+  logic.undo(app_stub, data)
+  assert(data.quads[1].x == orig_pos[1].x)
+  assert(data.quads[1].y == orig_pos[1].y)
+
+  -- And redoing restores the new position
+  logic.redo(app_stub, data)
+  assert(data.quads[1].x == 20)
+  assert(data.quads[1].y == 5)
 end
 
--- resize_quads
+-- Test limiting quad movement to image bounds
 do
-  -- NYI
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {
+    {x = 10, y = 10, w = 50, h = 50}
+  }
+  local orig_pos = {{x = 10, y = 10}}
+  logic.move_quads(app_stub, data, {data.quads[1]}, orig_pos, 50, 50, 70, 90)
+  -- The quad should not move beyond 20, 40 to stay within the image bounds
+  assert(data.quads[1].x == 20)
+  assert(data.quads[1].y == 40)
+
+  logic.move_quads(app_stub, data, {data.quads[1]}, orig_pos, -50, -50, 70, 90)
+  -- The quad should not move beyond 0, 0 to stay within the image bounds
+  assert(data.quads[1].x == 0)
+  assert(data.quads[1].y == 0)
+
+  logic.commit_movement(app_stub, data, {data.quads[1]}, orig_pos)
+  assert(data.quads[1].x == 0)
+  assert(data.quads[1].y == 0)
+
+  -- And if we now undo the action, the quad should return to its old position
+  logic.undo(app_stub, data)
+  assert(data.quads[1].x == orig_pos[1].x)
+  assert(data.quads[1].y == orig_pos[1].y)
+
+  -- And redoing restores the new position
+  logic.redo(app_stub, data)
+  assert(data.quads[1].x == 0)
+  assert(data.quads[1].y == 0)
+end
+
+--[[
+               _                                 _
+ _ __ ___  ___(_)_______    __ _ _   _  __ _  __| |___
+| '__/ _ \/ __| |_  / _ \  / _` | | | |/ _` |/ _` / __|
+| | |  __/\__ \ |/ /  __/ | (_| | |_| | (_| | (_| \__ \
+|_|  \___||___/_/___\___|  \__, |\__,_|\__,_|\__,_|___/
+                              |_|
+]]
+local function quad(x, y, w, h)
+  return { x = x, y = y, w = w, h = h }
+end
+
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {
+    {x = 10, y = 10, w = 50, h = 50}
+  }
+  local orig_quad = {{x = 10, y = 10, w = 50, h = 50}}
+  local direction = {n = true}
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     10, -5, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 5, 50, 55)))
+
+  -- Check that the size cannot exceed the image bounds
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     10, -100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 0, 50, 60)))
+
+  -- Check that the size cannot shrink below 1
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     10, 100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 59, 50, 1)))
+
+  logic.commit_resizing(app_stub, data, {data.quads[1]}, orig_quad)
+  assert(testutils.equals(data.quads[1], quad(10, 59, 50, 1)))
+
+  -- And if we now undo the action, the quad should return to its old size
+  logic.undo(app_stub, data)
+  assert(testutils.equals(data.quads[1], orig_quad[1]))
+
+  -- And redoing restores the new position
+  logic.redo(app_stub, data)
+  assert(testutils.equals(data.quads[1], quad(10, 59, 50, 1)))
+end
+
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {
+    {x = 10, y = 10, w = 50, h = 50}
+  }
+  local orig_quad = {{x = 10, y = 10, w = 50, h = 50}}
+  local direction = {n = true, e = true}
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     10, -5, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 5, 60, 55)))
+
+  -- Check that the size cannot exceed the image bounds
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     100, -100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 0, 90, 60)))
+
+  -- Check that the size cannot shrink below 1
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     -100, 100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 59, 1, 1)))
+
+  logic.commit_resizing(app_stub, data, {data.quads[1]}, orig_quad)
+  assert(testutils.equals(data.quads[1], quad(10, 59, 1, 1)))
+
+  -- And if we now undo the action, the quad should return to its old size
+  logic.undo(app_stub, data)
+  assert(testutils.equals(data.quads[1], orig_quad[1]))
+
+  -- And redoing restores the new position
+  logic.redo(app_stub, data)
+  assert(testutils.equals(data.quads[1], quad(10, 59, 1, 1)))
+end
+
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {
+    {x = 10, y = 10, w = 50, h = 50}
+  }
+  local orig_quad = {{x = 10, y = 10, w = 50, h = 50}}
+  local direction = {e = true}
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     10, 10, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 60, 50)))
+
+  -- Check that the size cannot exceed the image bounds
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     100, 10, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 90, 50)))
+
+  -- Check that the size cannot shrink below 1
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     -100, 10, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 1, 50)))
+
+  logic.commit_resizing(app_stub, data, {data.quads[1]}, orig_quad)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 1, 50)))
+
+  -- And if we now undo the action, the quad should return to its old size
+  logic.undo(app_stub, data)
+  assert(testutils.equals(data.quads[1], orig_quad[1]))
+
+  -- And redoing restores the new position
+  logic.redo(app_stub, data)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 1, 50)))
+end
+
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {
+    {x = 10, y = 10, w = 50, h = 50}
+  }
+  local orig_quad = {{x = 10, y = 10, w = 50, h = 50}}
+  local direction = {s = true, e = true}
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     10, 10, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 60, 60)))
+
+  -- Check that the size cannot exceed the image bounds
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     100, 100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 90, 90)))
+
+  -- Check that the size cannot shrink below 1
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     -100, -100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 1, 1)))
+
+  logic.commit_resizing(app_stub, data, {data.quads[1]}, orig_quad)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 1, 1)))
+
+  -- And if we now undo the action, the quad should return to its old size
+  logic.undo(app_stub, data)
+  assert(testutils.equals(data.quads[1], orig_quad[1]))
+
+  -- And redoing restores the new position
+  logic.redo(app_stub, data)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 1, 1)))
+end
+
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {
+    {x = 10, y = 10, w = 50, h = 50}
+  }
+  local orig_quad = {{x = 10, y = 10, w = 50, h = 50}}
+  local direction = {s = true}
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     10, 10, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 50, 60)))
+
+  -- Check that the size cannot exceed the image bounds
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     10, 100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 50, 90)))
+
+  -- Check that the size cannot shrink below 1
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     10, -100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 50, 1)))
+
+  logic.commit_resizing(app_stub, data, {data.quads[1]}, orig_quad)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 50, 1)))
+
+  -- And if we now undo the action, the quad should return to its old size
+  logic.undo(app_stub, data)
+  assert(testutils.equals(data.quads[1], orig_quad[1]))
+
+  -- And redoing restores the new position
+  logic.redo(app_stub, data)
+  assert(testutils.equals(data.quads[1], quad(10, 10, 50, 1)))
+end
+
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {
+    {x = 10, y = 10, w = 50, h = 50}
+  }
+  local orig_quad = {{x = 10, y = 10, w = 50, h = 50}}
+  local direction = {s = true, w = true}
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     -5, 10, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(5, 10, 55, 60)))
+
+  -- Check that the size cannot exceed the image bounds
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     -100, 100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(0, 10, 60, 90)))
+
+  -- Check that the size cannot shrink below 1
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     100, -100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(59, 10, 1, 1)))
+
+  logic.commit_resizing(app_stub, data, {data.quads[1]}, orig_quad)
+  assert(testutils.equals(data.quads[1], quad(59, 10, 1, 1)))
+
+  -- And if we now undo the action, the quad should return to its old size
+  logic.undo(app_stub, data)
+  assert(testutils.equals(data.quads[1], orig_quad[1]))
+
+  -- And redoing restores the new position
+  logic.redo(app_stub, data)
+  assert(testutils.equals(data.quads[1], quad(59, 10, 1, 1)))
+end
+
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {
+    {x = 10, y = 10, w = 50, h = 50}
+  }
+  local orig_quad = {{x = 10, y = 10, w = 50, h = 50}}
+  local direction = {w = true}
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     -5, 10, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(5, 10, 55, 50)))
+
+  -- Check that the size cannot exceed the image bounds
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     -100, 10, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(0, 10, 60, 50)))
+
+  -- Check that the size cannot shrink below 1
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     100, 10, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(59, 10, 1, 50)))
+
+  logic.commit_resizing(app_stub, data, {data.quads[1]}, orig_quad)
+  assert(testutils.equals(data.quads[1], quad(59, 10, 1, 50)))
+
+  -- And if we now undo the action, the quad should return to its old size
+  logic.undo(app_stub, data)
+  assert(testutils.equals(data.quads[1], orig_quad[1]))
+
+  -- And redoing restores the new position
+  logic.redo(app_stub, data)
+  assert(testutils.equals(data.quads[1], quad(59, 10, 1, 50)))
+end
+
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {
+    {x = 10, y = 10, w = 50, h = 50}
+  }
+  local orig_quad = {{x = 10, y = 10, w = 50, h = 50}}
+  local direction = {n = true, w = true}
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     -5, -5, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(5, 5, 55, 55)))
+
+  -- Check that the size cannot exceed the image bounds
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     -100, -100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(0, 0, 60, 60)))
+
+  -- Check that the size cannot shrink below 1
+  logic.resize_quads(app_stub, data, {data.quads[1]}, orig_quad, direction,
+                     100, 100, 100, 100)
+  assert(testutils.equals(data.quads[1], quad(59, 59, 1, 1)))
+
+  logic.commit_resizing(app_stub, data, {data.quads[1]}, orig_quad)
+  assert(testutils.equals(data.quads[1], quad(59, 59, 1, 1)))
+
+  -- And if we now undo the action, the quad should return to its old size
+  logic.undo(app_stub, data)
+  assert(testutils.equals(data.quads[1], orig_quad[1]))
+
+  -- And redoing restores the new position
+  logic.redo(app_stub, data)
+  assert(testutils.equals(data.quads[1], quad(59, 59, 1, 1)))
 end
 
 --[[
