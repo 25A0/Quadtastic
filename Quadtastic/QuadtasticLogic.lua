@@ -302,27 +302,56 @@ function QuadtasticLogic.transitions(interface) return {
     interface.move_quad_into_view(state.quad_scrollpane_state, new_quad)
   end,
 
-  move_quads = function(app, data, quads, dx, dy, img_w, img_h)
+  --[[
+                                                    _
+   _ __ ___   _____   _____    __ _ _   _  __ _  __| |___
+  | '_ ` _ \ / _ \ \ / / _ \  / _` | | | |/ _` |/ _` / __|
+  | | | | | | (_) \ V /  __/ | (_| | |_| | (_| | (_| \__ \
+  |_| |_| |_|\___/ \_/ \___|  \__, |\__,_|\__,_|\__,_|___/
+                                 |_|
+  ]]
+  -- Moves the given quads by the given delta as far as possible.
+  -- original_pos should be a table that contains the original position of each
+  -- quad before the user started to move them. Each element of this table
+  -- should have its x coordinate at index x and its y coordinate at index x.
+  -- The nth element in original_pos should contain the coordinates of the nth
+  -- quad in quads.
+  -- dx, dy should be the accumulative delta by which the quads should be moved.
+  -- That is, if the user moves the mouse by 4 pixels first, and then by another
+  -- 8 pixels, then the delta in the second call should be 12, and not 8.
+  -- All this is necessary because the movement of each quad is limited by the
+  -- image's border, and therefore a quad right next to the right border cannot
+  -- move as far to the right as a quad further to the left. Thus, as the user
+  -- moves the quads around, we want to keep them inside the image, but we also
+  -- want to preserve the relative positions of the quads. Otherwise moving all
+  -- quads to the bottom right corner and them moving them in the opposite
+  -- direction by the same distance would not restore the quad's original
+  -- position.
+  move_quads = function(app, data, quads, original_pos, dx, dy, img_w, img_h)
     if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end
+    assert(#quads == #original_pos)
 
-    for _,quad in ipairs(quads) do
+    for i=1,#quads do
+      quad = quads[i]
+      pos = original_pos[i]
       if libquadtastic.is_quad(quad) then
-        quad.x = math.max(0, math.min(img_w - quad.w, quad.x + dx))
-        quad.y = math.max(0, math.min(img_h - quad.h, quad.y + dy))
+        quad.x = math.max(0, math.min(img_w - quad.w, pos.x + dx))
+        quad.y = math.max(0, math.min(img_h - quad.h, pos.y + dy))
       end
     end
   end,
 
   -- Resizes all given quads by the given amount, in the given direction.
-  -- The direction is a string that identifies which side or corner is
-  -- changed, and should be a table containing the keys n, e, s, w when
+  -- The direction should be a table containing the keys n, e, s, w when
   -- the quads are resized in the respective direction. For example, if a
   -- quad is resized at the south-east corner, then direction.s and direction.e
   -- should be set to `true`. All other keys should be `false` or `nil`.
+  -- original_quad is a table that has at the nth index the original x, y, width
+  -- and height at index x, y, w and h, respectively, of the nth quad in quads.
   -- The image dimensions are needed so that the position and size of the quads
   -- can be restricted.
-  resize_quads = function(app, data, quads, direction, dx, dy, img_w, img_h)
+  resize_quads = function(app, data, quads, original_quad, direction, dx, dy, img_w, img_h)
     dx, dy = dx or 0, dy or 0
     -- All quads have their position in the upper left corner, and their
     -- size extends to the lower right corner.
@@ -348,12 +377,14 @@ function QuadtasticLogic.transitions(interface) return {
     end
 
     -- Now apply all changes
-    for _,quad in pairs(quads) do
+    for i,quad in pairs(quads) do
+      local ox, oy = original_quad[i].x, original_quad[i].y
+      local ow, oh = original_quad[i].w, original_quad[i].h
       -- Resize the quads, but restrict their dimensions and position
-      quad.x = math.max(0, math.min(img_w, quad.x + math.min(quad.w - 1, dpx)))
-      quad.y = math.max(0, math.min(img_h, quad.y + math.min(quad.h - 1, dpy)))
-      quad.w = math.max(1, math.min(img_w - quad.x, quad.w + dw))
-      quad.h = math.max(1, math.min(img_h - quad.y, quad.h + dh))
+      quad.x = math.max(0, math.min(img_w, ox + math.min(ow - 1, dpx)))
+      quad.y = math.max(0, math.min(img_h, oy + math.min(oh - 1, dpy)))
+      quad.w = math.max(1, math.min(img_w - ox, ow + dw))
+      quad.h = math.max(1, math.min(img_h - oy, oh + dh))
     end
   end,
 

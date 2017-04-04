@@ -256,8 +256,21 @@ local function select_tool(app, gui_state, state, img_w, img_h)
       end
     end
     if direction then
-      state.toolstate.mode = "resizing"
-      state.toolstate.direction = direction
+      if gui_state.input.mouse.buttons[1] and
+         gui_state.input.mouse.buttons[1].presses >= 1
+      then
+        state.toolstate.mode = "resizing"
+        state.toolstate.direction = direction
+
+        -- Store the initial size of each quad
+        state.toolstate.original_quad = {}
+        for i,v in ipairs(state.selection:get_selection()) do
+          if libquadtastic.is_quad(v) then
+            state.toolstate.original_quad[i] = {x = v.x, y = v.y, w = v.w, h = v.h}
+          end
+        end
+      end
+
       -- Set the cursor
       local cursor_string
       if direction.n and direction.e or direction.s and direction.w then
@@ -279,8 +292,17 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     -- If the hovered quad is already selected, show the movement cursor, and
     -- move the quads when the mouse is dragged
     if state.selection:is_selected(state.hovered) then
-      if gui_state.input.mouse.buttons[1] and gui_state.input.mouse.buttons[1].pressed then
+      if gui_state.input.mouse.buttons[1] and
+         gui_state.input.mouse.buttons[1].presses >= 1
+      then
         state.toolstate.mode = "dragging"
+        -- Save the locations of all quads
+        state.toolstate.original_pos = {}
+        for i,v in ipairs(state.selection:get_selection()) do
+          if libquadtastic.is_quad(v) then
+            state.toolstate.original_pos[i] = {x = v.x, y = v.y}
+          end
+        end
       else
         love.mouse.setCursor(gui_state.style.cursors.hand_cursor)
       end
@@ -350,23 +372,22 @@ local function select_tool(app, gui_state, state, img_w, img_h)
   -- dragged movement in sprite pixels
   local dpx, dpy = 0, 0
   if gui_state.input.mouse.buttons[1] then
-    local dx, dy = gui_state.input.mouse.dx, gui_state.input.mouse.dy
-    dx, dy = gui_state.transform:unproject_dimensions(dx, dy)
-    local acc_dx = gui_state.input.mouse.old_x - gui_state.input.mouse.buttons[1].at_x
-    local acc_dy = gui_state.input.mouse.old_y - gui_state.input.mouse.buttons[1].at_y
+    local acc_dx = gui_state.input.mouse.x - gui_state.input.mouse.buttons[1].at_x
+    local acc_dy = gui_state.input.mouse.y - gui_state.input.mouse.buttons[1].at_y
     acc_dx, acc_dy = gui_state.transform:unproject_dimensions(acc_dx, acc_dy)
-    dpx = math.modf(acc_dx + dx) - math.modf(acc_dx)
-    dpy = math.modf(acc_dy + dy) - math.modf(acc_dy)
+    dpx = math.modf(acc_dx)
+    dpy = math.modf(acc_dy)
   end
 
   if state.toolstate.mode == "dragging" then
     love.mouse.setCursor(gui_state.style.cursors.move_cursor)
     -- Move the quads by the dragged amount
-    if dpx ~= 0 or dpy ~= 0 then
-      app.quadtastic.move_quads(state.selection:get_selection(), dpx, dpy, img_w, img_h)
-    end
-  elseif state.toolstate.mode == "resizing" and (dpx ~= 0 or dpy ~= 0) then
+    app.quadtastic.move_quads(state.selection:get_selection(),
+                              state.toolstate.original_pos,
+                              dpx, dpy, img_w, img_h)
+  elseif state.toolstate.mode == "resizing" then
     app.quadtastic.resize_quads(state.selection:get_selection(),
+                                state.toolstate.original_quad,
                                 state.toolstate.direction,
                                 dpx, dpy, img_w, img_h)
   end
