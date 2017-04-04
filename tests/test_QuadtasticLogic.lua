@@ -1,23 +1,20 @@
 local QuadtasticLogic = require("Quadtastic.QuadtasticLogic")
 local Selection = require("Quadtastic.Selection")
+local History = require("Quadtastic.History")
+local testutils = require("tests.testutils")
 
-local app_stub = function(data)
-  return {
-    quadtastic = setmetatable({},{
+local app_stub = function(data, logic)
+  local app = {}
+  app.quadtastic = setmetatable({},{
       __index = function(_, key)
-        local f = QuadtasticLogic.key
+        local f = logic[key]
         return function(...)
-          f(data, ...)
+          return f(app, data, ...)
         end
       end,
     })
-  }
+  return app
 end
-
-local interface_stub = {
-  reset_view = function(...) end,
-  move_quad_into_view = function(...) end,
-}
 
 local function random_quad()
   return {
@@ -28,7 +25,9 @@ local function random_quad()
   }
 end
 
-local function test_data()
+local function test_data(options)
+  local history = History()
+  if options and options.saved then history:mark() end
   return {
     quads = {
       foo = {
@@ -37,38 +36,421 @@ local function test_data()
       },
     },
     selection = Selection(),
+    history = history,
+    collapsed_groups = {},
+    settings = {recent = {}},
   }
 end
 
--- Test rename
+local function test_interface()
+  return {
+    reset_view = function(...) end,
+    move_quad_into_view = function(...) end,
+    store_settings = function(...) end,
+    show_dialog = function(text, options)
+      local err_string = string.format("did not expect 'show_dialog'%s%s",
+                                       text and (" with text '"..text.."'")
+                                            or "",
+                                       options and (" with options " ..
+                                                    table.concat(options, ", "))
+                                               or "")
+      error(err_string)
+    end,
+    query = function(...)
+      error("did not expect 'query'")
+    end,
+    open_file = function(...)
+      error("did not expect 'open_file'")
+    end,
+    save_file = function(...)
+      error("did not expect 'save_file'")
+    end,
+    show_about_dialog = function(...)
+      error("did not expect 'show_about_dialog'")
+    end,
+    show_ack_dialog = function(...)
+      error("did not expect 'show_ack_dialog'")
+    end,
+  }
+end
+
+local function test_logic(interface)
+  if not interface then interface = test_interface() end
+  return QuadtasticLogic.transitions(interface)
+end
+
+--[[
+ _ __ ___ _ __   __ _ _ __ ___   ___
+| '__/ _ \ '_ \ / _` | '_ ` _ \ / _ \
+| | |  __/ | | | (_| | | | | | |  __/
+|_|  \___|_| |_|\__,_|_| |_| |_|\___|
+]]
 do
-  local data = test_data()
-  local logic = QuadtasticLogic.transitions(interface_stub)
+  local data = test_data({saved = true})
+  local interface_stub = test_interface()
   interface_stub.query = function(_, existing_key, _)
     assert(existing_key == "foo.bar")
     return "OK", "foo.new"
   end
+  local logic = test_logic(interface_stub)
+  local app_stub = app_stub(data, logic)
   local quad_ref = data.quads.foo.bar
   logic.rename(app_stub, data, {data.quads.foo.bar})
+  assert(not data.history:is_marked())
   assert(not data.quads.foo.bar)
   assert(quad_ref == data.quads.foo.new)
 end
+
 do
-  local data = test_data()
-  local logic = QuadtasticLogic.transitions(interface_stub)
+  local data = test_data({saved = true})
+  local interface_stub = test_interface()
   interface_stub.query = function(_, existing_key, _)
     assert(existing_key == "foo.bar")
     return "OK", "foo.baz"
   end
-  interface_stub.show_dialog = function(_, options)
-    assert(options[1] == "Cancel")
-    assert(options[2] == "Swap")
-    assert(options[3] == "Replace")
+  interface_stub.show_dialog = function(text, options)
+    assert(options[1] == "Cancel", text)
+    assert(options[2] == "Swap", text)
+    assert(options[3] == "Replace", text)
     return "Swap"
   end
+  local logic = test_logic(interface_stub)
+  local app_stub = app_stub(data, logic)
   local quad_ref_bar = data.quads.foo.bar
   local quad_ref_baz = data.quads.foo.baz
   logic.rename(app_stub, data, {data.quads.foo.bar})
+  assert(not data.history:is_marked())
   assert(quad_ref_baz == data.quads.foo.bar)
   assert(quad_ref_bar == data.quads.foo.baz)
 end
+
+--[[
+                _
+ ___  ___  _ __| |_
+/ __|/ _ \| '__| __|
+\__ \ (_) | |  | |_
+|___/\___/|_|   \__|
+]]
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+
+  data.quads = {
+    {x = 10, y= 20, w= 2, h = 2},
+    {x = 20, y= 10, w= 2, h = 2},
+    {x = 10, y= 10, w= 2, h = 2},
+    {x = 0, y= 22, w= 2, h = 2},
+  }
+  local original = testutils.clone(data.quads)
+  local expected = {
+    {x = 10, y= 10, w= 2, h = 2},
+    {x = 20, y= 10, w= 2, h = 2},
+    {x = 10, y= 20, w= 2, h = 2},
+    {x = 0, y= 22, w= 2, h = 2},
+  }
+  logic.sort(app_stub, data, data.quads)
+  assert(testutils.equals(expected, data.quads))
+  logic.undo(app_stub, data)
+  assert(testutils.equals(original, data.quads))
+end
+
+--[[
+ _ __ ___ _ __ ___   _____   _____
+| '__/ _ \ '_ ` _ \ / _ \ \ / / _ \
+| | |  __/ | | | | | (_) \ V /  __/
+|_|  \___|_| |_| |_|\___/ \_/ \___|
+]]
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  local old_quads = testutils.clone(data.quads)
+  local old_quad = data.quads.foo.bar
+  logic.remove(app_stub, data, {data.quads.foo.bar})
+  assert(not data.history:is_marked())
+  assert(data.quads.foo.bar == nil)
+  logic.undo(app_stub, data)
+  assert(data.history:is_marked())
+  assert(data.quads.foo.bar == old_quad)
+  assert(testutils.equals(old_quads, data.quads))
+  logic.redo(app_stub, data)
+  assert(data.quads.foo.bar == nil)
+  logic.undo(app_stub, data)
+
+  local old_group = data.quads.foo
+  logic.remove(app_stub, data, {data.quads.foo})
+  assert(not data.history:is_marked())
+  assert(data.quads.foo == nil)
+  logic.undo(app_stub, data)
+  assert(data.history:is_marked())
+  assert(data.quads.foo == old_group)
+  assert(testutils.equals(old_quads, data.quads))
+end
+
+--[[
+                     _
+  ___ _ __ ___  __ _| |_ ___
+ / __| '__/ _ \/ _` | __/ _ \
+| (__| | |  __/ (_| | ||  __/
+ \___|_|  \___|\__,_|\__\___|
+]]
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  data.quads = {}
+  local new_quad = random_quad()
+  logic.create(app_stub, data, new_quad)
+  assert(not data.history:is_marked())
+  assert(data.quads[1] == new_quad)
+  logic.undo(app_stub, data)
+  assert(data.history:is_marked())
+  assert(#data.quads == 0)
+  logic.redo(app_stub, data)
+  assert(data.quads[1] == new_quad)
+
+  local another_quad = random_quad()
+  logic.create(app_stub, data, another_quad)
+  assert(data.quads[2] == another_quad)
+
+  data.quads[4] = random_quad()
+
+  -- Test whether index 3 is skipped
+  local yet_another_quad = random_quad()
+  logic.create(app_stub, data, yet_another_quad)
+  assert(data.quads[5] == yet_another_quad)
+end
+
+-- move_quads
+do
+  -- NYI
+end
+
+-- resize_quads
+do
+  -- NYI
+end
+
+--[[
+  __ _ _ __ ___  _   _ _ __
+ / _` | '__/ _ \| | | | '_ \
+| (_| | | | (_) | |_| | |_) |
+ \__, |_|  \___/ \__,_| .__/
+ |___/                |_|
+]]
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  local quads = {
+    random_quad(), random_quad(), random_quad(),
+    random_quad(), random_quad(), random_quad(),
+  }
+  data.quads = {
+    quads[1],
+    quads[2],
+    quads[3],
+    {
+      quads[4], quads[5], quads[6]
+    }
+  }
+  local old_quads = testutils.clone(data.quads)
+  logic.group(app_stub, data, {quads[2], quads[3]})
+  assert(not data.history:is_marked())
+
+  local expected = {
+    quads[1],
+    {
+      quads[2],
+      quads[3],
+    },
+    {
+      quads[4], quads[5], quads[6]
+    }
+  }
+  assert(testutils.equals(data.quads, expected))
+
+  logic.undo(app_stub, data)
+  assert(data.history:is_marked())
+  assert(testutils.equals(data.quads, old_quads))
+end
+
+--[[
+ _   _ _ __   __ _ _ __ ___  _   _ _ __
+| | | | '_ \ / _` | '__/ _ \| | | | '_ \
+| |_| | | | | (_| | | | (_) | |_| | |_) |
+ \__,_|_| |_|\__, |_|  \___/ \__,_| .__/
+             |___/                |_|
+]]
+do
+  local data = test_data({saved = true})
+  local interface_stub = test_interface()
+  -- A dialog should pop up, asking whether it's okay that some of the indices
+  -- will change while sorting the quads
+  interface_stub.show_dialog = function(text, options)
+    return "Yes"
+  end
+  local logic = test_logic(interface_stub)
+  local app_stub = app_stub(data, logic)
+  local quads = {
+    random_quad(), random_quad(), random_quad(),
+    random_quad(), random_quad(), random_quad(),
+  }
+  data.quads = {
+    quads[1],
+    quads[2],
+    quads[3],
+    {
+      quads[4], quads[5], quads[6]
+    }
+  }
+  local old_quads = testutils.clone(data.quads)
+  logic.ungroup(app_stub, data, {data.quads[4]})
+  assert(not data.history:is_marked())
+  assert(data.quads[4] == quads[4])
+  assert(data.quads[5] == quads[5])
+  assert(data.quads[6] == quads[6])
+
+  logic.undo(app_stub, data)
+  assert(testutils.equals(data.quads, old_quads))
+end
+
+-- offer_reload
+do
+  -- Not sure what to test here...
+end
+
+--[[
+                 _                         _                _
+ _   _ _ __   __| | ___     __ _ _ __   __| |  _ __ ___  __| | ___
+| | | | '_ \ / _` |/ _ \   / _` | '_ \ / _` | | '__/ _ \/ _` |/ _ \
+| |_| | | | | (_| | (_) | | (_| | | | | (_| | | | |  __/ (_| | (_) |
+ \__,_|_| |_|\__,_|\___/   \__,_|_| |_|\__,_| |_|  \___|\__,_|\___/
+]]
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  local do_function, do_spy = testutils.call_spy()
+  local undo_function, undo_spy = testutils.call_spy()
+  data.history:add(do_function, undo_function)
+  assert(not data.history:is_marked())
+  logic.undo(app_stub, data)
+  assert(undo_spy() == 1) --check that the undo function was called once
+  assert(data.history:is_marked())
+  logic.redo(app_stub, data)
+  assert(do_spy() == 1) --check that the redo function was called once
+  assert(not data.history:is_marked())
+end
+
+--[[
+ _ __   _____      __
+| '_ \ / _ \ \ /\ / /
+| | | |  __/\ V  V /
+|_| |_|\___| \_/\_/
+]]
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  logic.new(app_stub, data)
+  assert(data.history:is_marked())
+end
+
+--[[
+ ___  __ ___   _____
+/ __|/ _` \ \ / / _ \
+\__ \ (_| |\ V /  __/
+|___/\__,_| \_/ \___|
+]]
+do
+  local data = test_data()
+  local interface = test_interface()
+  -- Create a stub function that returns yes
+  local save_as_stub, save_as_spy = testutils.call_spy(function() return "Save", '/dev/null' end)
+  local store_settings_stub, store_settings_spy = testutils.call_spy()
+  interface.save_file = save_as_stub
+  interface.store_settings = store_settings_stub
+  local logic = test_logic(interface)
+  local app_stub = app_stub(data, logic)
+  logic.save(app_stub, data)
+  assert(data.history:is_marked())
+  assert(save_as_spy() == 1) -- check that these functions were each called once
+  assert(store_settings_spy() == 1)
+
+  -- When we now save again, it should not ask for a filename a second time.
+  logic.save(app_stub, data)
+  assert(data.history:is_marked())
+  assert(save_as_spy() == 1) -- check that the counter didn't change on both functions
+  assert(store_settings_spy() == 1)
+end
+
+--[[
+ ___  __ ___   _____    __ _ ___
+/ __|/ _` \ \ / / _ \  / _` / __|
+\__ \ (_| |\ V /  __/ | (_| \__ \
+|___/\__,_| \_/ \___|  \__,_|___/
+]]
+do
+  local data = test_data()
+  local interface = test_interface()
+  -- Create a stub function that returns yes
+  local save_as_stub, save_as_spy = testutils.call_spy(function() return "Save", '/dev/null' end)
+  local store_settings_stub, store_settings_spy = testutils.call_spy()
+  interface.save_file = save_as_stub
+  interface.store_settings = store_settings_stub
+  local logic = test_logic(interface)
+  local app_stub = app_stub(data, logic)
+  logic.save_as(app_stub, data)
+  assert(data.history:is_marked())
+  assert(save_as_spy() == 1) -- check that these functions were each called once
+  assert(store_settings_spy() == 1)
+
+  -- When we now save again, it should again ask for a filename.
+  logic.save_as(app_stub, data)
+  assert(data.history:is_marked())
+  assert(save_as_spy() == 2) -- check that the counter was incremented on both functions
+  assert(store_settings_spy() == 2)
+end
+
+-- choose_quad
+do
+  -- NYI
+end
+
+-- proceed_despite_unsaved_changes
+do
+  -- NYI
+end
+
+-- load_quad
+do
+  -- NYI
+end
+
+-- choose_image
+do
+  -- NYI
+end
+
+-- load_image
+do
+  -- NYI
+end
+
+-- load_dropped_file
+do
+  -- NYI
+end
+
+-- show_about_dialog
+do
+  -- NYI
+end
+
+-- show_ack_dialog
+do
+  -- NYI
+end
+
