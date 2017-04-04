@@ -333,8 +333,8 @@ function QuadtasticLogic.transitions(interface) return {
     assert(#quads == #original_pos)
 
     for i=1,#quads do
-      quad = quads[i]
-      pos = original_pos[i]
+      local quad = quads[i]
+      local pos = original_pos[i]
       if libquadtastic.is_quad(quad) then
         quad.x = math.max(0, math.min(img_w - quad.w, pos.x + dx))
         quad.y = math.max(0, math.min(img_h - quad.h, pos.y + dy))
