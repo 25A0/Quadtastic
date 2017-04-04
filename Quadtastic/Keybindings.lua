@@ -31,6 +31,10 @@ local keybindings = {
 	group = {"g", {mac and "*gui" or "*ctrl"}},
 	ungroup = {"g", {mac and "*gui" or "*ctrl", "*shift"}},
 
+	-- undo, redo
+	undo = {"z", {mac and "*gui" or "*ctrl"}},
+	redo = {"z", {mac and "*gui" or "*ctrl", "*shift"}},
+
 	-- open, save, quit, etc
 	open    = {"o", {mac and "*gui" or "*ctrl"}},
 	save    = {"s", {mac and "*gui" or "*ctrl"}},

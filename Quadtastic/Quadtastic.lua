@@ -517,6 +517,9 @@ Affects: %s]]
     if is_pressed(Keybindings.quit) then app.quadtastic.quit() end
     if is_pressed(Keybindings.new) then app.quadtastic.new() end
 
+    if is_pressed(Keybindings.undo) then app.quadtastic.undo() end
+    if is_pressed(Keybindings.redo) then app.quadtastic.redo() end
+
     if is_pressed(Keybindings.delete) then app.quadtastic.remove() end
     if is_pressed(Keybindings.rename) then app.quadtastic.rename() end
     if is_pressed(Keybindings.group) then app.quadtastic.group() end
