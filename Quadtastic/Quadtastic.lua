@@ -347,7 +347,7 @@ Affects: %s]]
           do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 21)
             -- Draw the list of quads
             local clicked, hovered =
-              QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 19,
+              QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 33,
                             state.hovered)
             if clicked then
               local new_quads = {clicked}
@@ -435,6 +435,30 @@ Affects: %s]]
             if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment_h = ":"}) then
               app.quadtastic.save(save_toast_callback)
             end
+
+            Layout.next(gui_state, "|", 2)
+
+            do Layout.start(gui_state)
+              state.turbo_workflow = Checkbox.draw(gui_state, nil, nil, nil, 12, state.turbo_workflow)
+
+              Layout.next(gui_state, "-")
+
+              if state.turbo_workflow then
+                local anim_set = gui_state.style.turboworkflow_activated
+                local frame = 1 + math.fmod(gui_state.second / anim_set.duration, #anim_set.frames)
+                frame = math.modf(frame)
+                love.graphics.draw(anim_set.sheet, anim_set.frames[frame],
+                                   gui_state.layout.next_x, gui_state.layout.next_y - 2)
+              else
+                love.graphics.draw(gui_state.style.turboworkflow_deactivated,
+                                   gui_state.layout.next_x, gui_state.layout.next_y - 2)
+              end
+              Tooltip.draw(gui_state, "Reloads image whenever it changes on disk, and repeats export whenever quads change.", nil, nil, 128, 12)
+              -- imgui.push_style(gui_state, "font", gui_state.style.small_font)
+              -- Label.draw(gui_state, nil, nil, nil, 12, "Turbo-Workflow")
+              -- imgui.pop_style(gui_state, "font")
+            end Layout.finish(gui_state, "-")
+
           end Layout.finish(gui_state, "|")
           Layout.next(gui_state, "-")
 
