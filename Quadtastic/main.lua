@@ -58,6 +58,8 @@ function love.load()
 
   local stylesheet = love.graphics.newImage("res/style.png")
   local icon = love.graphics.newImage("res/icon-32x32.png")
+  local turboworkflow_deactivated = love.graphics.newImage("res/turboworkflow-deactivated.png")
+  local turboworkflow_activated = love.graphics.newImage("res/turboworkflow-activated.png")
 
   love.keyboard.setKeyRepeat(true)
   gui_state = imgui.init_state(transform)
@@ -66,6 +68,19 @@ function love.load()
   gui_state.style.font = med_font
   gui_state.style.font_color = {32, 63, 73}
   gui_state.style.stylesheet = stylesheet
+
+  gui_state.style.turboworkflow_deactivated = turboworkflow_deactivated
+
+  local frames = {}
+  for i=0,3 do
+    frames[i + 1] = love.graphics.newQuad(i*128, 0, 128, 16, 512, 16)
+  end
+  gui_state.style.turboworkflow_activated = {
+    sheet = turboworkflow_activated,
+    frames = frames,
+    duration = .1,
+  }
+
   gui_state.style.icon = icon
   gui_state.style.raw_quads = require("res/style")
   gui_state.style.quads = libquadtastic.import_quads(gui_state.style.raw_quads,

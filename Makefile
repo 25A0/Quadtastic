@@ -16,7 +16,7 @@ run: app_resources
 run_debug: DEBUG=DEBUG=true
 run_debug: run
 
-app_resources: ${APPNAME}/res/style.png ${APPNAME}/res/icon-32x32.png update_license
+app_resources: ${APPNAME}/res/style.png ${APPNAME}/res/icon-32x32.png ${APPNAME}/res/turboworkflow-deactivated.png ${APPNAME}/res/turboworkflow-activated.png update_license
 	# Store version info in ${APPNAME}/res
 	echo v${APPVERSION} > ${APPNAME}/res/version.txt
 
@@ -63,6 +63,9 @@ dist/res/%.icns: res/%.ase
 	iconutil -c icns dist/res/$*.iconset
 
 aseprite=/Applications/Aseprite.app/Contents/MacOS/aseprite
+${APPNAME}/res/turboworkflow-activated.png: res/turboworkflow-activated.ase
+	${aseprite} -b res/turboworkflow-activated.ase --sheet ${APPNAME}/res/turboworkflow-activated.png
+
 ${APPNAME}/res/%.png: res/%.ase
 	${aseprite} -b res/$*.ase --save-as ${APPNAME}/res/$*.png
 
