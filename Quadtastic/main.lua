@@ -11,7 +11,7 @@ local AppLogic = require(current_folder .. ".AppLogic")
 local Quadtastic = require(current_folder .. ".Quadtastic")
 local libquadtastic = require(current_folder .. ".libquadtastic")
 
-local Transform = require(current_folder .. '.Transform')
+local Transform = require(current_folder .. '.transform')
 local Toast = require(current_folder .. '.Toast')
 local Text = require(current_folder .. '.Text')
 local transform = Transform()
