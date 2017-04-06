@@ -147,9 +147,9 @@ its rgb value.
        the same problem when using the quads.
  - [ ] Make quad list prettier
  - [x] Make quad groups in quad list collapsible and expandable
- - [ ] >>>>>>> TURBO-WorkflOw >>>>>
-	 - [ ] Automatically reload image when it changes on disk
-	 - [ ] Automatically export new quad file whenever quads are changed
+ - [x] >>>>>>> TURBO-WorkflOw >>>>>
+	 - [x] Automatically reload image when it changes on disk
+	 - [x] Automatically export new quad file whenever quads are changed
  - [ ] Custom exporter for people who don't want to export to lua
 
 # Credits and tools used
