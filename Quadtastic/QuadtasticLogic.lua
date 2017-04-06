@@ -629,14 +629,14 @@ function QuadtasticLogic.transitions(interface) return {
   end,
 
   undo = function(app, data)
-    assert(data.history:can_undo())
+    if not data.history:can_undo() then return end
     local undo_action = data.history:undo()
     undo_action()
     if data.turbo_workflow then app.quadtastic.save() end
   end,
 
   redo = function(app, data)
-    assert(data.history:can_redo())
+    if not data.history:can_redo() then return end
     local redo_action = data.history:redo()
     redo_action()
     if data.turbo_workflow then app.quadtastic.save() end
