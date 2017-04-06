@@ -220,6 +220,20 @@ local function select_tool(app, gui_state, state, img_w, img_h)
   -- Check if we should start resizing a quad
   local direction
 
+  local function get_cursor_string(direction)
+    local cursor_string
+    if direction.n and direction.e or direction.s and direction.w then
+      cursor_string = "sizenesw"
+    elseif direction.n and direction.w or direction.s and direction.e then
+      cursor_string = "sizenwse"
+    elseif direction.n or direction.s then
+      cursor_string = "sizens"
+    elseif direction.w or direction.e then
+      cursor_string = "sizewe"
+    end
+    return cursor_string
+  end
+
   if not state.toolstate.mode then
     local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
     mx, my = gui_state.transform:unproject(mx, my)
@@ -281,17 +295,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
       end
 
       -- Set the cursor
-      local cursor_string
-      if direction.n and direction.e or direction.s and direction.w then
-        cursor_string = "sizenesw"
-      elseif direction.n and direction.w or direction.s and direction.e then
-        cursor_string = "sizenwse"
-      elseif direction.n or direction.s then
-        cursor_string = "sizens"
-      elseif direction.w or direction.e then
-        cursor_string = "sizewe"
-      end
-      love.mouse.setCursor(gui_state.style.cursors[cursor_string])
+      love.mouse.setCursor(gui_state.style.cursors[get_cursor_string(direction)])
     end
 
   end
@@ -401,6 +405,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
                               state.toolstate.original_pos,
                               dpx, dpy, img_w, img_h)
   elseif state.toolstate.mode == "resizing" then
+    love.mouse.setCursor(gui_state.style.cursors[get_cursor_string(state.toolstate.direction)])
     app.quadtastic.resize_quads(state.selection:get_selection(),
                                 state.toolstate.original_quad,
                                 state.toolstate.direction,
