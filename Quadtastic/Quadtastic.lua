@@ -514,7 +514,13 @@ Quadtastic.draw = function(app, state, gui_state)
     local filepath = data.quads._META.image_path
     local current_timestamp = lfs.attributes(filepath, "modification")
     if current_timestamp ~= data.file_timestamps.image_latest then
-      app.quadtastic.offer_reload(reload_image_toast_callback)
+      if data.turbo_workflow then
+        -- Automatically reload the image without asking
+        app.quadtastic.load_image(filepath, reload_image_toast_callback)
+      else
+        -- Ask the user
+        app.quadtastic.offer_reload(reload_image_toast_callback)
+      end
     end
     data.file_timestamps.image_latest = current_timestamp
   end
