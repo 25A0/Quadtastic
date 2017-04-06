@@ -150,8 +150,9 @@ function love.draw()
     love.graphics.setColor(53, 53, 53, 192)
     love.graphics.rectangle("fill", x-2, y + 2,
                             Text.min_width(gui_state, gui_state.mousestring) + 4, 12)
-    love.graphics.setColor(255, 255, 255)
+    imgui.push_style(gui_state, "font_color", {202, 222, 227})
     Text.draw(gui_state, x, y, nil, nil, gui_state.mousestring)
+    imgui.pop_style(gui_state, "font_color")
     love.graphics.setCanvas()
     love.graphics.pop()
     gui_state.mousestring = nil
