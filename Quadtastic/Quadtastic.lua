@@ -173,7 +173,7 @@ Quadtastic.draw = function(app, state, gui_state)
       if Menu.menu_start(gui_state, w/4, h - 12, S.menu.help()) then
 
         if Menu.action_item(gui_state, S.menu.help.github) then
-          love.system.openURL()
+          love.system.openURL(S.github_url)
         end
         if Menu.menu_start(gui_state, w/4, h - 12, S.menu.help.report()) then
 
