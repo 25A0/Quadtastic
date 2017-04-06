@@ -5,8 +5,9 @@ APPIDENTIFIER = com.25a0.quadtastic
 APPVERSION = $(shell git describe --abbrev=0 --tags)-$(shell git log -1 --pretty=format:%h )
 APPCOPYRIGHT = 2017 Moritz Neikes
 macos-love-distname = love-0.10.2-macosx-x64
+windows-love-distname = love-0.10.2-win32
 
-.PHONY: clean test check tests/* run all app_resources run_debug update_license release*
+.PHONY: clean test check tests/* run all app_resources run_debug update_license release* distfiles
 
 all: run_debug
 
@@ -28,7 +29,25 @@ check: ${APPNAME}/*.lua
 
 test: check ${TESTS}
 
-dist/${APPNAME}.love: ${APPNAME}/* app_resources
+distfiles: dist/releases/${APPVERSION}/macos/${APPNAME}.app dist/releases/${APPVERSION}/windows/${APPNAME}.zip dist/releases/${APPVERSION}/crossplatform/${APPNAME}.zip
+
+dist/releases/${APPVERSION}/macos/${APPNAME}.app: dist/macos/${APPNAME}.app
+	mkdir -p dist/releases/${APPVERSION}/macos
+	cp -r dist/macos/${APPNAME}.app dist/releases/${APPVERSION}/macos/
+
+dist/releases/${APPVERSION}/windows/${APPNAME}.zip: dist/windows/${APPNAME}.zip
+	mkdir -p dist/releases/${APPVERSION}/windows
+	cp dist/windows/${APPNAME}.zip dist/releases/${APPVERSION}/windows/
+
+dist/releases/${APPVERSION}/crossplatform/${APPNAME}.zip: dist/${APPNAME}.love
+	mkdir -p dist/releases/${APPVERSION}/crossplatform
+	cp dist/${APPNAME}.love dist/releases/${APPVERSION}/crossplatform/
+	cp -r dist/shared dist/releases/${APPVERSION}/crossplatform/
+
+	cd dist/releases/${APPVERSION}/crossplatform;\
+	zip ${APPNAME}.zip -Z store -m -r .
+
+dist/${APPNAME}.love: ${APPNAME}/*.lua app_resources
 	cd ${APPNAME}; zip ../dist/${APPNAME}.love -Z store -FS -r . -x .\*
 	cp -R shared dist/
 
@@ -47,6 +66,20 @@ dist/macos/${APPNAME}.app: dist/res/love.app dist/${APPNAME}.love dist/res/icon.
 	sed -i -e 's/__APPCOPYRIGHT/${APPCOPYRIGHT}/g' dist/macos/plist.patch
 	patch dist/macos/${APPNAME}.app/Contents/Info.plist dist/macos/plist.patch
 	rm dist/macos/plist.patch*
+
+dist/windows/${APPNAME}.zip: dist/res/${windows-love-distname}.zip dist/${APPNAME}.love
+	mkdir -p dist/windows/${APPNAME}
+	rsync -qa dist/res/${windows-love-distname}/ dist/windows/${APPNAME}/
+	cat dist/${APPNAME}.love >> dist/windows/${APPNAME}/love.exe
+	mv dist/windows/${APPNAME}/love.exe dist/windows/${APPNAME}/${APPNAME}.exe
+	cp -r dist/shared dist/windows/${APPNAME}/
+	cd dist/windows/${APPNAME}; zip ../${APPNAME}.zip -Z store -FS -r . -x .\*
+
+dist/res/${windows-love-distname}.zip:
+	mkdir -p dist/res
+	cd dist/res; \
+	wget -N https://bitbucket.org/rude/love/downloads/${windows-love-distname}.zip; \
+	unzip ${windows-love-distname}.zip
 
 dist/res/love.app:
 	mkdir -p dist/res
@@ -79,7 +112,7 @@ tests/test_*.lua:
 	lua $@
 
 clean:
-	rm -rf dist
+	rm -rf dist/
 
 firstyear=2017
 thisyear=$(shell date "+%Y")
