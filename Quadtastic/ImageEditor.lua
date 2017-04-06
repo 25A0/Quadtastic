@@ -226,6 +226,14 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     -- the mouse was pressed
     local function get_resize_directions(quad)
       local direction = {}
+
+      -- Make a rough check to see if the mouse is near any edge
+      if mx < quad.x - 1 or mx > quad.x + quad.w + 1 or
+         my < quad.y - 1 or my > quad.y + quad.h + 1
+      then
+        return nil
+      end
+
       if math.abs(mx - quad.x) <= 1 then
         direction.w = true
       elseif math.abs(mx - (quad.x + quad.w)) <= 1 then
