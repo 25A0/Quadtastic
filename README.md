@@ -81,7 +81,7 @@ its rgb value.
     - [x] Automatically generate change log from checked items
           in README's Roadmap. Most of the time it works every time!
     - [x] Add License (MIT)
-    - [ ] Licenses of used software
+    - [x] Licenses of used software
     - [x] Automatically put version and commit hash in plist
     - [x] MacOS
     - [ ] Windows 32 bit
