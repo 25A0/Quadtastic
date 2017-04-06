@@ -22,15 +22,15 @@ function Checkbox.draw(gui_state, x, y, w, h, checked)
   local quads = gui_state.style.quads.checkbox
   local raw_quads = gui_state.style.raw_quads.checkbox
 
-  local w = w or raw_quads.unchecked.w
-  local h = h or raw_quads.unchecked.h
+  w = w or raw_quads.unchecked.w
+  h = h or raw_quads.unchecked.h
 
   -- Add margins to center the sprite inside the available area
   local margin_x = (w - raw_quads.unchecked.w) / 2
   local margin_y = (h - raw_quads.unchecked.h) / 2
 
   love.graphics.setColor(255, 255, 255)
-  love.graphics.draw(gui_state.style.stylesheet, 
+  love.graphics.draw(gui_state.style.stylesheet,
                      quads[checked and "checked" or "unchecked"],
                      x + margin_x, y + margin_y)
 
