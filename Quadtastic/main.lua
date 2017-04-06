@@ -1,13 +1,9 @@
 local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local os_name = love.system.getOS()
 package.cpath = package.cpath ..
-                string.format(";%s/shared/%s/?.so",
+                string.format(";%s/shared/%s/?.%s",
                               love.filesystem.getSourceBaseDirectory(),
-                              love.system.getOS())
-
-if os.getenv("DEBUG") then
-  -- require("lib/lovedebug/lovedebug")
-  require("debugconfig")
-end
+                              os_name, os_name == "Windows" and "dll" or "so")
 
 local imgui = require(current_folder .. ".imgui")
 
