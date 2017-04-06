@@ -136,7 +136,7 @@ its rgb value.
        random, which causes the output to change even if the quad definitions
        stayed the same
  - [ ] Overhaul dialog texts
- - [ ] Move all text to separate module for better readability, easier
+ - [x] Move all text to separate module for better readability, easier
        localization, and easy comparison during tests
  - [ ] Fix detection of quads: Currently the application treats all tables as
        quads that have values for x, y, w, and h. This means that you cannot

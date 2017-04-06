@@ -4,6 +4,7 @@ local History = require(current_folder.. ".History")
 local table = require(current_folder.. ".tableplus")
 local libquadtastic = require(current_folder.. ".libquadtastic")
 local common = require(current_folder.. ".common")
+local S = require(current_folder.. ".strings")
 
 -- Shared library
 local lfs = require("lfs")
@@ -36,8 +37,9 @@ function QuadtasticLogic.transitions(interface) return {
 
   quit = function(app, data)
     if not app.quadtastic.proceed_despite_unsaved_changes() then return end
-    local result = interface.show_dialog("Do you really want to quit?", {"Yes", "No"})
-    if result == "Yes" then
+    local result = interface.show_dialog(S.dialogs.quit,
+                                         {S.buttons.yes, S.buttons.no})
+    if result == S.buttons.yes then
       return 0
     end
   end,
@@ -46,7 +48,7 @@ function QuadtasticLogic.transitions(interface) return {
     if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return
     elseif #quads > 1 then
-      interface.show_dialog("You cannot rename more than one element at once.")
+      interface.show_dialog(S.dialogs.rename.err_only_one)
       return
     else
       local quad = quads[1]
@@ -54,8 +56,9 @@ function QuadtasticLogic.transitions(interface) return {
       local old_key = table.concat(current_keys, ".")
       local new_key = old_key
       local ret
-      ret, new_key = interface.query(
-        "Name:", new_key, {escape = "Cancel", enter = "OK"})
+      ret, new_key = interface.query(S.dialogs.rename.name_prompt, new_key,
+                                     {escape = S.buttons.cancel,
+                                      enter = S.buttons.ok})
 
       local function replace(tab, old_keys, new_keys, element)
         -- Make sure that the new keys form a valid path, that is, all but the
@@ -64,9 +67,7 @@ function QuadtasticLogic.transitions(interface) return {
         for i=1,#new_keys do
           if type(current_table) == "table" and libquadtastic.is_quad(current_table) then
             local keys_so_far = table.concat(new_keys, ".", 1, i)
-            interface.show_dialog(string.format(
-              "The element %s is a quad, and can therefore not have nested quads.",
-              keys_so_far))
+            interface.show_dialog(S.dialogs.rename.err_nested_quad(keys_so_far))
             return
           end
           -- This does intentionally not check the very last key, since it is
@@ -100,7 +101,7 @@ function QuadtasticLogic.transitions(interface) return {
 
       end
 
-      if ret == "OK" then
+      if ret == S.buttons.ok then
         if new_key == old_key then return end
 
         local new_keys = {}
@@ -110,9 +111,9 @@ function QuadtasticLogic.transitions(interface) return {
         -- Check if that key already exists
         if table.get(data.quads, unpack(new_keys)) then
           local action = interface.show_dialog(
-            string.format("The element '%s' already exists.", new_key),
-            {"Cancel", "Swap", "Replace"})
-          if action == "Swap" then
+            S.dialogs.rename.err_exists(new_key),
+            {S.buttons.cancel, S.buttons.swap, S.buttons.replace})
+          if action == S.buttons.swap then
             local old_value = table.get(data.quads, unpack(new_keys))
             local do_action = function()
               table.set(data.quads, old_value, unpack(current_keys))
@@ -127,7 +128,7 @@ function QuadtasticLogic.transitions(interface) return {
             data.history:add(do_action, undo_action)
             do_action()
 
-          elseif action == "Replace" then
+          elseif action == S.buttons.replace then
             replace(data.quads, current_keys, new_keys, quad)
           else -- Cancel option
             return
@@ -158,7 +159,7 @@ function QuadtasticLogic.transitions(interface) return {
       -- This is an N^2 search and it sucks, but it probably won't matter.
       local key = table.find_key(shared_parent, v)
       if not key then
-        interface.show_dialog("You cannot sort quads across different groups")
+        interface.show_dialog(S.dialogs.sort.err_not_shared_group)
         return
       else
         individual_keys[v] = key
@@ -168,7 +169,7 @@ function QuadtasticLogic.transitions(interface) return {
       end
     end
     if numeric_quads == 0 then
-      interface.show_dialog("Only unnamed quads can be sorted")
+      interface.show_dialog(S.dialogs.sort.err_no_numeric_quads)
       return
     end
 
@@ -487,7 +488,7 @@ function QuadtasticLogic.transitions(interface) return {
       -- This is an N^2 search and it sucks, but it probably won't matter.
       local key = table.find_key(shared_parent, v)
       if not key then
-        interface.show_dialog("You cannot group quads across different groups")
+        interface.show_dialog(S.dialogs.group.err_not_shared_group)
         return
       else
         individual_keys[v] = key
@@ -540,7 +541,7 @@ function QuadtasticLogic.transitions(interface) return {
     if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end
     if #quads > 1 then
-      interface.show_dialog("You can only break up one group at a time")
+      interface.show_dialog(S.dialogs.ungroup.err_only_one)
       return
     end
     if libquadtastic.is_quad(quads[1]) then
@@ -565,22 +566,16 @@ function QuadtasticLogic.transitions(interface) return {
         end
         if type(k) == "number" then
           if not ignore_numeric_clash then
-            local ret = interface.show_dialog(string.format([[
-  Breaking up this group will change some numeric indices of the
-  elements in that group. In particular, the index %d already exists%s.
-  Proceed anyways?]],
-              k, (parent_name and " in group "..parent_name) or ""),
-              {"Yes", "No"})
-            if ret == "Yes" then
+            local ret = interface.show_dialog(S.dialogs.ungroup.warn_numeric_clash(k),
+                                              {S.buttons.yes, S.buttons.no})
+            if ret == S.buttons.yes then
               ignore_numeric_clash = true
             else
               return
             end
           end
         else
-          interface.show_dialog(string.format([[
-This group cannot be broken up since there is already an element called '%s'%s.]],
-            k, (parent_name and " in group "..parent_name) or ""))
+          interface.show_dialog(S.dialogs.ungroup.err_name_conflict(k))
           return
         end
       end
@@ -621,9 +616,9 @@ This group cannot be broken up since there is already an element called '%s'%s.]
   offer_reload = function(app, data)
     local image_path = data.quads._META.image_path
     local ret = interface.show_dialog(
-      string.format("The image %s has changed on disk.\nDo you want to reload it?", image_path),
-      {enter="Yes", escape="No"})
-    if ret == "Yes" then
+      S.dialogs.offer_reload(image_path),
+      {enter=S.buttons.yes, escape=S.buttons.no})
+    if ret == S.buttons.yes then
       app.quadtastic.load_image(image_path)
     end
   end,
@@ -673,7 +668,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
 
   save_as = function(app, data, callback)
     local ret, filepath = interface.save_file(data.quadpath)
-    if ret == "Save" then
+    if ret == S.buttons.save then
       data.quadpath = filepath
       app.quadtastic.save(callback)
       add_path_to_recent_files(interface, data, filepath)
@@ -687,7 +682,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       basepath = love.filesystem.getUserDirectory()
     end
     local ret, filepath = interface.open_file(basepath)
-    if ret == "Open" then
+    if ret == S.buttons.open then
       app.quadtastic.load_quad(filepath)
     end
   end,
@@ -704,12 +699,12 @@ This group cannot be broken up since there is already an element called '%s'%s.]
     if not data.history or data.history:is_marked() then return true end
 
     -- Otherwise check with the user
-    local ret = interface.show_dialog("Do you want to save the changes you made in the current file?",
-      {"Cancel", "Discard", "Save"})
-    if ret == "Save" then
+    local ret = interface.show_dialog(S.dialogs.save_changes,
+      {S.buttons.cancel, S.buttons.discard, S.buttons.save})
+    if ret == S.buttons.save then
       app.quadtastic.save()
     end
-    return ret == "Save" or ret == "Discard"
+    return ret == S.buttons.save or ret == S.buttons.discard
   end,
 
   load_quad = function(app, data, filepath)
@@ -747,7 +742,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
 
       add_path_to_recent_files(interface, data, filepath)
     else
-      interface.show_dialog(string.format("Could not load quads: %s", more))
+      interface.show_dialog(S.dialogs.err_load_quads(more))
     end
   end,
 
@@ -762,7 +757,7 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       end
     end
     local ret, filepath = interface.open_file(basepath)
-    if ret == "Open" then
+    if ret == S.buttons.open then
       app.quadtastic.load_image(filepath)
     end
   end,
@@ -785,16 +780,16 @@ This group cannot be broken up since there is already an element called '%s'%s.]
       -- Try to read a quad file
       local quadfilename = find_lua_file(filepath)
       if not data.quadpath and lfs.attributes(quadfilename) then
-        local should_load = interface.show_dialog(string.format(
-          "We found a quad file in %s.\nWould you like to load it?", quadfilename),
-          {enter = "Yes", escape = "No"}
+        local should_load = interface.show_dialog(S.dialogs.offer_load(quadname),
+                                                  {enter = S.buttons.yes,
+                                                   escape = S.buttons.no}
         )
-        if should_load == "Yes" then
+        if should_load == S.buttons.yes then
           app.quadtastic.load_quad(quadfilename)
         end
       end
     else
-      interface.show_dialog(string.format("Could not load image: %s", more))
+      interface.show_dialog(S.dialogs.err_load_image(more))
     end
   end,
 

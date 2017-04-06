@@ -20,6 +20,7 @@ local QuadtasticLogic = require(current_folder .. ".QuadtasticLogic")
 local Dialog = require(current_folder .. ".Dialog")
 local Menu = require(current_folder .. ".Menu")
 local Keybindings = require(current_folder .. ".Keybindings")
+local S = require(current_folder .. ".strings")
 
 local lfs = require("lfs")
 
@@ -101,7 +102,7 @@ Quadtastic.transitions = QuadtasticLogic.transitions(interface)
 -- -------------------------------------------------------------------------- --
 Quadtastic.draw = function(app, state, gui_state)
   local save_toast_callback = function(path)
-    imgui.show_toast(gui_state, "Saved as " .. path, nil, 2)
+    imgui.show_toast(gui_state, S.toast.saved_as(path), nil, 2)
   end
 
   local w, h = gui_state.transform:unproject_dimensions(
@@ -113,17 +114,19 @@ Quadtastic.draw = function(app, state, gui_state)
     local was_menu_open = imgui.is_any_menu_open(gui_state)
 
     do Menu.menubar_start(gui_state, w, 12)
-      if Menu.menu_start(gui_state, w/4, h - 12, "File") then
-        if Menu.action_item(gui_state, "New") then app.quadtastic.new() end
-        if Menu.action_item(gui_state, "Open...") then app.quadtastic.choose_quad() end
-        if Menu.action_item(gui_state, "Save") then
+      if Menu.menu_start(gui_state, w/4, h - 12, S.menu.file()) then
+        if Menu.action_item(gui_state, S.menu.file.new) then app.quadtastic.new() end
+        if Menu.action_item(gui_state, S.menu.file.open) then app.quadtastic.choose_quad() end
+        if Menu.action_item(gui_state, S.menu.file.save) then
           app.quadtastic.save(save_toast_callback)
         end
-        if Menu.action_item(gui_state, "Save as...") then
+        if Menu.action_item(gui_state, S.menu.file.save_as) then
           app.quadtastic.save_as(save_toast_callback)
         end
         if #state.settings.recent > 0 then
-          if Menu.menu_start(gui_state, w/4, h - 12, "Open recent") then
+          if Menu.menu_start(gui_state, w/4, h - 12,
+                             S.menu.file.open_recent)
+          then
             for _, file in ipairs(state.settings.recent) do
               local _, filename = common.split(file)
               if Menu.action_item(gui_state, filename) then app.quadtastic.load_quad(file) end
@@ -132,80 +135,63 @@ Quadtastic.draw = function(app, state, gui_state)
           end
         end
         Menu.separator(gui_state)
-        if Menu.action_item(gui_state, "Quit") then love.event.quit() end
+        if Menu.action_item(gui_state, S.menu.file.quit) then love.event.quit() end
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
-      if Menu.menu_start(gui_state, w/4, h - 12, "Edit") then
-        if Menu.action_item(gui_state, "Undo",
+      if Menu.menu_start(gui_state, w/4, h - 12, S.menu.edit()) then
+        if Menu.action_item(gui_state, S.menu.edit.undo,
                             {disabled = not state.history:can_undo()})
         then
           app.quadtastic.undo()
         end
-        if Menu.action_item(gui_state, "Redo",
+        if Menu.action_item(gui_state, S.menu.edit.redo,
                             {disabled = not state.history:can_redo()})
         then
           app.quadtastic.redo()
         end
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
-      if Menu.menu_start(gui_state, w/4, h - 12, "Image") then
-        if Menu.action_item(gui_state, "Open image...") then app.quadtastic.choose_image() end
+      if Menu.menu_start(gui_state, w/4, h - 12, S.menu.image()) then
+        if Menu.action_item(gui_state, S.menu.image.open_image) then
+          app.quadtastic.choose_image()
+        end
         local loaded = state.file_timestamps.image_loaded
         local latest = state.file_timestamps.image_latest
         local can_reload = loaded and latest and loaded ~= latest
         local disabled = not can_reload or not state.quads._META.image_path
-        if Menu.action_item(gui_state, "Reload image", {disabled = disabled}) then
+        if Menu.action_item(gui_state, S.menu.image.reload_image,
+                            {disabled = disabled})
+        then
           app.quadtastic.load_image(state.quads._META.image_path)
         end
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
-      if Menu.menu_start(gui_state, w/4, h - 12, "Help") then
+      if Menu.menu_start(gui_state, w/4, h - 12, S.menu.help()) then
 
-        if Menu.action_item(gui_state, "GitHub") then
-          love.system.openURL("https://www.github.com/25A0/Quadtastic")
+        if Menu.action_item(gui_state, S.menu.help.github) then
+          love.system.openURL()
         end
-        if Menu.menu_start(gui_state, w/4, h - 12, "Report a bug") then
-          local function compose_body(version_info)
-            local issuebody = [[
-[Describe the bug]
+        if Menu.menu_start(gui_state, w/4, h - 12, S.menu.help.report()) then
 
-### Steps to reproduce
- 1. 
-
-###  Expected behaviour
-
-
-### Actual behaviour :scream:
-
-
----
-Affects: %s]]
-            issuebody = string.format(issuebody, version_info)
-            issuebody = string.gsub(issuebody, "\n", "%%0A")
-            issuebody = string.gsub(issuebody, " ", "%%20")
-            issuebody = string.gsub(issuebody, "#", "%%23")
-            return issuebody
-          end
-
-          if Menu.action_item(gui_state, "via GitHub") then
+          if Menu.action_item(gui_state, S.menu.help.report.github) then
             local version_info = love.filesystem.read("res/version.txt")
-            local body = compose_body(version_info)
+            local body = S.menu.help.report.issue_body(version_info)
             love.system.openURL("https://www.github.com/25A0/Quadtastic/issues/new?body="..body)
           end
-          if Menu.action_item(gui_state, "via email") then
+          if Menu.action_item(gui_state, S.menu.help.report.email) then
             local version_info = love.filesystem.read("res/version.txt")
-            local subject = "Bug in Quadtastic " .. version_info
-            local body = compose_body(version_info)
+            local subject = S.menu.help.report.email_subject(version_info)
+            local body = S.menu.help.report.issue_body(version_info)
             love.system.openURL("mailto:moritz@25a0.com?subject="..subject..
                                 "&body="..body)
           end
           Menu.menu_finish(gui_state, w/4, h-12)
         end
         Menu.separator(gui_state)
-        if Menu.action_item(gui_state, "Acknowledgements") then
+        if Menu.action_item(gui_state, S.menu.help.acknowledgements) then
           app.quadtastic.show_ack_dialog()
         end
-        if Menu.action_item(gui_state, "About") then
+        if Menu.action_item(gui_state, S.menu.help.about) then
           app.quadtastic.show_about_dialog()
         end
         Menu.menu_finish(gui_state, w/4, h - 12)
@@ -227,7 +213,7 @@ Affects: %s]]
         then
           state.toolstate = {type = "select"}
         end
-        Tooltip.draw(gui_state, "Select, move and resize quads")
+        Tooltip.draw(gui_state, S.tooltips.select_tool)
         Layout.next(gui_state, "|")
 
         if Button.draw(gui_state, nil, nil, nil, nil, nil,
@@ -237,7 +223,7 @@ Affects: %s]]
           state.toolstate = {type = "create"}
 
         end
-        Tooltip.draw(gui_state, "Create new quads quads")
+        Tooltip.draw(gui_state, S.tooltips.create_tool)
         Layout.next(gui_state, "|")
 
         if Button.draw(gui_state, nil, nil, nil, nil, nil,
@@ -247,7 +233,7 @@ Affects: %s]]
           state.toolstate = {type = "border"}
           imgui.show_toast(gui_state, "NYI", nil, 2)
         end
-        Tooltip.draw(gui_state, "Create quads for a border")
+        Tooltip.draw(gui_state, S.tooltips.border_tool)
         Layout.next(gui_state, "|")
 
         if Button.draw(gui_state, nil, nil, nil, nil, nil,
@@ -257,7 +243,7 @@ Affects: %s]]
           state.toolstate = {type = "strip"}
           imgui.show_toast(gui_state, "NYI", nil, 2)
         end
-        Tooltip.draw(gui_state, "Create a strip of similar quads")
+        Tooltip.draw(gui_state, S.tooltips.strip_tool)
         Layout.next(gui_state, "|")
 
       end Layout.finish(gui_state, "|")
@@ -273,7 +259,7 @@ Affects: %s]]
             imgui.push_style(gui_state, "font", gui_state.style.small_font)
             Label.draw(gui_state, nil, nil,
               gui_state.layout.max_w, gui_state.layout.max_h,
-              "no image :(\nDrag an image into this window to load it",
+              S.image_editor_no_image,
               {alignment_h = ":", alignment_v = "-"})
             imgui.pop_style(gui_state, "font")
           end
@@ -288,7 +274,7 @@ Affects: %s]]
             if pressed then
               ImageEditor.zoom(state, 1)
             end
-            Tooltip.draw(gui_state, "Zoom in")
+            Tooltip.draw(gui_state, S.tooltips.zoom_in)
           end
           Layout.next(gui_state, "-")
           do
@@ -297,7 +283,7 @@ Affects: %s]]
             if pressed then
               ImageEditor.zoom(state, -1)
             end
-            Tooltip.draw(gui_state, "Zoom out")
+            Tooltip.draw(gui_state, S.tooltips.zoom_out)
           end
           Layout.next(gui_state, "-")
 
@@ -432,7 +418,9 @@ Affects: %s]]
 
             Layout.next(gui_state, "|")
 
-            if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil, "EXPORT", nil, {alignment_h = ":"}) then
+            if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil,
+                           S.buttons.export, nil, {alignment_h = ":"})
+            then
               app.quadtastic.save(save_toast_callback)
             end
 
@@ -453,7 +441,8 @@ Affects: %s]]
                 love.graphics.draw(gui_state.style.turboworkflow_deactivated,
                                    gui_state.layout.next_x, gui_state.layout.next_y - 2)
               end
-              Tooltip.draw(gui_state, "Reloads image whenever it changes on disk, and repeats export whenever quads change.", nil, nil, 128, 12)
+              Tooltip.draw(gui_state, S.tooltips.turbo_workflow,
+                           nil, nil, 128, 12)
               -- imgui.push_style(gui_state, "font", gui_state.style.small_font)
               -- Label.draw(gui_state, nil, nil, nil, 12, "Turbo-Workflow")
               -- imgui.pop_style(gui_state, "font")
@@ -469,35 +458,35 @@ Affects: %s]]
             then
               app.quadtastic.rename(state.selection:get_selection())
             end
-            Tooltip.draw(gui_state, "Rename")
+            Tooltip.draw(gui_state, S.tooltips.rename)
             Layout.next(gui_state, "|")
             if Button.draw(gui_state, nil, nil, nil, nil, nil,
                            gui_state.style.quads.buttons.delete)
             then
               app.quadtastic.remove(state.selection:get_selection())
             end
-            Tooltip.draw(gui_state, "Delete selected quad(s)")
+            Tooltip.draw(gui_state, S.tooltips.delete)
             Layout.next(gui_state, "|")
             if Button.draw(gui_state, nil, nil, nil, nil, nil,
                            gui_state.style.quads.buttons.sort)
             then
               app.quadtastic.sort(state.selection:get_selection())
             end
-            Tooltip.draw(gui_state, "Sort unnamed quads from top to bottom, left to right")
+            Tooltip.draw(gui_state, S.tooltips.sort)
             Layout.next(gui_state, "|")
             if Button.draw(gui_state, nil, nil, nil, nil, nil,
                            gui_state.style.quads.buttons.group)
             then
               app.quadtastic.group(state.selection:get_selection())
             end
-            Tooltip.draw(gui_state, "Form new group from selected quads")
+            Tooltip.draw(gui_state, S.tooltips.group)
             Layout.next(gui_state, "|")
             if Button.draw(gui_state, nil, nil, nil, nil, nil,
                            gui_state.style.quads.buttons.ungroup)
             then
               app.quadtastic.ungroup(state.selection:get_selection())
             end
-            Tooltip.draw(gui_state, "Break up selected group(s)")
+            Tooltip.draw(gui_state, S.tooltips.ungroup)
           end Layout.finish(gui_state, "|")
         end Layout.finish(gui_state, "-")
       end Layout.finish(gui_state, "|")

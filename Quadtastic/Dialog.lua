@@ -10,6 +10,7 @@ local Text = require(current_folder .. ".Text")
 local Window = require(current_folder .. ".Window")
 local imgui = require(current_folder .. ".imgui")
 local licenses = require(current_folder .. ".res.licenses")
+local S = require(current_folder .. ".strings")
 
 -- Shared library
 local lfs = require("lfs")
@@ -149,7 +150,8 @@ function Dialog.show_dialog(message, buttons)
     end,
   }
   local dialog_state = State("dialog", transitions,
-                             {message = message, buttons = buttons or {enter = "OK"}})
+                             {message = message,
+                              buttons = buttons or {enter = S.buttons.ok}})
   -- Store the draw function in the state
   dialog_state.draw = draw
   return coroutine.yield(dialog_state)
@@ -183,7 +185,7 @@ function Dialog.query(message, input, buttons)
         end
         Layout.next(gui_state, "|")
         if committed then
-          app.query.respond("OK")
+          app.query.respond(S.buttons.ok)
         end
       end Layout.finish(gui_state, "|")
       Layout.next(gui_state, "|")
@@ -203,7 +205,8 @@ function Dialog.query(message, input, buttons)
   }
   local query_state = State("query", transitions,
                              {input = input or "", message = message,
-                              buttons = buttons or {escape = "Cancel", enter = "OK"},
+                              buttons = buttons or {escape = S.buttons.cancel,
+                                                    enter = S.buttons.ok},
                               was_drawn = false,
                              })
   -- Store the draw function in the state
@@ -293,7 +296,7 @@ function Dialog.open_file(basepath)
         if data.committed_file.type == "directory" then
           new_basepath = data.basepath .. "/" .. data.committed_file.name
         elseif data.committed_file.type == "file" then
-          app.open_file.respond("Open")
+          app.open_file.respond(S.buttons.open)
         end
       end
 
@@ -304,7 +307,7 @@ function Dialog.open_file(basepath)
       if clicked_button then
 
         -- Set chosen file as committed when open is clicked
-        if clicked_button == "Open" then
+        if clicked_button == S.buttons.open then
           if data.chosen_file and data.chosen_file.type == "file" then
             data.committed_file = data.chosen_file
           end
@@ -342,7 +345,8 @@ function Dialog.open_file(basepath)
 
   local file_state = State("open_file", transitions,
                              {basepath = basepath or "/",
-                              buttons = {escape = "Cancel", enter = "Open"},
+                              buttons = {escape = S.buttons.cancel,
+                                         enter = S.buttons.open},
                              })
 
   -- Store the draw function in the state
@@ -446,7 +450,7 @@ function Dialog.save_file(basepath)
                      data.editing_filename == ""}})
       if clicked_button then
 
-        if clicked_button == "Save" then
+        if clicked_button == S.buttons.save then
           local filename = data.committed_file and data.committed_file.name or
                            data.editing_filename
           if filename then
@@ -455,7 +459,7 @@ function Dialog.save_file(basepath)
             if filetype == "file" then
               app.save_file.override(filepath)
             elseif filetype == "directory" then
-              app.save_file.err(string.format("%s is a directory.", filepath))
+              app.save_file.err(S.dialogs.err_save_directory(filepath))
             else -- it's a new file
               app.save_file.save(filepath)
             end
@@ -483,21 +487,19 @@ function Dialog.save_file(basepath)
   local transitions = {
     -- luacheck: no unused args
     save = function(app, data, filepath)
-      return "Save", filepath
+      return S.buttons.save, filepath
     end,
 
     override = function(app, data, filepath)
-      local ret = Dialog.show_dialog(
-        string.format("File %s already exists. Do you want to replace it?",
-                      filepath),
-        {"Yes", "No"})
-      if ret == "Yes" then
-        return "Save", filepath
+      local ret = Dialog.show_dialog(S.dialogs.save_replace(filepath),
+                                     {S.buttons.yes, S.buttons.no})
+      if ret == S.buttons.yes then
+        return S.buttons.save, filepath
       end
     end,
 
     cancel = function(app, data)
-      return "Cancel"
+      return S.buttons.cancel
     end,
 
     err = function(app, data, err)
@@ -507,7 +509,8 @@ function Dialog.save_file(basepath)
 
   local file_state = State("save_file", transitions,
                              {basepath = basepath or "/",
-                              buttons = {escape = "Cancel", enter = "Save"},
+                              buttons = {escape = S.buttons.cancel,
+                                         enter = S.buttons.save},
                              })
 
   -- Store the draw function in the state
@@ -536,11 +539,11 @@ function Dialog.show_about_dialog()
         gui_state.layout.adv_x, gui_state.layout.adv_y = icon_w, icon_h
         Layout.next(gui_state, "|")
 
-        Label.draw(gui_state, nil, nil, nil, nil, "Quadtastic " .. version_info)
+        Label.draw(gui_state, nil, nil, nil, nil, S.dialogs.about(version_info))
         Layout.next(gui_state, "|")
         Label.draw(gui_state, nil, nil, nil, nil, copyright_info)
         Layout.next(gui_state, "|")
-        if Button.draw(gui_state, nil, nil, nil, nil, "Close") then
+        if Button.draw(gui_state, nil, nil, nil, nil, S.buttons.close) then
           app.about_dialog.close()
         end
       end Layout.finish(gui_state, "|")
@@ -553,7 +556,7 @@ function Dialog.show_about_dialog()
   assert(coroutine.running(), "This function must be run in a coroutine.")
   local transitions = {
     -- luacheck: no unused args
-    close = function(app, data) return "close" end,
+    close = function(app, data) return S.buttons.close end,
   }
   local dialog_state = State("about_dialog", transitions, {})
   -- Store the draw function in the state
@@ -572,7 +575,7 @@ function Dialog.show_ack_dialog()
     do Window.start(gui_state, x, y, min_w, min_h)
       imgui.push_style(gui_state, "font", gui_state.style.small_font)
       do Layout.start(gui_state)
-        Label.draw(gui_state, nil, nil, nil, nil, "Quadtastic uses the following open-source software projects:")
+        Label.draw(gui_state, nil, nil, nil, nil, S.dialogs.acknowledgements)
         Layout.next(gui_state, "|")
 
         do Frame.start(gui_state, nil, nil, 320, 150)
@@ -604,7 +607,7 @@ function Dialog.show_ack_dialog()
         end Frame.finish(gui_state)
         Layout.next(gui_state, "|")
 
-        if Button.draw(gui_state, nil, nil, nil, nil, "Close") then
+        if Button.draw(gui_state, nil, nil, nil, nil, S.buttons.close) then
           app.ack_dialog.close()
         end
       end Layout.finish(gui_state, "|")
@@ -618,7 +621,7 @@ function Dialog.show_ack_dialog()
   assert(coroutine.running(), "This function must be run in a coroutine.")
   local transitions = {
     -- luacheck: no unused args
-    close = function(app, data) return "close" end,
+    close = function(app, data) return S.buttons.close end,
   }
   local dialog_state = State("ack_dialog", transitions, {})
   -- Store the draw function in the state
