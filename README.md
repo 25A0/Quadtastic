@@ -59,7 +59,6 @@ its rgb value.
  - [x] Name quads
  - [x] Delete and modify existing quads
  - [x] Export defined quads as lua code
- - [x] Detect and import existing quad definitions
  - [x] Group quads
  - [x] Highlight selected and hovered quads
  - [x] Display name of quads in ImageEditor

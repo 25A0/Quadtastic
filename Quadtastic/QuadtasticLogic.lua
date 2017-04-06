@@ -9,10 +9,6 @@ local S = require(current_folder.. ".strings")
 -- Shared library
 local lfs = require("lfs")
 
-local function find_lua_file(filepath)
-  return string.gsub(filepath, "%.(%w+)$", ".lua")
-end
-
 local function add_path_to_recent_files(interface, data, filepath)
   -- Insert new file into list of recently loaded files
   -- Remove duplicates from recent files
@@ -789,17 +785,6 @@ function QuadtasticLogic.transitions(interface) return {
       data.file_timestamps.image_latest = data.file_timestamps.image_loaded
       interface.reset_view(data)
       if callback then callback(filepath) end
-      -- Try to read a quad file
-      local quadfilename = find_lua_file(filepath)
-      if not data.quadpath and lfs.attributes(quadfilename) then
-        local should_load = interface.show_dialog(S.dialogs.offer_load(quadname),
-                                                  {enter = S.buttons.yes,
-                                                   escape = S.buttons.no}
-        )
-        if should_load == S.buttons.yes then
-          app.quadtastic.load_quad(quadfilename)
-        end
-      end
     else
       interface.show_dialog(S.dialogs.err_load_image(more))
     end
