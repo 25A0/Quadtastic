@@ -30,6 +30,10 @@ function Text.break_at(state, text, width)
         if sep_index == #separators then
           print(string.format("Warning: %s is too long for one line", chunk))
         else
+          if #line > 0 then
+            complete_line(separator)
+            line, line_length = {}, 0
+          end
           break_up(word, sep_index + 1)
         end
       elseif line_length + wordlength > width then
