@@ -145,6 +145,7 @@ function love.draw()
     love.graphics.setCanvas(gui_state.overlay_canvas)
     local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
     local x, y = gui_state.transform:unproject(mx + 10, my + 10)
+    x, y = math.floor(x), math.floor(y)
     -- Draw dark background for better readability
     love.graphics.setColor(53, 53, 53, 192)
     love.graphics.rectangle("fill", x-2, y + 2,
