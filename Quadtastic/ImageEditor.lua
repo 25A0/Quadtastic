@@ -220,15 +220,15 @@ local function select_tool(app, gui_state, state, img_w, img_h)
   -- Check if we should start resizing a quad
   local direction
 
-  local function get_cursor_string(direction)
+  local function get_cursor_string(dir)
     local cursor_string
-    if direction.n and direction.e or direction.s and direction.w then
+    if dir.n and dir.e or dir.s and dir.w then
       cursor_string = "sizenesw"
-    elseif direction.n and direction.w or direction.s and direction.e then
+    elseif dir.n and dir.w or dir.s and dir.e then
       cursor_string = "sizenwse"
-    elseif direction.n or direction.s then
+    elseif dir.n or dir.s then
       cursor_string = "sizens"
-    elseif direction.w or direction.e then
+    elseif dir.w or dir.e then
       cursor_string = "sizewe"
     end
     return cursor_string
@@ -241,7 +241,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     -- Returns the directions in which a quad should be resized based on where
     -- the mouse was pressed
     local function get_resize_directions(quad)
-      local direction = {}
+      local dir = {}
 
       -- Make a rough check to see if the mouse is near any edge
       if mx < quad.x - 1 or mx > quad.x + quad.w + 1 or
@@ -251,19 +251,19 @@ local function select_tool(app, gui_state, state, img_w, img_h)
       end
 
       if math.abs(mx - quad.x) <= 1 then
-        direction.w = true
+        dir.w = true
       elseif math.abs(mx - (quad.x + quad.w)) <= 1 then
-        direction.e = true
+        dir.e = true
       end
       if math.abs(my - quad.y) <= 1 then
-        direction.n = true
+        dir.n = true
       elseif math.abs(my - (quad.y + quad.h)) <= 1 then
-        direction.s = true
+        dir.s = true
       end
-      if not (direction.n or direction.e or direction.s or direction.w) then
+      if not (dir.n or dir.e or dir.s or dir.w) then
         return nil
       else
-        return direction
+        return dir
       end
     end
 
