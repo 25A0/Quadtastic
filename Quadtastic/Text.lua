@@ -17,6 +17,7 @@ function Text.break_at(state, text, width)
   local separators = {" ", "-", "/", "\\", "."}
   local function complete_line(separator)
     local new_line = table.concat(line, separator)
+    if separator ~= " " then new_line = new_line .. separator end
     table.insert(lines, new_line)
   end
 
