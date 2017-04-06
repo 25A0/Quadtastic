@@ -613,13 +613,13 @@ function QuadtasticLogic.transitions(interface) return {
 
   end,
 
-  offer_reload = function(app, data)
+  offer_reload = function(app, data, callback)
     local image_path = data.quads._META.image_path
     local ret = interface.show_dialog(
       S.dialogs.offer_reload(image_path),
       {enter=S.buttons.yes, escape=S.buttons.no})
     if ret == S.buttons.yes then
-      app.quadtastic.load_image(image_path)
+      app.quadtastic.load_image(image_path, callback)
     end
   end,
 
@@ -762,7 +762,7 @@ function QuadtasticLogic.transitions(interface) return {
     end
   end,
 
-  load_image = function(app, data, filepath)
+  load_image = function(app, data, filepath, callback)
     local success, more = pcall(common.load_image, filepath)
 
     -- success, more = pcall(love.graphics.newImage, data)
@@ -777,6 +777,7 @@ function QuadtasticLogic.transitions(interface) return {
       data.file_timestamps.image_loaded = lfs.attributes(filepath, "modification")
       data.file_timestamps.image_latest = data.file_timestamps.image_loaded
       interface.reset_view(data)
+      if callback then callback(filepath) end
       -- Try to read a quad file
       local quadfilename = find_lua_file(filepath)
       if not data.quadpath and lfs.attributes(quadfilename) then

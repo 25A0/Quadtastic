@@ -105,6 +105,10 @@ Quadtastic.draw = function(app, state, gui_state)
     imgui.show_toast(gui_state, S.toast.saved_as(path), nil, 2)
   end
 
+  local reload_image_toast_callback = function(path)
+    imgui.show_toast(gui_state, S.toast.reloaded(path), nil, 2)
+  end
+
   local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
@@ -510,7 +514,7 @@ Quadtastic.draw = function(app, state, gui_state)
     local filepath = data.quads._META.image_path
     local current_timestamp = lfs.attributes(filepath, "modification")
     if current_timestamp ~= data.file_timestamps.image_latest then
-      app.quadtastic.offer_reload()
+      app.quadtastic.offer_reload(reload_image_toast_callback)
     end
     data.file_timestamps.image_latest = current_timestamp
   end
