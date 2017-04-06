@@ -117,12 +117,7 @@ its rgb value.
  - [x] Idle application while not in focus
  - [x] Resize overlay canvas on resize, otherwise things might break subtly
  - [x] Add text area that wraps at layout boundary automatically
- - [ ] Outline quads with a color that maximizes contrast (i.e. white for darker
-       areas, black for brighter areas). The most efficient way to do this is
-       probably by creating a canvas with the image's size that is black in all
-       bright areas of the canvas, and white in all dark areas. When we then
-       draw the the outline, we use a shader that samples the pre-processed
-       image. The outline uses the color of the pixel that is being outlined.
+ - [x] Outline quads in black and white for better contrast
  - [ ] Add toolbar with tools:
     - [x] The Create tool to create new quads
     - [x] The Select tool to select, move and resize quads

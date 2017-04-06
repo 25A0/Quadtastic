@@ -122,7 +122,11 @@ local function show_quad(gui_state, state, quad, quadname)
       love.graphics.setLineStyle("rough")
       love.graphics.setLineWidth(1/state.display.zoom)
       if quad == state.hovered or state.selection:is_selected(quad) then
+        -- Draw a black outline first
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
         -- Use a dashed line to outline the quad
+        love.graphics.setColor(255, 255, 255)
         draw_dashed_line(quad, gui_state)
       else
         -- Use a simple line to outline the quad
