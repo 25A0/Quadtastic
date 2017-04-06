@@ -218,6 +218,8 @@ end
 
 local function select_tool(app, gui_state, state, img_w, img_h)
   -- Check if we should start resizing a quad
+  local direction
+
   if not state.toolstate.mode then
     local mx, my = gui_state.input.mouse.x, gui_state.input.mouse.y
     mx, my = gui_state.transform:unproject(mx, my)
@@ -252,7 +254,6 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     end
 
     -- Check if the mouse was pressed on the border of a selected quad
-    local direction
     if state.hovered and state.selection:is_selected(state.hovered) then
       direction = get_resize_directions(state.hovered)
     else -- check each selected quad
@@ -296,7 +297,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
   end
 
   local f = fun.partial(imgui.is_key_pressed, gui_state)
-  if state.hovered and not state.toolstate.mode then
+  if state.hovered and not state.toolstate.mode and not direction then
     -- If the hovered quad is already selected, show the movement cursor, and
     -- move the quads when the mouse is dragged
     if state.selection:is_selected(state.hovered) then
