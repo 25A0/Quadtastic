@@ -102,7 +102,7 @@ its rgb value.
        (doesn't look like this is possible. At least not on MacOS...)
  - [x] Add metadata to qua file to remember which image was loaded along with it
  - [ ] Make Export button glow when quads have changed since last export
- - [ ] Show confirmation dialog when the user would lose changes by loading a
+ - [x] Show confirmation dialog when the user would lose changes by loading a
        new image or quad file
  - [ ] Test palette feature in libquadtastic
  - [x] Adjust center of the viewport after zooming
