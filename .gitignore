@@ -2,7 +2,4 @@ shared
 dist
 
 # Auto-generated resources
-Quadtastic/res/style.png
-Quadtastic/res/icon-*
 Quadtastic/res/version.txt
-Quadtastic/res/copyright.txt
