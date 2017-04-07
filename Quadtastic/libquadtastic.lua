@@ -1,7 +1,10 @@
 local libquadtastic = {}
 
 function libquadtastic.is_quad(quad)
-  return type(quad) == "table" and quad.x and quad.y and quad.w and quad.h
+  return type(quad) == "table" and quad.x and type(quad.x) == "number" and
+                                   quad.y and type(quad.y) == "number" and
+                                   quad.w and type(quad.w) == "number" and
+                                   quad.h and type(quad.h) == "number"
 end
 
 function libquadtastic.get_metainfo(table)

@@ -146,13 +146,11 @@ instead of
  - [ ] Overhaul dialog texts
  - [x] Move all text to separate module for better readability, easier
        localization, and easy comparison during tests
- - [ ] Fix detection of quads: Currently the application treats all tables as
+ - [x] Fix detection of quads: Currently the application treats all tables as
        quads that have values for x, y, w, and h. This means that you cannot
        have a group that contains the entire alphabet, since that group could
-       have quads named x, y, w and h. Solution: Introduce a sneaky key _type
-       that identifies the type of element. Unfortunately, we will have to
-       include that key in the exported quad file, since we otherwise run into
-       the same problem when using the quads.
+       have quads named x, y, w and h. Solution: Make sure that the values of
+       the x, y, w and h attributes are numeric.
  - [x] Fix error handling when image cannot be loaded
  - [ ] Make quad list prettier
  - [x] Make quad groups in quad list collapsible and expandable

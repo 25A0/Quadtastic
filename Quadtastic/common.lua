@@ -1,3 +1,6 @@
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local libquadtastic = require(current_folder.. ".libquadtastic")
+
 -- Utility functions that don't deserve their own module
 
 local common = {}
@@ -59,7 +62,7 @@ local function export_table_content(handle, tab, indentation)
     end
     if type(v) == "table" then
       -- Check if it is a quad table, in which case we use a simpler function
-      if v.x and v.y and v.w and v.h then
+      if libquadtastic.is_quad(v) then
         export_quad(handle, v)
       else
         handle("{\n")
