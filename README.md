@@ -161,6 +161,9 @@ instead of
 	 - [x] Automatically export new quad file whenever quads are changed
  - [x] Colors in Palette are callable tables to easily change the alpha values
  - [x] Improve hitbox size to make it easier to move small quads around
+ - [x] When saving, add a default extension when the user doesn't specify one
+ - [ ] When renaming quads, treat numbers as numberic indices
+ - [ ] When saving for the first time, open file browser at location of loaded image
  - [ ] Custom exporter for people who don't want to export to lua
 
 # Credits and tools used

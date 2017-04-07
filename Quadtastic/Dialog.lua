@@ -357,7 +357,7 @@ function Dialog.open_file(basepath)
   return coroutine.yield(file_state)
 end
 
-function Dialog.save_file(basepath)
+function Dialog.save_file(basepath, default_extension)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
     local min_w = data.min_w or 0
@@ -455,6 +455,10 @@ function Dialog.save_file(basepath)
           local filename = data.committed_file and data.committed_file.name or
                            data.editing_filename
           if filename then
+            -- Add default file extension unless the user specified one
+            if default_extension and not common.split_extension(filename) then
+              filename = filename .. "." .. default_extension
+            end
             local filetype = lfs.attributes(filename, "mode")
             local filepath = (data.basepath or "") .. os.pathsep .. (filename or "")
             if filetype == "file" then

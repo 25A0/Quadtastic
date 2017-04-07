@@ -675,7 +675,7 @@ function QuadtasticLogic.transitions(interface) return {
   end,
 
   save_as = function(app, data, callback)
-    local ret, filepath = interface.save_file(data.quadpath)
+    local ret, filepath = interface.save_file(data.quadpath, "lua")
     if ret == S.buttons.save then
       data.quadpath = filepath
       app.quadtastic.save(callback)
