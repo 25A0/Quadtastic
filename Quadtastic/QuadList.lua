@@ -13,65 +13,74 @@ local function draw_elements(gui_state, state, elements, last_hovered, quad_boun
   local clicked_element, hovered_element
   for name,element in pairs(elements) do
     if name ~= "_META" then
-      local background_quads
-      if state.selection:is_selected(element) then
-        background_quads = gui_state.style.quads.rowbackground.selected
-      elseif last_hovered == element then
-        background_quads = gui_state.style.quads.rowbackground.hovered
-      else
-        background_quads = gui_state.style.quads.rowbackground.default
-      end
-
-      love.graphics.setColor(255, 255, 255)
-      -- Draw row background
-      love.graphics.draw( -- top
-        gui_state.style.stylesheet, background_quads.top,
-        gui_state.layout.next_x, gui_state.layout.next_y,
-        0, gui_state.layout.max_w, 1)
-      love.graphics.draw( -- center
-        gui_state.style.stylesheet, background_quads.center,
-        gui_state.layout.next_x, gui_state.layout.next_y + 2,
-        0, gui_state.layout.max_w, 12)
-      love.graphics.draw( -- bottom
-        gui_state.style.stylesheet, background_quads.bottom,
-        gui_state.layout.next_x, gui_state.layout.next_y + 14,
-        0, gui_state.layout.max_w, 1)
+      local row_height = 16
+      -- check if this quad will be visible, and only draw it if it is visible.
+      local visible = gui_state.layout.next_y + row_height >= state.quad_scrollpane_state.y and
+                      gui_state.layout.next_y < state.quad_scrollpane_state.y + (state.quad_scrollpane_state.h or 0)
 
       local input_consumed
-      if libquadtastic.is_quad(element) then
-        Text.draw(gui_state, 2, nil, gui_state.layout.max_w, nil,
-          string.format("%s: x%d y%d  %dx%d", tostring(name), element.x, element.y, element.w, element.h))
-      else
-        local raw_quads, quads
-        if state.collapsed_groups[element] then
-          raw_quads = gui_state.style.raw_quads.rowbackground.collapsed
-          quads = gui_state.style.quads.rowbackground.collapsed
+      if visible then
+        local background_quads
+        if state.selection:is_selected(element) then
+          background_quads = gui_state.style.quads.rowbackground.selected
+        elseif last_hovered == element then
+          background_quads = gui_state.style.quads.rowbackground.hovered
         else
-          raw_quads = gui_state.style.raw_quads.rowbackground.expanded
-          quads = gui_state.style.quads.rowbackground.expanded
+          background_quads = gui_state.style.quads.rowbackground.default
         end
 
-        assert(raw_quads.default.w == raw_quads.default.h)
-        local quad_size = raw_quads.default.w
+        love.graphics.setColor(255, 255, 255)
+        -- Draw row background
+        love.graphics.draw( -- top
+          gui_state.style.stylesheet, background_quads.top,
+          gui_state.layout.next_x, gui_state.layout.next_y,
+          0, gui_state.layout.max_w, 1)
+        love.graphics.draw( -- center
+          gui_state.style.stylesheet, background_quads.center,
+          gui_state.layout.next_x, gui_state.layout.next_y + 2,
+          0, gui_state.layout.max_w, 12)
+        love.graphics.draw( -- bottom
+          gui_state.style.stylesheet, background_quads.bottom,
+          gui_state.layout.next_x, gui_state.layout.next_y + 14,
+          0, gui_state.layout.max_w, 1)
 
-        local x, y = gui_state.layout.next_x + 1, gui_state.layout.next_y + 5
-        local w, h = quad_size, quad_size
-
-        local clicked, pressed, hovered = Button.draw_flat(gui_state, x, y, w, h, nil, quads)
-        if clicked then
+        if libquadtastic.is_quad(element) then
+          Text.draw(gui_state, 2, nil, gui_state.layout.max_w, nil,
+            string.format("%s: x%d y%d  %dx%d", tostring(name), element.x, element.y, element.w, element.h))
+        else
+          local raw_quads, quads
           if state.collapsed_groups[element] then
-            state.collapsed_groups[element] = false
+            raw_quads = gui_state.style.raw_quads.rowbackground.collapsed
+            quads = gui_state.style.quads.rowbackground.collapsed
           else
-            state.collapsed_groups[element] = true
+            raw_quads = gui_state.style.raw_quads.rowbackground.expanded
+            quads = gui_state.style.quads.rowbackground.expanded
           end
-        end
-        input_consumed = clicked or pressed or hovered
 
-        Text.draw(gui_state, quad_size + 3, nil, gui_state.layout.max_w, nil,
-          string.format("%s", tostring(name)))
+          assert(raw_quads.default.w == raw_quads.default.h)
+          local quad_size = raw_quads.default.w
+
+          local x, y = gui_state.layout.next_x + 1, gui_state.layout.next_y + 5
+          local w, h = quad_size, quad_size
+
+          local clicked, pressed, hovered = Button.draw_flat(gui_state, x, y, w, h, nil, quads)
+          if clicked then
+            if state.collapsed_groups[element] then
+              state.collapsed_groups[element] = false
+            else
+              state.collapsed_groups[element] = true
+            end
+          end
+          input_consumed = clicked or pressed or hovered
+
+          Text.draw(gui_state, quad_size + 3, nil, gui_state.layout.max_w, nil,
+            string.format("%s", tostring(name)))
+        end
+
       end
+
       gui_state.layout.adv_x = gui_state.layout.max_w
-      gui_state.layout.adv_y = 16
+      gui_state.layout.adv_y = row_height
 
       quad_bounds[element] = {x = gui_state.layout.next_x, y = gui_state.layout.next_y,
                            w = gui_state.layout.adv_x, h = gui_state.layout.adv_y}
