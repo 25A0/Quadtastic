@@ -186,7 +186,7 @@ Scrollpane.start = function(state, x, y, w, h, scrollpane_state)
 
   -- Start a layout that contains this scrollpane
   Layout.start(state, x, y, w, h)
-  love.graphics.clear(76, 100, 117)
+  love.graphics.clear(state.style.palette.scrollpane_background)
 
   -- Calculate the dimension of the viewport, based on whether the viewport
   -- needed a scrollbar in the last frame

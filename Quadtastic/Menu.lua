@@ -32,7 +32,8 @@ function Menu.menu_start(gui_state, w, h, label)
 
   if opened then
     options.bg_color_default =
-      gui_state.menu_depth == 0 and {202, 222, 227} or {68, 137, 156}
+      gui_state.menu_depth == 0 and gui_state.style.palette.brightest or
+                              gui_state.style.palette.neutral
   end
   -- Draw label depending on current menu depth
   local hit, hovered

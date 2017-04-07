@@ -112,7 +112,7 @@ Quadtastic.draw = function(app, state, gui_state)
   local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
-  love.graphics.clear(138, 179, 189)
+  love.graphics.clear(gui_state.style.palette.shades.bright)
   local win_x, win_y = 0, 0
   do Window.start(gui_state, win_x, win_y, w, h, {margin = 2, active = true, borderless = true})
     local was_menu_open = imgui.is_any_menu_open(gui_state)
