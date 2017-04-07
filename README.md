@@ -86,7 +86,7 @@ its rgb value.
     - [x] MacOS
     - [x] Windows 32 bit
     - [ ] Windows 64 bit (wontfix unless there's a way to compile LFS for 64 bit)
-    - [ ] Linux
+    - [x] Linux (works if lfs is installed with luarocks)
     - [x] Icon
     - [x] Show Quadtastic in title bar
     - [x] Makefile recipe for tagging releases
