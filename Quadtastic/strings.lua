@@ -112,7 +112,6 @@ strings.buttons = {
 }
 
 strings.dialogs = {
-  quit = "Do you really want to quit?",
   rename = {
     err_only_one = "You cannot rename more than one element at once.",
     err_nested_quad = f(s("The element %s is a quad, and can therefore not have\

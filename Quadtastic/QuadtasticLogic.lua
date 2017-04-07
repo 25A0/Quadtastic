@@ -32,10 +32,9 @@ function QuadtasticLogic.transitions(interface) return {
   -- luacheck: no unused args
 
   quit = function(app, data)
-    if not app.quadtastic.proceed_despite_unsaved_changes() then return end
-    local result = interface.show_dialog(S.dialogs.quit,
-                                         {S.buttons.yes, S.buttons.no})
-    if result == S.buttons.yes then
+    if not app.quadtastic.proceed_despite_unsaved_changes() then
+      return
+    else
       return 0
     end
   end,
