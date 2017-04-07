@@ -50,49 +50,22 @@ local function iter_quads(tab, index, depth)
   end
 end
 
-local function draw_dashed_line(quad, gui_state)
-  local segment_length = 1
-  local adv = (gui_state and gui_state.second or 0) * 2 * segment_length
-  -- top
-  if adv > segment_length then adv = adv - 2*segment_length end
-  while adv < quad.w do
-    local start = math.max(quad.x, quad.x + adv)
-    local max_adv = math.min(quad.w, adv + segment_length)
-    love.graphics.line(start           , quad.y,
-                       quad.x + max_adv, quad.y)
-    adv = adv + 2*segment_length
-  end
-  adv = adv - quad.w
-  -- right
-  if adv > segment_length then adv = adv - 2*segment_length end
-  while adv < quad.h do
-    local start = math.max(quad.y, quad.y + adv)
-    local max_adv = math.min(quad.h, adv + segment_length)
-    love.graphics.line(quad.x + quad.w, start,
-                       quad.x + quad.w, quad.y + max_adv)
-    adv = adv + 2*segment_length
-  end
-  adv = adv - quad.h
-  -- bottom
-  if adv > segment_length then adv = adv - 2*segment_length end
-  while adv < quad.w do
-    local start = math.min(quad.x + quad.w, quad.x + quad.w - adv)
-    local max_adv = math.min(quad.w, adv + segment_length)
-    love.graphics.line(start                    , quad.y + quad.h,
-                       quad.x + quad.w - max_adv, quad.y + quad.h)
-    adv = adv + 2*segment_length
-  end
-  adv = adv - quad.w
-  -- left
-  if adv > segment_length then adv = adv - 2*segment_length end
-  while adv < quad.h do
-    local start = math.min(quad.y + quad.h, quad.y + quad.h - adv)
-    local max_adv = math.min(quad.h, adv + segment_length)
-    love.graphics.line(quad.x, start,
-                       quad.x, quad.y + quad.h - max_adv)
-    adv = adv + 2*segment_length
-  end
-  -- adv = adv - quad.h
+local function draw_dashed_line(quad, gui_state, zoom)
+  local t = gui_state.second
+  local canvas_h = gui_state.style.dashed_line.horizontal.canvas
+  local canvas_v = gui_state.style.dashed_line.vertical.canvas
+  local quad_top   = love.graphics.newQuad(0 + t*4, 0, quad.w * zoom, 1, 4, 1)
+  local quad_right = love.graphics.newQuad(0, 0 + t*4, 1, quad.h * zoom, 1, 4)
+  local quad_bottom= love.graphics.newQuad(2 - t*4, 0, quad.w * zoom, 1, 4, 1)
+  local quad_left  = love.graphics.newQuad(0, 2 - t*4, 1, quad.h * zoom, 1, 4)
+
+  local x, y, w, h = quad.x, quad.y, quad.w, quad.h
+  local d = .5/zoom -- offset to center the line on the quad's border
+  local s = 1/zoom -- scale factor
+  love.graphics.draw(canvas_h, quad_top   , x     - d, y     - d, 0, s, s)
+  love.graphics.draw(canvas_v, quad_right , x + w - d, y     - d, 0, s, s)
+  love.graphics.draw(canvas_h, quad_bottom, x     + d, y + h - d, 0, s, s)
+  love.graphics.draw(canvas_v, quad_left  , x     - d, y     + d, 0, s, s)
 end
 
 local function show_quad(gui_state, state, quad, quadname)
@@ -122,12 +95,9 @@ local function show_quad(gui_state, state, quad, quadname)
       love.graphics.setLineStyle("rough")
       love.graphics.setLineWidth(1/state.display.zoom)
       if quad == state.hovered or state.selection:is_selected(quad) then
-        -- Draw a black outline first
-        love.graphics.setColor(0, 0, 0)
-        love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
         -- Use a dashed line to outline the quad
         love.graphics.setColor(255, 255, 255)
-        draw_dashed_line(quad, gui_state)
+        draw_dashed_line(quad, gui_state, state.display.zoom)
       else
         -- Use a simple line to outline the quad
         love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
@@ -351,11 +321,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
 
     local rect = get_dragged_rect(state, gui_state)
     love.graphics.setColor(255, 255, 255, 255)
-    love.graphics.push("all")
-    love.graphics.setLineStyle("rough")
-    love.graphics.setLineWidth(1/state.display.zoom)
-    draw_dashed_line(rect, gui_state)
-    love.graphics.pop()
+    draw_dashed_line(rect, gui_state, state.display.zoom)
 
     -- Highlight all quads that are enclosed in the dragged rect
     local keys, quad = iter_quads(state.quads)
