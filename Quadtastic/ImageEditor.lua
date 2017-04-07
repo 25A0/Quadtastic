@@ -87,28 +87,20 @@ local function show_quad(gui_state, state, quad, quadname)
     end
 
     love.graphics.setColor(255, 255, 255, 255)
-    -- We'll draw the quads differently if the viewport is zoomed out
-    -- all the way
-    if state.display.zoom == 1 then
-      if quad.w > 1 and quad.h > 1 then
-        love.graphics.rectangle("line", quad.x + .5, quad.y + .5, quad.w - 1, quad.h - 1)
-      else
-        love.graphics.rectangle("fill", quad.x, quad.y, quad.w, quad.h)
-      end
+
+    love.graphics.push("all")
+    love.graphics.setLineStyle("rough")
+    love.graphics.setLineWidth(1/state.display.zoom)
+    if quad == state.hovered or state.selection:is_selected(quad) then
+      -- Use a dashed line to outline the quad
+      love.graphics.setColor(255, 255, 255)
+      draw_dashed_line(quad, gui_state, state.display.zoom)
     else
-      love.graphics.push("all")
-      love.graphics.setLineStyle("rough")
-      love.graphics.setLineWidth(1/state.display.zoom)
-      if quad == state.hovered or state.selection:is_selected(quad) then
-        -- Use a dashed line to outline the quad
-        love.graphics.setColor(255, 255, 255)
-        draw_dashed_line(quad, gui_state, state.display.zoom)
-      else
-        -- Use a simple line to outline the quad
-        love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
-      end
-      love.graphics.pop()
+      -- Use a simple line to outline the quad
+      love.graphics.rectangle("line", quad.x, quad.y, quad.w, quad.h)
     end
+    love.graphics.pop()
+
   elseif type(quad) == "table" then
     -- If it's not a quad then it's a list of quads
     for k,v in pairs(quad) do
