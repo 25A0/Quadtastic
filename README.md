@@ -84,8 +84,8 @@ its rgb value.
     - [x] Licenses of used software
     - [x] Automatically put version and commit hash in plist
     - [x] MacOS
-    - [ ] Windows 32 bit
-    - [ ] Windows 64 bit
+    - [x] Windows 32 bit
+    - [ ] Windows 64 bit (wontfix unless there's a way to compile LFS for 64 bit)
     - [ ] Linux
     - [x] Icon
     - [x] Show Quadtastic in title bar
