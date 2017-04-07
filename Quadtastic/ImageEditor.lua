@@ -212,8 +212,6 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     -- Returns the directions in which a quad should be resized based on where
     -- the mouse was pressed
     local function get_resize_directions(quad)
-      local dir = {}
-
       -- Make a rough check to see if the mouse is near any edge
       if mx < quad.x - 1 or mx > quad.x + quad.w + 1 or
          my < quad.y - 1 or my > quad.y + quad.h + 1
@@ -221,14 +219,17 @@ local function select_tool(app, gui_state, state, img_w, img_h)
         return nil
       end
 
-      if math.abs(mx - quad.x) <= 1 then
+      local border = 2/state.display.zoom
+      local dir = {}
+
+      if math.abs(mx - quad.x) <= border then
         dir.w = true
-      elseif math.abs(mx - (quad.x + quad.w)) <= 1 then
+      elseif math.abs(mx - (quad.x + quad.w)) <= border then
         dir.e = true
       end
-      if math.abs(my - quad.y) <= 1 then
+      if math.abs(my - quad.y) <= border then
         dir.n = true
-      elseif math.abs(my - (quad.y + quad.h)) <= 1 then
+      elseif math.abs(my - (quad.y + quad.h)) <= border then
         dir.s = true
       end
       if not (dir.n or dir.e or dir.s or dir.w) then

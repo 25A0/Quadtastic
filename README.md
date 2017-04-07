@@ -160,6 +160,7 @@ instead of
 	 - [x] Automatically reload image when it changes on disk
 	 - [x] Automatically export new quad file whenever quads are changed
  - [x] Colors in Palette are callable tables to easily change the alpha values
+ - [x] Improve hitbox size to make it easier to move small quads around
  - [ ] Custom exporter for people who don't want to export to lua
 
 # Credits and tools used
