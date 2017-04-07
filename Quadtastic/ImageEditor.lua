@@ -54,18 +54,23 @@ local function draw_dashed_line(quad, gui_state, zoom)
   local t = gui_state.second
   local canvas_h = gui_state.style.dashed_line.horizontal.canvas
   local canvas_v = gui_state.style.dashed_line.vertical.canvas
-  local quad_top   = love.graphics.newQuad(0 + t*4, 0, quad.w * zoom, 1, 4, 1)
-  local quad_right = love.graphics.newQuad(0, 0 + t*4, 1, quad.h * zoom, 1, 4)
-  local quad_bottom= love.graphics.newQuad(2 - t*4, 0, quad.w * zoom, 1, 4, 1)
-  local quad_left  = love.graphics.newQuad(0, 2 - t*4, 1, quad.h * zoom, 1, 4)
+  local size = gui_state.style.dashed_line.size
+  local offset = 0
+  local quad_top   = love.graphics.newQuad(offset + t*size, 0, quad.w * zoom, 1, size, 1)
+  offset = math.fmod(offset + quad.w * zoom, size)
+  local quad_right = love.graphics.newQuad(0, offset + t*size, 1, quad.h * zoom, 1, size)
+  offset = math.fmod(offset + quad.h * zoom, size)
+  local quad_bottom= love.graphics.newQuad(offset + t*size, 0, quad.w * zoom, 1, size, 1)
+  offset = math.fmod(offset + quad.w * zoom, size)
+  local quad_left  = love.graphics.newQuad(0, offset + t*size, 1, quad.h * zoom, 1, size)
 
   local x, y, w, h = quad.x, quad.y, quad.w, quad.h
   local d = .5/zoom -- offset to center the line on the quad's border
   local s = 1/zoom -- scale factor
   love.graphics.draw(canvas_h, quad_top   , x     - d, y     - d, 0, s, s)
   love.graphics.draw(canvas_v, quad_right , x + w - d, y     - d, 0, s, s)
-  love.graphics.draw(canvas_h, quad_bottom, x     + d, y + h - d, 0, s, s)
-  love.graphics.draw(canvas_v, quad_left  , x     - d, y     + d, 0, s, s)
+  love.graphics.draw(canvas_h, quad_bottom, x + w + d, y + h - d, 0, -s, s)
+  love.graphics.draw(canvas_v, quad_left  , x     - d, y + h + d, 0, s, -s)
 end
 
 local function show_quad(gui_state, state, quad, quadname)

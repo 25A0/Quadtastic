@@ -91,26 +91,28 @@ function love.load()
     end)
   end
 
-  gui_state.style.dashed_line = { horizontal = {}, vertical = {}}
+  gui_state.style.dashed_line = { horizontal = {}, vertical = {}, size = 8}
   do
     local line = gui_state.style.dashed_line.horizontal
-    line.canvas = love.graphics.newCanvas(4, 1)
+    local size = gui_state.style.dashed_line.size
+    line.canvas = love.graphics.newCanvas(size, 1)
     line.spritebatch = love.graphics.newSpriteBatch(line.canvas, 4096)
     line.canvas:setWrap("repeat", "repeat")
     line.canvas:renderTo(function()
       love.graphics.clear(0, 0, 0)
-      love.graphics.rectangle("fill", 0, 0, 2, 1)
+      love.graphics.rectangle("fill", 0, 0, size/2, 1)
     end)
   end
 
   do
     local line = gui_state.style.dashed_line.vertical
-    line.canvas = love.graphics.newCanvas(1, 4)
+    local size = gui_state.style.dashed_line.size
+    line.canvas = love.graphics.newCanvas(1, size)
     line.spritebatch = love.graphics.newSpriteBatch(line.canvas, 4096)
     line.canvas:setWrap("repeat", "repeat")
     line.canvas:renderTo(function()
       love.graphics.clear(0, 0, 0)
-      love.graphics.rectangle("fill", 0, 0, 1, 2)
+      love.graphics.rectangle("fill", 0, 0, 1, size/2)
     end)
   end
 
