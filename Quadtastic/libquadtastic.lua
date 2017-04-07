@@ -33,8 +33,8 @@ local function create_palette(table, imagedata)
       t[k] = {imagedata:getPixel(v.x, v.y)}
       -- Make the table callable to easily modify the alpha value
       setmetatable(t[k], {
-        __call = function(table, alpha)
-          return {table[1], table[2], table[3], alpha or table[4] or 255}
+        __call = function(tab, alpha)
+          return {tab[1], tab[2], tab[3], alpha or tab[4] or 255}
         end,
       })
     elseif type(v) == "table" then

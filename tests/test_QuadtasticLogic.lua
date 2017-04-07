@@ -1,5 +1,7 @@
 -- stub for love.system.getOS()
-love = { system = { getOS = function() return "OS X" end}}
+love = { system = { getOS = function() return "OS X" end},
+         filesystem = { getUserDirectory = function() return "/" end}
+       }
 local QuadtasticLogic = require("Quadtastic.QuadtasticLogic")
 local Selection = require("Quadtastic.Selection")
 local History = require("Quadtastic.History")
