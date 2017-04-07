@@ -119,8 +119,8 @@ thisyear=$(shell date "+%Y")
 update_license:
 	cp res/raw_mit_license.txt LICENSE.txt
 	test ${firstyear} = ${thisyear} && \
-	sed -i -e 's/\[years\]/${thisyear}/' LICENSE.txt || \
-	sed -i -e 's/\[years\]/${firstyear}-${thisyear}/' LICENSE.txt
+	sed -i '' -e 's/\[years\]/${thisyear}/' LICENSE.txt || \
+	sed -i '' -e 's/\[years\]/${firstyear}-${thisyear}/' LICENSE.txt
 	head -1 LICENSE.txt > Quadtastic/res/copyright.txt
 
 # Build as $ make release-0.2.0
