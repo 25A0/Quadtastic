@@ -83,7 +83,7 @@ instead of
  - [x] Implement scroll bars
  - [x] Use CTRL+Mousewheel to zoom
  - [x] Use MMB to pan image
- - [ ] Drag and drop quads in the quad list to form groups
+ - [ ] Drag and drop quads in the quad list to form groups (won't implement)
  - [x] Selectable text in input fields
  - [x] Select all text when editing quad name
  - [x] Use common keys (Return, ESC) to confirm or cancel dialogs
@@ -153,7 +153,7 @@ instead of
        that identifies the type of element. Unfortunately, we will have to
        include that key in the exported quad file, since we otherwise run into
        the same problem when using the quads.
- - [ ] Fix error handling when image cannot be loaded
+ - [x] Fix error handling when image cannot be loaded
  - [ ] Make quad list prettier
  - [x] Make quad groups in quad list collapsible and expandable
  - [x] ![Turbo-Workflow](screenshots/turboworkflow.gif)

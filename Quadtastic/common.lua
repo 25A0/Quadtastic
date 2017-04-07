@@ -6,7 +6,7 @@ local common = {}
 function common.load_imagedata(filepath)
   local filehandle, err = io.open(filepath, "rb")
   if err then
-    error(err)
+    error(err, 0)
   end
   local filecontent = filehandle:read("*a")
   filehandle:close()

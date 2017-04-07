@@ -734,7 +734,7 @@ function QuadtasticLogic.transitions(interface) return {
     local success, more = pcall(function()
       local filehandle, err = io.open(filepath, "r")
       if err then
-        error(err)
+        error(err, 0)
       end
 
       if filehandle then
