@@ -54,6 +54,8 @@ local function draw_dashed_line(quad, gui_state, zoom)
   local t = gui_state.second
   local canvas_h = gui_state.style.dashed_line.horizontal.canvas
   local canvas_v = gui_state.style.dashed_line.vertical.canvas
+  local spritebatch_h = gui_state.style.dashed_line.horizontal.spritebatch
+  local spritebatch_v = gui_state.style.dashed_line.vertical.spritebatch
   local size = gui_state.style.dashed_line.size
   local offset = 0
   local quad_top   = love.graphics.newQuad(offset + t*size, 0, quad.w * zoom, 1, size, 1)
@@ -67,10 +69,10 @@ local function draw_dashed_line(quad, gui_state, zoom)
   local x, y, w, h = quad.x, quad.y, quad.w, quad.h
   local d = .5/zoom -- offset to center the line on the quad's border
   local s = 1/zoom -- scale factor
-  love.graphics.draw(canvas_h, quad_top   , x     - d, y     - d, 0, s, s)
-  love.graphics.draw(canvas_v, quad_right , x + w - d, y     - d, 0, s, s)
-  love.graphics.draw(canvas_h, quad_bottom, x + w + d, y + h - d, 0, -s, s)
-  love.graphics.draw(canvas_v, quad_left  , x     - d, y + h + d, 0, s, -s)
+  spritebatch_h:add(quad_top   , x     - d, y     - d, 0, s, s)
+  spritebatch_v:add(quad_right , x + w - d, y     - d, 0, s, s)
+  spritebatch_h:add(quad_bottom, x + w + d, y + h - d, 0, -s, s)
+  spritebatch_v:add(quad_left  , x     - d, y + h + d, 0, s, -s)
 end
 
 local function show_quad(gui_state, state, quad, quadname)
@@ -446,6 +448,13 @@ ImageEditor.draw = function(app, gui_state, state, x, y, w, h)
     if gui_state and gui_state.input then
       handle_input(app, gui_state, state, img_w, img_h)
     end
+
+    -- Draw dashed lines, then clear spritebatches
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.draw(gui_state.style.dashed_line.horizontal.spritebatch)
+    gui_state.style.dashed_line.horizontal.spritebatch:clear()
+    love.graphics.draw(gui_state.style.dashed_line.vertical.spritebatch)
+    gui_state.style.dashed_line.vertical.spritebatch:clear()
 
     content_w = img_w * state.display.zoom
     content_h = img_h * state.display.zoom

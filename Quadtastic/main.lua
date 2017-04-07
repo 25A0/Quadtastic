@@ -96,7 +96,7 @@ function love.load()
     local line = gui_state.style.dashed_line.horizontal
     local size = gui_state.style.dashed_line.size
     line.canvas = love.graphics.newCanvas(size, 1)
-    line.spritebatch = love.graphics.newSpriteBatch(line.canvas, 4096)
+    line.spritebatch = love.graphics.newSpriteBatch(line.canvas, 4096, "stream")
     line.canvas:setWrap("repeat", "repeat")
     line.canvas:renderTo(function()
       love.graphics.clear(0, 0, 0)
@@ -108,7 +108,7 @@ function love.load()
     local line = gui_state.style.dashed_line.vertical
     local size = gui_state.style.dashed_line.size
     line.canvas = love.graphics.newCanvas(1, size)
-    line.spritebatch = love.graphics.newSpriteBatch(line.canvas, 4096)
+    line.spritebatch = love.graphics.newSpriteBatch(line.canvas, 4096, "stream")
     line.canvas:setWrap("repeat", "repeat")
     line.canvas:renderTo(function()
       love.graphics.clear(0, 0, 0)
