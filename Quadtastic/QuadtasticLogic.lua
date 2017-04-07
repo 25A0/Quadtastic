@@ -104,6 +104,8 @@ function QuadtasticLogic.transitions(interface) return {
 
         local new_keys = {}
         for k in string.gmatch(new_key, "([^.]+)") do
+          -- Convert the key to a number if possible
+          k = tonumber(k) or k
           table.insert(new_keys, k)
         end
         -- Check if that key already exists
