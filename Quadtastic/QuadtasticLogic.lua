@@ -4,6 +4,7 @@ local History = require(current_folder.. ".History")
 local table = require(current_folder.. ".tableplus")
 local libquadtastic = require(current_folder.. ".libquadtastic")
 local common = require(current_folder.. ".common")
+local os = require(current_folder.. ".os")
 local S = require(current_folder.. ".strings")
 
 -- Shared library
@@ -12,6 +13,7 @@ local lfs = require("lfs")
 local function add_path_to_recent_files(interface, data, filepath)
   -- Insert new file into list of recently loaded files
   -- Remove duplicates from recent files
+  filepath = os.path(filepath)
   local remaining_files = {filepath}
   for _,v in ipairs(data.settings.recent) do
     -- Limit the number of recent files to 10
@@ -769,6 +771,7 @@ function QuadtasticLogic.transitions(interface) return {
   end,
 
   load_image = function(app, data, filepath, callback)
+    filepath = os.path(filepath)
     local success, more = pcall(common.load_image, filepath)
 
     -- success, more = pcall(love.graphics.newImage, data)

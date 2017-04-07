@@ -11,6 +11,8 @@ local Window = require(current_folder .. ".Window")
 local imgui = require(current_folder .. ".imgui")
 local licenses = require(current_folder .. ".res.licenses")
 local S = require(current_folder .. ".strings")
+local common = require(current_folder .. ".common")
+local os = require(current_folder .. ".os")
 
 -- Shared library
 local lfs = require("lfs")
@@ -253,12 +255,13 @@ function Dialog.open_file(basepath)
 
     if not data.filelist then
       local success
+      data.basepath = os.path(data.basepath)
       -- The given basepath might be a file. In that case set the basepath to
       -- the containing directory, and set the rest as the chosen file
       local mode, err = lfs.attributes(data.basepath, "mode")
       if mode then
         if mode == "file" then
-          local prev_basepath, filename = string.gmatch(data.basepath, "(.*/)([^/]*)")()
+          local prev_basepath, filename = common.split(data.basepath)
           success, err = switch_to(data, prev_basepath)
           if success then
             data.chosen_file = {
@@ -294,7 +297,7 @@ function Dialog.open_file(basepath)
 
       if data.committed_file then
         if data.committed_file.type == "directory" then
-          new_basepath = data.basepath .. "/" .. data.committed_file.name
+          new_basepath = data.basepath .. os.pathsep .. data.committed_file.name
         elseif data.committed_file.type == "file" then
           app.open_file.respond(S.buttons.open)
         end
@@ -333,7 +336,7 @@ function Dialog.open_file(basepath)
   local transitions = {
     -- luacheck: no unused args
     respond = function(app, data, response)
-      return response, (data.basepath or "") .. "/" .. (
+      return response, (data.basepath or "") .. os.pathsep .. (
         data.committed_file and data.committed_file.name or ""
       )
     end,
@@ -369,15 +372,13 @@ function Dialog.save_file(basepath)
 
     if not data.filelist then
       local success
-
+      data.basepath = os.path(data.basepath)
       -- The given basepath might be a file. In that case set the basepath to
       -- the containing directory, and set the rest as the chosen file
       local mode, err = lfs.attributes(data.basepath, "mode")
       if mode then
         if mode == "file" then
-          local prev_basepath, filename = string.gmatch(
-            data.basepath, "(.*/)([^/]*)"
-          )()
+          local prev_basepath, filename = common.split(data.basepath)
           success, err = switch_to(data, prev_basepath)
           if success then
             data.chosen_file = {
@@ -432,7 +433,7 @@ function Dialog.save_file(basepath)
       end
 
       if data.committed_file then
-        local combined_path = data.basepath .. "/" .. data.committed_file.name
+        local combined_path = data.basepath .. os.pathsep .. data.committed_file.name
         if data.committed_file.type == "directory" then
           new_basepath = combined_path
         elseif data.committed_file.type == "new" then
@@ -455,7 +456,7 @@ function Dialog.save_file(basepath)
                            data.editing_filename
           if filename then
             local filetype = lfs.attributes(filename, "mode")
-            local filepath = (data.basepath or "") .. "/" .. (filename or "")
+            local filepath = (data.basepath or "") .. os.pathsep .. (filename or "")
             if filetype == "file" then
               app.save_file.override(filepath)
             elseif filetype == "directory" then

@@ -55,4 +55,16 @@ function os.cursors()
   return cursors
 end
 
+-- on windows, replaces backslashes in path by slashes and removes trailing slashes
+-- to work around a bug in LFS
+function os.path(path)
+  if os.win then
+    path = string.gsub(path, "\\", "/") -- replace path separators by slashes
+    path = string.gsub(path, "([^:])/$", "%1") -- remove trailing slash, except it's something like D:/
+  end
+  return path
+end
+
+os.pathsep = os.win and "\\" or "/"
+
 return os
