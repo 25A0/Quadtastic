@@ -52,8 +52,6 @@ end
 
 local function draw_dashed_line(quad, gui_state, zoom)
   local t = gui_state.second
-  local canvas_h = gui_state.style.dashed_line.horizontal.canvas
-  local canvas_v = gui_state.style.dashed_line.vertical.canvas
   local spritebatch_h = gui_state.style.dashed_line.horizontal.spritebatch
   local spritebatch_v = gui_state.style.dashed_line.vertical.spritebatch
   local size = gui_state.style.dashed_line.size
