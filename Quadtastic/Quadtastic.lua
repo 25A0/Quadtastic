@@ -372,14 +372,14 @@ Quadtastic.draw = function(app, state, gui_state)
                     -- Clear the list of new quads to make the accumulation process
                     -- a bit easier
                     new_quads = {}
-                    for _,v in pairs(parent) do
+                    for k,v in pairs(parent) do
                       if v == clicked then
                         found_new = true
                       end
                       if v == state.previous_clicked then
                         found_previous = true
                       end
-                      if found_new or found_previous then
+                      if found_new or found_previous and k ~= "_META" then
                         table.insert(new_quads, v)
                       end
                       if found_new and found_previous then break end
@@ -510,7 +510,7 @@ Quadtastic.draw = function(app, state, gui_state)
   end Window.finish(gui_state, win_x, win_y, nil, {active = true, borderless = true})
 
   local function refresh_image_timestamp(data)
-    if not data.quads._META.image_path then return end
+    if not data.quads._META or not data.quads._META.image_path then return end
     local filepath = data.quads._META.image_path
     local current_timestamp = lfs.attributes(filepath, "modification")
     if current_timestamp ~= data.file_timestamps.image_latest then
