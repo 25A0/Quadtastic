@@ -675,7 +675,19 @@ function QuadtasticLogic.transitions(interface) return {
   end,
 
   save_as = function(app, data, callback)
-    local ret, filepath = interface.save_file(data.quadpath, "lua")
+    local basepath
+
+    if data.quadpath then
+      basepath = data.quadpath
+    elseif data.quads and data.quads._META and data.quads._META.image_path then
+      basepath = common.split(data.quads._META.image_path)
+    elseif data.settings.latest_qua then
+      basepath = data.settings.latest_qua
+    else
+      basepath = love.filesystem.getUserDirectory()
+    end
+
+    local ret, filepath = interface.save_file(basepath, "lua")
     if ret == S.buttons.save then
       data.quadpath = filepath
       app.quadtastic.save(callback)
