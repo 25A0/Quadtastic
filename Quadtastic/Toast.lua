@@ -58,7 +58,7 @@ function Toast.draw(gui_state, label, bounds, start, duration, options)
   if not options then options = {} end
   options.alignment_v = "-"
   if not options.font_color then
-    options.font_color = {202, 222, 227}
+    options.font_color = gui_state.style.palette.shades.brightest
   end
   Text.draw(gui_state, x + border_size, y + border_size,
     textwidth, textheight, label, options)

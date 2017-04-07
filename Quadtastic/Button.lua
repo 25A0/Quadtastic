@@ -66,7 +66,7 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
   -- Print label
   if not options then options = {} end
   if not options.font_color then
-    options.font_color = {255, 255, 255, 255}
+    options.font_color = state.style.palette.shades.white
   end
   local next_x = x
   if iconquad then
@@ -128,10 +128,12 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
     clicked, pressed, hovered = handle_input(state, x, y, w, h, options)
     pressed = pressed or options and options.pressed
     if pressed then
-      local pressed_color = options and options.bg_color_pressed or {0, 0, 0, 90}
+      local pressed_color = options and options.bg_color_pressed or
+                            state.style.palette.shades.darkest(90)
       love.graphics.setColor(pressed_color)
     elseif hovered then
-      local hovered_color = options and options.bg_color_hovered or {202, 222, 227}
+      local hovered_color = options and options.bg_color_hovered or
+                            state.style.palette.shades.brightest
       love.graphics.setColor(hovered_color)
     elseif options and options.bg_color_default then
       love.graphics.setColor(options.bg_color_default)
@@ -149,7 +151,7 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
   -- Print label
   if not options then options = {} end
   if not options.font_color then
-    options.font_color = {255, 255, 255, 255}
+    options.font_color = state.style.palette.shades.white
   end
   local next_x = x
   if icons then

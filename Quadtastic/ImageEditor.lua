@@ -330,7 +330,7 @@ local function select_tool(app, gui_state, state, img_w, img_h)
 
     -- Highlight all quads that are enclosed in the dragged rect
     local keys, quad = iter_quads(state.quads)
-    love.graphics.setColor(82, 128, 191, 128)
+    love.graphics.setColor(gui_state.style.palette.shades.bright(128))
     while keys do
       if Rectangle.contains(rect, quad.x, quad.y, quad.w, quad.h) then
         love.graphics.rectangle("fill", quad.x, quad.y, quad.w, quad.h)

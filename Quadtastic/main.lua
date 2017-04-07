@@ -62,7 +62,6 @@ function love.load()
   gui_state.style.small_font = smol_font
   gui_state.style.med_font = med_font
   gui_state.style.font = med_font
-  gui_state.style.font_color = {32, 63, 73}
   gui_state.style.stylesheet = stylesheet
 
   gui_state.style.turboworkflow_deactivated = turboworkflow_deactivated
@@ -81,6 +80,11 @@ function love.load()
   gui_state.style.raw_quads = require("res/style")
   gui_state.style.quads = libquadtastic.import_quads(gui_state.style.raw_quads,
     stylesheet:getWidth(), stylesheet:getHeight())
+
+  gui_state.style.palette = libquadtastic.import_palette(gui_state.style.raw_quads.palette,
+    stylesheet)
+
+  gui_state.style.font_color = gui_state.style.palette.shades.darkest
 
   gui_state.style.backgroundcanvas = love.graphics.newCanvas(8, 8)
   do
@@ -139,7 +143,7 @@ function love.draw()
       if not is_active then imgui.cover_input(gui_state) end
       local f = state.draw
       -- Draw that state with the draw function
-      love.graphics.setColor(32, 63, 73, 60)
+      love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
       love.graphics.rectangle("fill", 0, 0, w, h)
       love.graphics.setColor(255, 255, 255, 255)
       f(app, state.data, gui_state, w, h)
@@ -168,10 +172,10 @@ function love.draw()
     local x, y = gui_state.transform:unproject(mx + 10, my + 10)
     x, y = math.floor(x), math.floor(y)
     -- Draw dark background for better readability
-    love.graphics.setColor(53, 53, 53, 192)
+    love.graphics.setColor(gui_state.style.palette.shades.darkest(192))
     love.graphics.rectangle("fill", x-2, y + 2,
                             Text.min_width(gui_state, gui_state.mousestring) + 4, 12)
-    imgui.push_style(gui_state, "font_color", {202, 222, 227})
+    imgui.push_style(gui_state, "font_color", gui_state.style.palette.shades.brightest)
     Text.draw(gui_state, x, y, nil, nil, gui_state.mousestring)
     imgui.pop_style(gui_state, "font_color")
     love.graphics.setCanvas()

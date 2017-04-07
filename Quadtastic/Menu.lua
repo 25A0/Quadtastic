@@ -153,7 +153,7 @@ local function draw_item_background(gui_state, h)
   local x = gui_state.layout.next_x
   local y = gui_state.layout.next_y
   local w = gui_state.layout.max_w
-  love.graphics.setColor(202, 222, 227)
+  love.graphics.setColor(gui_state.style.palette.shades.brightest)
   love.graphics.rectangle("fill", x, y, w, h)
 end
 
@@ -161,10 +161,16 @@ function Menu.menu_item(gui_state, label, options)
   draw_item_background(gui_state, 16)
   options = options or {}
   if options.disabled then
-    options.font_color = {128, 128, 128}
-  elseif not options.font_color then options.font_color = {0, 0, 0, 255} end
-  if not options.bg_color_hovered then options.bg_color_hovered = {68, 137, 156} end
-  if not options.bg_color_pressed then options.bg_color_pressed = {42, 82, 94} end
+    options.font_color = gui_state.style.palette.shades.bright
+  elseif not options.font_color then
+    options.font_color = gui_state.style.palette.shades.darkest
+  end
+  if not options.bg_color_hovered then
+    options.bg_color_hovered = gui_state.style.palette.shades.neutral
+  end
+  if not options.bg_color_pressed then
+    options.bg_color_pressed = gui_state.style.palette.shades.dark
+  end
 
   options.trigger_on_release = true
   local clicked, _, hovered = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
@@ -203,9 +209,9 @@ end
 function Menu.menubar_item(gui_state, label, options)
   options = options or {}
   if options.disabled then
-    options.font_color = {128, 128, 128}
+    options.font_color = gui_state.style.palette.shades.bright
   else
-    options.font_color = {0, 0, 0, 255}
+    options.font_color = gui_state.style.palette.shades.darkest
   end
   options.trigger_on_release = true
   local clicked, _, hovered = Button.draw_flat(gui_state, nil, nil, nil, gui_state.layout.max_h,

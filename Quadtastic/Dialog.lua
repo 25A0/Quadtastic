@@ -46,7 +46,7 @@ end
 
 local function show_filelist(gui_state, scrollpane_state, filelist, chosen_file)
   local options = {}
-  options.font_color = {202, 222, 227}
+  options.font_color = gui_state.style.palette.shades.brightest
   options.alignment_v = "-"
 
   local committed_file
@@ -66,16 +66,16 @@ local function show_filelist(gui_state, scrollpane_state, filelist, chosen_file)
           local selected = chosen_file and chosen_file.name == file.name
 
           if selected then
-            love.graphics.setColor(32, 63, 73)
+            love.graphics.setColor(gui_state.style.palette.shades.darkest)
           elseif hovering then
-            love.graphics.setColor(42, 82, 94)
+            love.graphics.setColor(gui_state.style.palette.shades.dark)
           end
           if hovering or selected then
             love.graphics.rectangle("fill",
               gui_state.layout.next_x, gui_state.layout.next_y,
               row_width, row_height)
-            love.graphics.setColor(255, 255, 255)
           end
+          love.graphics.setColor(255, 255, 255)
 
           local x = gui_state.layout.next_x + 2
           if file.type == "directory" then
@@ -580,7 +580,7 @@ function Dialog.show_ack_dialog()
         Layout.next(gui_state, "|")
 
         do Frame.start(gui_state, nil, nil, 320, 150)
-          imgui.push_style(gui_state, "font_color", {202, 222, 227})
+          imgui.push_style(gui_state, "font_color", gui_state.style.palette.shades.brightest)
           do data.scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, data.scrollpane_state)
             do Layout.start(gui_state, nil, nil, nil, nil, {noscissor = true})
             for i, software in ipairs(licenses) do

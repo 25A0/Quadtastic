@@ -74,6 +74,21 @@ return {
     tl = {x = 96, y = 32, w = 2, h = 2},
     tr = {x = 110, y = 32, w = 2, h = 2},
   },
+  palette = {
+    image_editor = {
+      bg_A = {x = 2, y = 112, w = 2, h = 2},
+      bg_B = {x = 2, y = 114, w = 2, h = 2},
+    },
+    scrollpane_background = {x = 2, y = 116, w = 2, h = 2},
+    shades = {
+      bright = {x = 0, y = 118, w = 2, h = 2},
+      brightest = {x = 0, y = 120, w = 2, h = 2},
+      dark = {x = 0, y = 114, w = 2, h = 2},
+      darkest = {x = 0, y = 112, w = 2, h = 2},
+      neutral = {x = 0, y = 116, w = 2, h = 2},
+      white = {x = 0, y = 122, w = 2, h = 2},
+    },
+  },
   rowbackground = {
     collapsed = {
       default = {x = 17, y = 40, w = 7, h = 7},

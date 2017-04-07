@@ -42,7 +42,8 @@ Label.draw = function(state, x, y, w, h, label, options)
   h = h or 2 + #lines * line_height
 
   -- Print label
-  local fontcolor = options and options.font_color or {32, 63, 73, 255}
+  local fontcolor = options and options.font_color or
+                    state.style.palette.shades.darkest
   local total_text_height = line_height * #lines
   local margin_y = (h - total_text_height) / 2
   love.graphics.setColor(fontcolor)

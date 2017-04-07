@@ -319,9 +319,9 @@ Inputfield.draw = function(state, x, y, w, h, content, options)
   local text = content
   if #content == 0 and options and options.ghost_text then
     text = options.ghost_text
-    imgui.push_style(state, "font_color", {202, 222, 227, 128})
+    imgui.push_style(state, "font_color", state.style.palette.shades.brightest(128))
   else
-    imgui.push_style(state, "font_color", {202, 222, 227})
+    imgui.push_style(state, "font_color", state.style.palette.shades.brightest)
   end
   Text.draw(state, text_x, y + margin_y, nil, nil, text, options)
   imgui.pop_style(state, "font_color")
