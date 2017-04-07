@@ -28,6 +28,12 @@ local function create_palette(table, imagedata)
     if libquadtastic.is_quad(v) then
       -- Grab the pixel color of the quad's upper left corner
       t[k] = {imagedata:getPixel(v.x, v.y)}
+      -- Make the table callable to easily modify the alpha value
+      setmetatable(t[k], {
+        __call = function(table, alpha)
+          return {table[1], table[2], table[3], alpha or table[4] or 255}
+        end,
+      })
     elseif type(v) == "table" then
       -- Recursively add the quads stored in this table
       t[k] = create_palette(v, imagedata)

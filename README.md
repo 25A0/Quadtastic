@@ -49,6 +49,20 @@ its rgb value.
 	love.graphics.circle("fill", 400, 100, 50)
 ```
 
+The colors are stored as tables containing the rgba values in range 0-255.
+These tables are callable to make it easy to change the alpha value on the fly.
+That means that you can do this
+```lua
+  love.graphics.setColor(palette.highlight(128))
+```
+instead of
+```lua
+  local transparent_highlight = palette.highlight
+  transparent_highlight[4] = 128
+  love.graphics.setColor(transparent_highlight)
+```
+
+
 ## Roadmap
 
  - [x] Select a file
@@ -85,7 +99,7 @@ its rgb value.
     - [x] Automatically put version and commit hash in plist
     - [x] MacOS
     - [x] Windows 32 bit
-    - [ ] Windows 64 bit (wontfix unless there's a way to compile LFS for 64 bit)
+    - [ ] Windows 64 bit (wontfix for now)
     - [x] Linux (works if lfs is installed with luarocks)
     - [x] Icon
     - [x] Show Quadtastic in title bar
@@ -103,7 +117,7 @@ its rgb value.
  - [ ] Make Export button glow when quads have changed since last export
  - [x] Show confirmation dialog when the user would lose changes by loading a
        new image or quad file
- - [ ] Test palette feature in libquadtastic
+ - [x] Test palette feature in libquadtastic
  - [x] Adjust center of the viewport after zooming
  - [x] Add file browser
  - [x] Add background to text drawn next to mouse cursor for better readability
@@ -139,11 +153,13 @@ its rgb value.
        that identifies the type of element. Unfortunately, we will have to
        include that key in the exported quad file, since we otherwise run into
        the same problem when using the quads.
+ - [ ] Fix error handling when image cannot be loaded
  - [ ] Make quad list prettier
  - [x] Make quad groups in quad list collapsible and expandable
  - [x] ![Turbo-Workflow](screenshots/turboworkflow.gif)
 	 - [x] Automatically reload image when it changes on disk
 	 - [x] Automatically export new quad file whenever quads are changed
+ - [x] Colors in Palette are callable tables to easily change the alpha values
  - [ ] Custom exporter for people who don't want to export to lua
 
 # Credits and tools used
