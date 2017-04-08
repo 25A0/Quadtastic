@@ -4,11 +4,15 @@
 
 There are currently no unreleased changes
 
+### Release 0.4.1, 2017-04-08
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.4.1)
+
+ - Remove roadmap from README and keep track of changes in changelog.md
+
 ### Release 0.4.0, 2017-04-08
 
 [Download](https://github.com/25A0/Quadtastic/releases/tag/0.4.0)
-
-
 
  - Distribution:
     - Windows 32 bit
