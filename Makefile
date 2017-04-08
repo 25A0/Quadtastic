@@ -165,6 +165,7 @@ release-%: test update_license
 	@cp .releasemessage changelog.md
 
 	@echo Review and commit changes made to changelog.md
+	@${EDITOR} changelog.md
 	git add -p changelog.md
 
 	git commit -m "Update chagnelog.md"
