@@ -62,6 +62,7 @@ instead of
   love.graphics.setColor(transparent_highlight)
 ```
 
+## [Changelog](./changelog.md)
 
 ## Roadmap
 

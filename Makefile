@@ -136,14 +136,41 @@ release-%: test update_license
 	# Write a message for release $*\n\
 	# Lines starting with # will be ignored\n\n\
 	" >> .tagmessage
-	@./changelog.sh >> .tagmessage
+	@echo "Changelog:" >> .tagmessage
+
+	@################################################################
+	@# If you're on linux, you will almost certainly need to change #
+	@# `sed -E` to `sed -r`. Sorry for that                         #
+	@################################################################
+	@cat changelog.md | sed -E '/^### Unreleased/,/^### Release/!d' \
+					  | sed -E '/^###/d' >> .tagmessage
 
 	@# Open the tag message in the editor before creating the tag.
 	# If you're using sublime text as your editor, make sure to pass the -w
 	# flag so that sublime text doesn't return until you close the edited
 	# tag message.
 	@${EDITOR} .tagmessage
+	@cp .tagmessage .releasemessage
 
-	# Signing tag
+	@# Now we use the composed tag message to update the changelog, so that
+	@# changelog and release notes are uniform.
+	@sed -i '' "/#.*/ d" .releasemessage
+	@sed -i '' "/Changelog:/ d" .releasemessage
+
+	@# Can't use multi-line sed commands in Make, so this is stored separately
+	@./changelog.sh $*
+
+	@#Now combine all of this to update the changelog
+	@sed -e '/### Release/,$$ !d' < changelog.md >> .releasemessage
+	@cp .releasemessage changelog.md
+
+	@echo Review and commit changes made to changelog.md
+	git add -p changelog.md
+
+	git commit -m "Update chagnelog.md"
+
+	@# Signing tag
 	@git tag -s $* -F .tagmessage
+
 	@rm .tagmessage
+	@rm .releasemessage
