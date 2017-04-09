@@ -29,7 +29,11 @@ check: ${APPNAME}/*.lua
 
 test: check ${TESTS}
 
-distfiles: dist/releases/${APPVERSION}/macos/${APPNAME}.app dist/releases/${APPVERSION}/windows/${APPNAME}.zip dist/releases/${APPVERSION}/crossplatform/${APPNAME}.zip
+distfiles: test
+distfiles: dist/releases/${APPVERSION}/macos/${APPNAME}.app
+distfiles: dist/releases/${APPVERSION}/windows/${APPNAME}.zip
+distfiles: dist/releases/${APPVERSION}/crossplatform/${APPNAME}.zip
+distfiles: dist/releases/${APPVERSION}/love/${APPNAME}.love
 
 dist/releases/${APPVERSION}/macos/${APPNAME}.app: dist/macos/${APPNAME}.app
 	mkdir -p dist/releases/${APPVERSION}/macos
@@ -46,6 +50,10 @@ dist/releases/${APPVERSION}/crossplatform/${APPNAME}.zip: dist/${APPNAME}.love
 
 	cd dist/releases/${APPVERSION}/crossplatform;\
 	zip ${APPNAME}.zip -Z store -m -r .
+
+dist/releases/${APPVERSION}/love/${APPNAME}.love: dist/${APPNAME}.love
+	mkdir -p dist/releases/${APPVERSION}/love
+	cp dist/${APPNAME}.love dist/releases/${APPVERSION}/love/
 
 dist/${APPNAME}.love: ${APPNAME}/*.lua app_resources
 	cd ${APPNAME}; zip ../dist/${APPNAME}.love -Z store -FS -r . -x .\*
