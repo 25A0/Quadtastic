@@ -188,3 +188,16 @@ release-%: test update_license
 
 	@rm .tagmessage
 	@rm .releasemessage
+
+publish: distfiles
+	# Check that the version to be released is tagged.
+	@if [[ ! ${APPVERSION} =~ ^[0-9]+.[0-9]+.[0-9]+$$ ]] ; then\
+	  echo "Error: Cannot publish an untagged commit."; false;\
+	fi
+	# Uses itch.io's butler to push dist files to the Quadtastic page on itch.io
+	butler push dist/releases/${APPVERSION}/windows/${APPNAME}.zip \
+	       25a0/quadtastic:windows --userversion ${APPVERSION}
+	butler push dist/releases/${APPVERSION}/macos \
+	       25a0/quadtastic:osx     --userversion ${APPVERSION}
+	butler push dist/releases/${APPVERSION}/love \
+	       25a0/quadtastic:love     --userversion ${APPVERSION}
