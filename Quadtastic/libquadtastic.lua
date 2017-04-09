@@ -69,32 +69,37 @@ end
 function libquadtastic.create_palette(table, image)
 
   local function create_palette(tab, imagedata)
-    local palette = {}
 
-    for k,v in pairs(tab) do
-      if libquadtastic.is_quad(v) then
-        -- Grab the pixel color of the quad's upper left corner
-        palette[k] = {imagedata:getPixel(v.x, v.y)}
-        -- Make the table callable to easily modify the alpha value
-        setmetatable(palette[k], {
-          __call = function(t, alpha)
-            return {t[1], t[2], t[3], alpha or t[4]}
-          end,
-        })
-      elseif type(v) == "table" then
+    if libquadtastic.is_quad(tab) then
+      -- Grab the pixel color of the quad's upper left corner
+      local color = {imagedata:getPixel(tab.x, tab.y)}
+      -- Make the table callable to easily modify the alpha value
+      setmetatable(color, {
+        __call = function(t, alpha)
+          return {t[1], t[2], t[3], alpha or t[4]}
+        end,
+      })
+      return color
+
+    elseif type(tab) == "table" then
+      local palette = {}
+      for k,v in pairs(tab) do
         -- Recursively add the quads stored in this table
         palette[k] = create_palette(v, imagedata)
       end
+      return palette
+
     end
-    return palette
   end
 
   local imagedata
+
   if image:isCompressed() then
     error("Cannot currently handle compressed images")
   else
     imagedata = image:getData()
   end
+
   return create_palette(table, imagedata)
 end
 
