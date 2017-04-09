@@ -2,7 +2,7 @@ TESTS := $(shell find tests -type f -name "test_*.lua")
 
 APPNAME = Quadtastic
 APPIDENTIFIER = com.25a0.quadtastic
-APPVERSION = $(shell git describe --abbrev=0 --tags)-$(shell git log -1 --pretty=format:%h )
+APPVERSION = $(shell git describe --tags)
 APPCOPYRIGHT = 2017 Moritz Neikes
 macos-love-distname = love-0.10.2-macosx-x64
 windows-love-distname = love-0.10.2-win32
