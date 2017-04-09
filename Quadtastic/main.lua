@@ -78,10 +78,10 @@ function love.load()
 
   gui_state.style.icon = icon
   gui_state.style.raw_quads = require("res/style")
-  gui_state.style.quads = libquadtastic.import_quads(gui_state.style.raw_quads,
+  gui_state.style.quads = libquadtastic.create_quads(gui_state.style.raw_quads,
     stylesheet:getWidth(), stylesheet:getHeight())
 
-  gui_state.style.palette = libquadtastic.import_palette(gui_state.style.raw_quads.palette,
+  gui_state.style.palette = libquadtastic.create_palette(gui_state.style.raw_quads.palette,
     stylesheet)
 
   gui_state.style.font_color = gui_state.style.palette.shades.darkest

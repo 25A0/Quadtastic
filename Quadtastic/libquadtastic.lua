@@ -21,8 +21,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ]]
+
+
+
+-- -------------------------------------------------------------------------- --
+--    MORE DOCUMENTATION IS AVAILABLE ON https://github.com/25a0/Quadtastic   --
+-- -------------------------------------------------------------------------- --
+
 local libquadtastic = {}
 
+-- Decides whether the given value is a valid quad.
 function libquadtastic.is_quad(quad)
   return type(quad) == "table" and quad.x and type(quad.x) == "number" and
                                    quad.y and type(quad.y) == "number" and
@@ -34,41 +42,53 @@ function libquadtastic.get_metainfo(table)
   return table["_META"] or {}
 end
 
-function libquadtastic.import_quads(table, width, height)
+-- Creates LOVE quads from the raw quads that are defined in the given table.
+-- width and height are the dimensions of the spritesheet for which the quads
+-- are defined.
+-- Returns a new table that is structured equally to the input table, but
+-- contains Quad objects instead of the raw quads.
+function libquadtastic.create_quads(table, width, height)
   local t = {}
   for k,v in pairs(table) do
     if libquadtastic.is_quad(v) then
       t[k] = love.graphics.newQuad(v.x, v.y, v.w, v.h, width, height)
     elseif type(v) == "table" then
       -- Recursively add the quads stored in this table
-      t[k] = libquadtastic.import_quads(v, width, height)
+      t[k] = libquadtastic.create_quads(v, width, height)
     end
   end
   return t
 end
 
-local function create_palette(table, imagedata)
-  local t = {}
+-- Creates a color palette from the quads that are defined in the given table.
+-- Returns a new table which contains the RGBA value of the upper left corner of
+-- each defined quad in the input table.
+-- The defined colors are stored as a table, containing the R, G, B and A
+-- component of the color at index 1 through 4. Furthermore, each color is
+-- "callable", which makes it easier to change the alpha value on the fly.
+function libquadtastic.create_palette(table, image)
 
-  for k,v in pairs(table) do
-    if libquadtastic.is_quad(v) then
-      -- Grab the pixel color of the quad's upper left corner
-      t[k] = {imagedata:getPixel(v.x, v.y)}
-      -- Make the table callable to easily modify the alpha value
-      setmetatable(t[k], {
-        __call = function(tab, alpha)
-          return {tab[1], tab[2], tab[3], alpha or tab[4]}
-        end,
-      })
-    elseif type(v) == "table" then
-      -- Recursively add the quads stored in this table
-      t[k] = create_palette(v, imagedata)
+  local function create_palette(tab, imagedata)
+    local palette = {}
+
+    for k,v in pairs(tab) do
+      if libquadtastic.is_quad(v) then
+        -- Grab the pixel color of the quad's upper left corner
+        palette[k] = {imagedata:getPixel(v.x, v.y)}
+        -- Make the table callable to easily modify the alpha value
+        setmetatable(palette[k], {
+          __call = function(t, alpha)
+            return {t[1], t[2], t[3], alpha or t[4]}
+          end,
+        })
+      elseif type(v) == "table" then
+        -- Recursively add the quads stored in this table
+        palette[k] = create_palette(v, imagedata)
+      end
     end
+    return palette
   end
-  return t
-end
 
-function libquadtastic.import_palette(table, image)
   local imagedata
   if image:isCompressed() then
     error("Cannot currently handle compressed images")
