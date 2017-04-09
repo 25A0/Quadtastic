@@ -130,6 +130,11 @@ update_license:
 	sed -i '' -e 's/\[years\]/${thisyear}/' LICENSE.txt || \
 	sed -i '' -e 's/\[years\]/${firstyear}-${thisyear}/' LICENSE.txt
 	head -1 LICENSE.txt > Quadtastic/res/copyright.txt
+	test ${firstyear} = ${thisyear} && \
+	sed -i '' -e 's/Copyright (c) .* Moritz Neikes/Copyright (c) ${thisyear} Moritz Neikes/' \
+	    Quadtastic/libquadtastic.lua || \
+	sed -i '' -e 's/Copyright (c) .* Moritz Neikes/Copyright (c) ${firsyear}-${thisyear} Moritz Neikes/' \
+	    Quadtastic/libquadtastic.lua
 
 # Build as $ make release-0.2.0
 release-%: test update_license
