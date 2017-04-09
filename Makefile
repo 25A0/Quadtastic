@@ -105,7 +105,7 @@ dist/res/%.icns: res/%.ase
 
 aseprite=/Applications/Aseprite.app/Contents/MacOS/aseprite
 screenshots/turboworkflow.gif: res/turboworkflow-activated.ase Makefile
-	${aseprite} -b res/turboworkflow-activated.ase --scale 2 --save-as screenshots/turboworkflow.gif
+	${aseprite} -b res/turboworkflow-activated.ase --scale 1 --save-as screenshots/turboworkflow.gif
 
 ${APPNAME}/res/turboworkflow-activated.png: res/turboworkflow-activated.ase
 	${aseprite} -b res/turboworkflow-activated.ase --sheet ${APPNAME}/res/turboworkflow-activated.png
