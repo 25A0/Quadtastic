@@ -57,7 +57,7 @@ local function create_palette(table, imagedata)
       -- Make the table callable to easily modify the alpha value
       setmetatable(t[k], {
         __call = function(tab, alpha)
-          return {tab[1], tab[2], tab[3], alpha or tab[4] or 255}
+          return {tab[1], tab[2], tab[3], alpha or tab[4]}
         end,
       })
     elseif type(v) == "table" then
