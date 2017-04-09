@@ -824,6 +824,7 @@ function QuadtasticLogic.transitions(interface) return {
   show_ack_dialog = function(app, data)
     interface.show_ack_dialog()
   end,
+
 }
 end
 

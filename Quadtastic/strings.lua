@@ -24,6 +24,7 @@ strings.report_email = "moritz@25a0.com"
 strings.toast = {
   saved_as = f "Saved as %s",
   reloaded = f "Reloaded %s",
+  copied_to_clipboard = "Copied to clipboard",
 }
 
 strings.menu = {
@@ -45,6 +46,9 @@ strings.menu = {
     }),
   help = menu_table("Help", {
       github = "GitHub",
+      libquadtastic = menu_table("libquadtastic.lua", {
+        copy = "Copy to clipboard",
+      }),
       report = menu_table("Report a bug", {
           github = "via GitHub",
           email = "via email",

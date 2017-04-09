@@ -175,6 +175,14 @@ Quadtastic.draw = function(app, state, gui_state)
         if Menu.action_item(gui_state, S.menu.help.github) then
           love.system.openURL(S.github_url)
         end
+        if Menu.menu_start(gui_state, w/4, h-12, S.menu.help.libquadtastic()) then
+          if Menu.action_item(gui_state, S.menu.help.libquadtastic.copy) then
+            local content = love.filesystem.read("libquadtastic.lua")
+            love.system.setClipboardText(content)
+            imgui.show_toast(gui_state, S.toast.copied_to_clipboard, nil, 2)
+          end
+          Menu.menu_finish(gui_state, w/4, h-12)
+        end
         if Menu.menu_start(gui_state, w/4, h - 12, S.menu.help.report()) then
 
           if Menu.action_item(gui_state, S.menu.help.report.github) then
