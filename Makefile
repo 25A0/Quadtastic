@@ -166,56 +166,65 @@ check_license:
 
 # Build as $ make release-0.2.0
 release-%: test check_license
-	# Releasing $*
 	@# Only proceed if that version doesn't already exist
 	@test ! -f .git/refs/tags/$* || \
 	(echo "Version $* is already released"; exit 1)
 
+	@printf "\e[1mReleasing $*\e[0m\n"
+	@printf "Press CTRL-C at any time to cancel the release\n"
+
 	@# Prepare tag message
-	@echo 'Release $*\n' > .tagmessage
+	@mkdir -p .tmp
+	@echo 'Release $*\n' > .tmp/tagmessage
+
+	@printf "\e[1m1. Write release message\e[0m\n"
 	@printf "\
 	# Write a message for release $*\n\
 	# Lines starting with # will be ignored\n\n\
-	" >> .tagmessage
-	@echo "Changelog:" >> .tagmessage
+	" >> .tmp/tagmessage
+	@echo "Changelog:" >> .tmp/tagmessage
 
 	@################################################################
 	@# If you're on linux, you will almost certainly need to change #
 	@# `sed -E` to `sed -r`. Sorry for that                         #
 	@################################################################
 	@cat changelog.md | sed -E '/^### Unreleased/,/^### Release/!d' \
-					  | sed -E '/^###/d' >> .tagmessage
+					  | sed -E '/^###/d' >> .tmp/tagmessage
 
 	@# Open the tag message in the editor before creating the tag.
-	# If you're using sublime text as your editor, make sure to pass the -w
-	# flag so that sublime text doesn't return until you close the edited
-	# tag message.
-	@${EDITOR} .tagmessage
-	@cp .tagmessage .releasemessage
+	@# If you're using sublime text as your editor, make sure to pass the -w
+	@# flag so that sublime text doesn't return until you close the edited
+	@# tag message.
+	@${EDITOR} .tmp/tagmessage
+	@cp .tmp/tagmessage .tmp/releasemessage
 
 	@# Now we use the composed tag message to update the changelog, so that
 	@# changelog and release notes are uniform.
-	@sed -i '' "/#.*/ d" .releasemessage
-	@sed -i '' "/Changelog:/ d" .releasemessage
+	@sed -i '' "/#.*/ d" .tmp/releasemessage
+	@sed -i '' "/Changelog:/ d" .tmp/releasemessage
 
 	@# Can't use multi-line sed commands in Make, so this is stored separately
 	@./changelog.sh $*
 
 	@#Now combine all of this to update the changelog
-	@sed -e '/### Release/,$$ !d' < changelog.md >> .releasemessage
-	@cp .releasemessage changelog.md
+	@sed -E '1,/### Unreleased/ !d' < changelog.md > .tmp/planned
+	@sed -E '/### Release/,$$ !d' < changelog.md > .tmp/older
+	@cat -s .tmp/planned .tmp/releasemessage .tmp/older > .tmp/changelog
 
-	@echo Review and commit changes made to changelog.md
-	@${EDITOR} changelog.md
+	@printf "\e[1m2. Review new changelog\e[0m\n"
+	@${EDITOR} .tmp/changelog
+	@printf "\e[1m3. Commit changes to changelog\e[0m\n"
+	@cp .tmp/changelog changelog.md
 	git add -p changelog.md
 
-	git commit -m "Update chagnelog.md"
+	git commit -m "Update changelog.md"
 
 	@# Signing tag
-	@git tag -s $* -F .tagmessage
+	@printf "\e[1m4. Tag release\e[0m\n"
+	@git tag -s $* -F .tmp/tagmessage
 
-	@rm .tagmessage
-	@rm .releasemessage
+	@rm -rf .tmp
+	@printf "\e[1mAll done.\e[0m You can now run 'make publish' to publish version $*\n"
 
 publish: distfiles
 	# Check that the version to be released is tagged.
