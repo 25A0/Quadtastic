@@ -38,6 +38,7 @@ distfiles: dist/releases/${APPVERSION}/macos/${APPNAME}.app
 distfiles: dist/releases/${APPVERSION}/windows/${APPNAME}.zip
 distfiles: dist/releases/${APPVERSION}/crossplatform/${APPNAME}.zip
 distfiles: dist/releases/${APPVERSION}/love/${APPNAME}.love
+distfiles: dist/releases/${APPVERSION}/libquadtastic/libquadtastic.lua
 
 dist/releases/${APPVERSION}/macos/${APPNAME}.app: dist/macos/${APPNAME}.app
 	mkdir -p dist/releases/${APPVERSION}/macos
@@ -58,6 +59,10 @@ dist/releases/${APPVERSION}/crossplatform/${APPNAME}.zip: dist/${APPNAME}.love
 dist/releases/${APPVERSION}/love/${APPNAME}.love: dist/${APPNAME}.love
 	mkdir -p dist/releases/${APPVERSION}/love
 	cp dist/${APPNAME}.love dist/releases/${APPVERSION}/love/
+
+dist/releases/${APPVERSION}/libquadtastic/libquadtastic.lua: Quadtastic/libquadtastic.lua
+	mkdir -p dist/releases/${APPVERSION}/libquadtastic
+	cp Quadtastic/libquadtastic.lua dist/releases/${APPVERSION}/libquadtastic/
 
 dist/${APPNAME}.love: ${APPNAME}/*.lua app_resources
 	cd ${APPNAME}; zip ../dist/${APPNAME}.love -Z store -FS -r . -x .\*
@@ -211,8 +216,11 @@ publish: distfiles
 	fi
 	# Uses itch.io's butler to push dist files to the Quadtastic page on itch.io
 	butler push dist/releases/${APPVERSION}/windows/${APPNAME}.zip \
-	       25a0/quadtastic:windows --userversion ${APPVERSION}
+	       25a0/quadtastic:windows       --userversion ${APPVERSION}
 	butler push dist/releases/${APPVERSION}/macos \
-	       25a0/quadtastic:osx     --userversion ${APPVERSION}
+	       25a0/quadtastic:osx           --userversion ${APPVERSION}
 	butler push dist/releases/${APPVERSION}/love \
-	       25a0/quadtastic:love     --userversion ${APPVERSION}
+	       25a0/quadtastic:love          --userversion ${APPVERSION}
+	butler push dist/releases/${APPVERSION}/libquadtastic \
+	       25a0/quadtastic:libquadtastic --userversion ${APPVERSION}
+
