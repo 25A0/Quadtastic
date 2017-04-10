@@ -1,8 +1,28 @@
 ## Changelog
 
+### Planned
+
+ - Add palette tool that creates a quad for each unique color in the
+   selected region, and then asks for a palette name
+ - Use relative paths in quadfile's metadata if possible
+ - Show overview of keybindings
+
 ### Unreleased
 
 There are currently no unreleased changes
+
+### Release 0.4.2, 2017-04-10
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.4.2)
+
+ - Update README
+ - Make sure that importing palettes will still work in LOVE 0.11
+ - Add Makefile target to push builds to itch.io
+ - Add license to libquadtastic since it will likely be used separately from
+   the rest of the codebase
+ - Add menu item to copy current libquadtastic version to clipboard
+ - Add example project
+ - Add libquadtastic as distribution target
 
 ### Release 0.4.1, 2017-04-08
 
