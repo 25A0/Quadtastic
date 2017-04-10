@@ -7,7 +7,7 @@ APPCOPYRIGHT = 2017 Moritz Neikes
 macos-love-distname = love-0.10.2-macosx-x64
 windows-love-distname = love-0.10.2-win32
 
-.PHONY: clean test check tests/* run all app_resources run_debug update_license release* distfiles
+.PHONY: clean test check tests/* run all app_resources run_debug update_license release* distfiles publish screenshots/example.gif check_license
 
 all: run_debug
 
@@ -17,7 +17,11 @@ run: app_resources
 run_debug: DEBUG=DEBUG=true
 run_debug: run
 
-app_resources: ${APPNAME}/res/style.png ${APPNAME}/res/icon-32x32.png ${APPNAME}/res/turboworkflow-deactivated.png ${APPNAME}/res/turboworkflow-activated.png update_license
+app_resources: ${APPNAME}/res/style.png
+app_resources: ${APPNAME}/res/icon-32x32.png
+app_resources: ${APPNAME}/res/turboworkflow-deactivated.png
+app_resources: ${APPNAME}/res/turboworkflow-activated.png
+app_resources: check_license
 	# Store version info in ${APPNAME}/res
 	echo v${APPVERSION} > ${APPNAME}/res/version.txt
 
@@ -136,8 +140,19 @@ update_license:
 	sed -i '' -e 's/Copyright (c) .* Moritz Neikes/Copyright (c) ${firsyear}-${thisyear} Moritz Neikes/' \
 	    Quadtastic/libquadtastic.lua
 
+check_license:
+	@(test ${firstyear} = ${thisyear} && \
+	grep -q "Copyright (c) ${thisyear} Moritz" LICENSE.txt || \
+	grep -q "Copyright (c) ${firstyear}-${thisyear} Moritz" LICENSE.txt) || \
+	(echo "LICENSE.txt is not up to date" && false)
+
+	@(test ${firstyear} = ${thisyear} && \
+	grep -q "Copyright (c) ${thisyear} Moritz" Quadtastic/libquadtastic.lua || \
+	grep -q "Copyright (c) ${firstyear}-${thisyear} Moritz" Quadtastic/libquadtastic.lua) || \
+	(echo "License in Quadtastic/libquadtastic.lua is not up to date" && false)
+
 # Build as $ make release-0.2.0
-release-%: test update_license
+release-%: test check_license
 	# Releasing $*
 	@# Only proceed if that version doesn't already exist
 	@test ! -f .git/refs/tags/$* || \
