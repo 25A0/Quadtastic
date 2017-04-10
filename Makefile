@@ -125,6 +125,14 @@ ${APPNAME}/res/%.png: res/%.ase
 ${APPNAME}/res/icon-32x32.png: res/icon.ase
 	${aseprite} -b res/icon.ase --scale 2 --save-as ${APPNAME}/res/icon-32x32.png
 
+%.png: %.ase
+	${aseprite} -b $*.ase --save-as $*.png
+
+screenshots/example.gif:
+	ffmpeg -i screenshots/example.mov -r 10 -vcodec png screenshots/out-static-%04d.png 
+	time convert -verbose +dither -layers Optimize -resize 106x120\> screenshots/out-static*.png  GIF:- > screenshots/example.gif
+	rm screenshots/out-static-*
+
 tests/test_*.lua:
 	lua $@
 
