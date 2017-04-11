@@ -56,8 +56,7 @@ local function escape(str)
   return str
 end
 
-local function export_table_content(handle, tab, keys)
-  keys = keys or ""
+local function export_table_content(handle, tab, indentation)
   local numeric_keys = {}
   local string_keys = {}
   for k in pairs(tab) do
@@ -69,31 +68,34 @@ local function export_table_content(handle, tab, keys)
   table.sort(string_keys)
 
   local function export_pair(k, v)
-    local new_keys
+    handle(string.rep("  ", indentation))
     if type(k) == "string" then
-      new_keys = keys .. string.format("[\"%s\"]", escape(k))
-    elseif type(k) == "number" then
-      new_keys = keys .. string.format("[%s]", k)
-    else
+      if common.is_lua_Name(k) then
+        handle(string.format("%s = ", k))
+      else
+        handle(string.format("[\"%s\"] = ", escape(k)))
+      end
+    elseif type(k) ~= "number" then
       error("Cannot handle table keys of type "..type(k))
     end
-    handle("t", new_keys, " = ")
     if type(v) == "table" then
       -- Check if it is a quad table, in which case we use a simpler function
       if libquadtastic.is_quad(v) then
         export_quad(handle, v)
       else
-        handle("{}\n")
-        export_table_content(handle, v, new_keys)
+        handle("{\n")
+        export_table_content(handle, v, indentation+1)
+        handle(string.rep("  ", indentation))
+        handle("}")
       end
     elseif type(v) == "number" then
       handle(tostring(v))
     elseif type(v) == "string" then
-      handle("\"", escape(v), "\"")
+      handle("\"", v, "\"")
     else
       error("Cannot handle table values of type "..type(v))
     end
-    handle("\n")
+    handle(",\n")
   end
 
   for _, k in ipairs(numeric_keys) do
@@ -108,9 +110,9 @@ local function export_table_content(handle, tab, keys)
 end
 
 function common.export_table_content(handle, tab)
-  handle("local t = {}\n")
-  export_table_content(handle, tab, "")
-  handle("return t\n")
+  handle("return {\n")
+  export_table_content(handle, tab, 1)
+  handle("}\n")
 end
 
 function common.export_table_to_file(filehandle, tab)
