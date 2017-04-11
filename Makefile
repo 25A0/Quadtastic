@@ -7,7 +7,7 @@ APPCOPYRIGHT = 2017 Moritz Neikes
 macos-love-distname = love-0.10.2-macosx-x64
 windows-love-distname = love-0.10.2-win32
 
-.PHONY: clean test check tests/* run all app_resources run_debug update_license release* distfiles publish screenshots/example.gif check_license
+.PHONY: clean test check tests/* run all distfiles app_resources run_debug release* publish
 
 all: run_debug
 
@@ -17,13 +17,16 @@ run: app_resources
 run_debug: DEBUG=DEBUG=true
 run_debug: run
 
-app_resources: ${APPNAME}/res/style.png
-app_resources: ${APPNAME}/res/icon-32x32.png
-app_resources: ${APPNAME}/res/turboworkflow-deactivated.png
-app_resources: ${APPNAME}/res/turboworkflow-activated.png
-app_resources: check_license
-	# Store version info in ${APPNAME}/res
-	echo v${APPVERSION} > ${APPNAME}/res/version.txt
+LICENSES = LICENSE.txt ${APPNAME}/res/copyright.txt ${APPNAME}/libquadtastic.lua
+
+APP_RESOURCES = ${LICENSES} \
+                ${APPNAME}/res/style.png \
+                ${APPNAME}/res/icon-32x32.png \
+                ${APPNAME}/res/turboworkflow-deactivated.png \
+                ${APPNAME}/res/turboworkflow-activated.png \
+                ${APPNAME}/res/version.txt
+
+app_resources: ${APP_RESOURCES}
 
 check: ${APPNAME}/*.lua
 	@which luacheck 1>/dev/null || (echo \
@@ -33,16 +36,19 @@ check: ${APPNAME}/*.lua
 
 test: check ${TESTS}
 
-distfiles: test
-distfiles: dist/releases/${APPVERSION}/macos/${APPNAME}.app
-distfiles: dist/releases/${APPVERSION}/windows/${APPNAME}.zip
-distfiles: dist/releases/${APPVERSION}/crossplatform/${APPNAME}.zip
-distfiles: dist/releases/${APPVERSION}/love/${APPNAME}.love
-distfiles: dist/releases/${APPVERSION}/libquadtastic/libquadtastic.lua
+DISTFILES = dist/releases/${APPVERSION}/macos/${APPNAME}.app \
+            dist/releases/${APPVERSION}/windows/${APPNAME}.zip \
+            dist/releases/${APPVERSION}/crossplatform/${APPNAME}.zip \
+            dist/releases/${APPVERSION}/love/${APPNAME}.love \
+            dist/releases/${APPVERSION}/libquadtastic/libquadtastic.lua
+
+distfiles: ${DISTFILES}
 
 dist/releases/${APPVERSION}/macos/${APPNAME}.app: dist/macos/${APPNAME}.app
 	mkdir -p dist/releases/${APPVERSION}/macos
 	cp -r dist/macos/${APPNAME}.app dist/releases/${APPVERSION}/macos/
+	# Update directory timestamp explicitly
+	touch $@
 
 dist/releases/${APPVERSION}/windows/${APPNAME}.zip: dist/windows/${APPNAME}.zip
 	mkdir -p dist/releases/${APPVERSION}/windows
@@ -64,14 +70,14 @@ dist/releases/${APPVERSION}/libquadtastic/libquadtastic.lua: Quadtastic/libquadt
 	mkdir -p dist/releases/${APPVERSION}/libquadtastic
 	cp Quadtastic/libquadtastic.lua dist/releases/${APPVERSION}/libquadtastic/
 
-dist/${APPNAME}.love: ${APPNAME}/*.lua app_resources
+dist/${APPNAME}.love: ${APPNAME}/*.lua ${APP_RESOURCES}
 	cd ${APPNAME}; zip ../dist/${APPNAME}.love -Z store -FS -r . -x .\*
 	cp -R shared dist/
 
 dist/macos/${APPNAME}.app: dist/res/love.app dist/${APPNAME}.love dist/res/icon.icns
 	mkdir -p dist/macos
 	mkdir -p dist/macos/${APPNAME}.app
-	rsync -qa dist/res/love.app/ dist/macos/${APPNAME}.app/
+	rsync -qat dist/res/love.app/ dist/macos/${APPNAME}.app/
 	cp dist/${APPNAME}.love dist/macos/${APPNAME}.app/Contents/Resources/
 	cp -R dist/shared dist/macos/${APPNAME}.app/Contents/Resources/
 	cp dist/res/icon.icns dist/macos/${APPNAME}.app/Contents/Resources/
@@ -84,9 +90,12 @@ dist/macos/${APPNAME}.app: dist/res/love.app dist/${APPNAME}.love dist/res/icon.
 	patch dist/macos/${APPNAME}.app/Contents/Info.plist dist/macos/plist.patch
 	rm dist/macos/plist.patch*
 
+	# Update directory timestamp explicitly
+	touch $@
+
 dist/windows/${APPNAME}.zip: dist/res/${windows-love-distname}.zip dist/${APPNAME}.love
 	mkdir -p dist/windows/${APPNAME}
-	rsync -qa dist/res/${windows-love-distname}/ dist/windows/${APPNAME}/
+	rsync -qat dist/res/${windows-love-distname}/ dist/windows/${APPNAME}/
 	cat dist/${APPNAME}.love >> dist/windows/${APPNAME}/love.exe
 	mv dist/windows/${APPNAME}/love.exe dist/windows/${APPNAME}/${APPNAME}.exe
 	cp -r dist/shared dist/windows/${APPNAME}/
@@ -125,10 +134,19 @@ ${APPNAME}/res/%.png: res/%.ase
 ${APPNAME}/res/icon-32x32.png: res/icon.ase
 	${aseprite} -b res/icon.ase --scale 2 --save-as ${APPNAME}/res/icon-32x32.png
 
+# hacky way to determine whether we need to remake the version file
+_stored_version = $(shell test -f ${APPNAME}/res/version.txt && cat ${APPNAME}/res/version.txt)
+ifneq "v$(APPVERSION)" "$(_stored_version)"
+.PHONY: ${APPNAME}/res/version.txt
+endif
+
+${APPNAME}/res/version.txt:
+	echo v${APPVERSION} > ${APPNAME}/res/version.txt
+
 %.png: %.ase
 	${aseprite} -b $*.ase --save-as $*.png
 
-screenshots/example.gif:
+screenshots/example.gif: screenshots/example.mov
 	ffmpeg -i screenshots/example.mov -r 10 -vcodec png screenshots/out-static-%04d.png 
 	time convert -verbose +dither -layers Optimize -resize 106x120\> screenshots/out-static*.png  GIF:- > screenshots/example.gif
 	rm screenshots/out-static-*
@@ -141,31 +159,33 @@ clean:
 
 firstyear=2017
 thisyear=$(shell date "+%Y")
-update_license:
+years=$(shell test ${firstyear} = ${thisyear} && echo ${firstyear} || echo ${firstyear}-${thisyear})
+
+# hacky way to determine whether we need to remake the license file
+_remake_license = $(shell test -f LICENSE.txt && grep -q " ${years} " LICENSE.txt || echo 1)
+ifeq "${_remake_license}" "1"
+.PHONY: LICENSE.txt
+endif
+
+LICENSE.txt: res/raw_mit_license.txt
 	cp res/raw_mit_license.txt LICENSE.txt
-	test ${firstyear} = ${thisyear} && \
-	sed -i '' -e 's/\[years\]/${thisyear}/' LICENSE.txt || \
-	sed -i '' -e 's/\[years\]/${firstyear}-${thisyear}/' LICENSE.txt
-	head -1 LICENSE.txt > Quadtastic/res/copyright.txt
-	test ${firstyear} = ${thisyear} && \
-	sed -i '' -e 's/Copyright (c) .* Moritz Neikes/Copyright (c) ${thisyear} Moritz Neikes/' \
-	    Quadtastic/libquadtastic.lua || \
-	sed -i '' -e 's/Copyright (c) .* Moritz Neikes/Copyright (c) ${firsyear}-${thisyear} Moritz Neikes/' \
+	sed -i '' -e 's/\[years\]/${years}/' LICENSE.txt
+
+${APPNAME}/res/copyright.txt: LICENSE.txt
+	head -1 LICENSE.txt > ${APPNAME}/res/copyright.txt
+
+# hacky way to determine whether we need to remake the license file
+_remake_libquadtastic = $(shell grep -q " ${years} " Quadtastic/libquadtastic.lua || echo 1)
+ifeq "1" "${_remake_libquadtastic}"
+.PHONY: ${APPNAME}/libquadtastic.lua
+endif
+
+${APPNAME}/libquadtastic.lua:
+	sed -i '' -e 's/Copyright (c) .* Moritz Neikes/Copyright (c) ${years} Moritz Neikes/' \
 	    Quadtastic/libquadtastic.lua
 
-check_license:
-	@(test ${firstyear} = ${thisyear} && \
-	grep -q "Copyright (c) ${thisyear} Moritz" LICENSE.txt || \
-	grep -q "Copyright (c) ${firstyear}-${thisyear} Moritz" LICENSE.txt) || \
-	(echo "LICENSE.txt is not up to date" && false)
-
-	@(test ${firstyear} = ${thisyear} && \
-	grep -q "Copyright (c) ${thisyear} Moritz" Quadtastic/libquadtastic.lua || \
-	grep -q "Copyright (c) ${firstyear}-${thisyear} Moritz" Quadtastic/libquadtastic.lua) || \
-	(echo "License in Quadtastic/libquadtastic.lua is not up to date" && false)
-
 # Build as $ make release-0.2.0
-release-%: test check_license
+release-%: test ${LICENSES}
 	@# Only proceed if that version doesn't already exist
 	@test ! -f .git/refs/tags/$* || \
 	(echo "Version $* is already released"; exit 1)
@@ -226,7 +246,7 @@ release-%: test check_license
 	@rm -rf .tmp
 	@printf "\e[1mAll done.\e[0m You can now run 'make publish' to publish version $*\n"
 
-publish: distfiles
+publish: ${DISTFILES}
 	# Check that the version to be released is tagged.
 	@if [[ ! ${APPVERSION} =~ ^[0-9]+.[0-9]+.[0-9]+$$ ]] ; then\
 	  echo "Error: Cannot publish an untagged commit."; false;\
