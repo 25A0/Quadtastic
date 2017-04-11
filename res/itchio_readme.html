@@ -1,0 +1,95 @@
+<h3>
+  A tool to manage sprite sheets and color palettes for
+  <a href="https://www.love2d.org">LÖVE</a> projects.
+</h3>
+
+<hr>
+
+<h3>
+  Features
+</h3>
+<ul>
+  <li>Sample from sprite sheets without ever typing out coordinates or dimensions</li>
+  <li>Name your quads to make it easier to access them</li>
+  <li>Create groups of quads to organize them hierarchically</li>
+  <li>Quads are saved as a simple lua table. They look something like this:
+    <pre>
+  return {
+    head = {x = 3, y = 3, w = 16, h = 16},
+    torso = {x = 2, y = 22, w = 16, h = 32},
+    legs = {x = 3, y = 58, w = 16, h = 16},
+  }</pre>
+  </li>
+  <li>As you expand your sprite sheet, you can re-open this quadfile in Quadtastic
+    to add or modify quads
+  </li>
+  <li>Enable Turbo-Workflow to reload the spritesheet whenever it changes on disk,
+    and to re-export the quads whenever you change them
+  </li>
+  <li>
+    Using <code>libquadtastic.lua</code>, use these quads in your LÖVE projects like so:
+    <pre>
+  local libquadtastic = require("libquadtastic")
+
+  -- do this once in love.load
+  local image = love.graphics.newImage(
+    "path/to/spritesheet"
+  )
+
+  local quads = libquadtastic.import_quads(
+    require("path/to/quadfile"),
+    image:getWidth(), image:getHeight()
+  )
+
+   -- do this whenever you want to draw the quads
+  love.graphics.draw(image, quads.head, 2, 0)
+  love.graphics.draw(image, quads.legs, 2, 47)
+  love.graphics.draw(image, quads.torso, 0, 15)
+    </pre>
+  </li>
+</ul>
+
+<p align="center">
+  <a href="https://github.com/25a0/Quadtastic">
+    <img src="http://imgur.com/5GAt2H1.png">
+  </a>
+</p>
+
+
+<h3>Credits and tools used</h3>
+
+<ul>
+  <li>
+    <a href="https://love2d.org/">LÖVE</a>
+  </li>
+  <li>
+    The <a href="https://managore.itch.io/m5x7">m5x7</a> and
+    <a href="https://managore.itch.io/m3x6">m3x6</a> fonts by
+    <a href="https://managore.itch.io/">Daniel Linssen</a>
+  </li>
+  <li>
+    <a href="https://www.aseprite.org/">aseprite</a> by David Kapello.
+    Oh, also, the pixelated Quadtastic UI is my lousy attempt to create something
+    similar to the gorgeous UI in aseprite.
+  </li>
+  <li>
+    <a href="https://github.com/keplerproject/luafilesystem">luafilesystem</a>
+  </li>
+  <li>
+    <a href="https://github.com/Ranguna/LOVEDEBUG">lovedebug</a> by kalle2990,
+    maintained by Ranguna 
+  </li>
+  <li>
+    <a href="https://github.com/vurtun/nuklear">Nuklear</a> for guidance on how
+    to write IMGUI
+  </li>
+  <li>
+    <a href="https://github.com/markandgo/simple-transform">affine</a>
+    by Minh Ngo, for reverse transformation
+  </li>
+  <li>
+    <a href="https://love2d.org/forums/viewtopic.php?p=201884#p201884">xform</a>
+    by pgimeno, for practical ideas related to reverse transformation
+  </li>
+
+</ul>
