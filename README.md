@@ -15,7 +15,6 @@
   </a>
 </p>
 
-
 ## Usage
 
 ### Defining quads
@@ -33,7 +32,7 @@
 ```lua
   return {
     head = {x = 3, y = 3, w = 16, h = 16},
-    body = {x = 2, y = 22, w = 16, h = 32},
+    torso = {x = 2, y = 22, w = 16, h = 32},
     legs = {x = 3, y = 58, w = 16, h = 16},
   }
 ```
@@ -84,7 +83,7 @@ Either way, this loads the raw quad definitions:
   --[[
   with the example quads above, this prints:
   head  3 3 16  16
-  body  2 22 16  32
+  torso  2 22 16  32
   legs  3 58 16  16
   ]]
 
@@ -125,7 +124,7 @@ quad in your quadfile:
    -- do this whenever you want to draw the quads
   love.graphics.draw(image, quads.head, 2, 0)
   love.graphics.draw(image, quads.legs, 2, 47)
-  love.graphics.draw(image, quads.body, 0, 15)
+  love.graphics.draw(image, quads.torso, 0, 15)
 ```
 
 You can just as easily use them with a spritebatch:
@@ -142,7 +141,7 @@ You can just as easily use them with a spritebatch:
    -- do this whenever you want to draw the quads
   spritebatch:add(quads.head, 2, 0)
   spritebatch:add(quads.legs, 2, 47)
-  spritebatch:add(quads.body, 0, 15)
+  spritebatch:add(quads.torso, 0, 15)
 
   love.graphics.draw(spritebatch)
   spritebatch:clear()
