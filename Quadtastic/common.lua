@@ -42,6 +42,14 @@ local function export_quad(handle, quadtable)
     quadtable.x, quadtable.y, quadtable.w, quadtable.h))
 end
 
+-- Checks if a given string qualifies as a Lua Name, see "Lexical Conventions"
+function common.is_lua_Name(str)
+  -- Names (also called identifiers) in Lua can be any string of letters,
+  -- digits, and underscores, not beginning with a digit.
+  -- http://www.lua.org/manual/5.1/manual.html#2.1
+  return str and str == string.gmatch(str, "[A-Za-z_][A-Za-z0-9_]*")()
+end
+
 local function escape(str)
   str = string.gsub(str, "\\", "\\\\")
   str = string.gsub(str, "\"", "\\\"")
