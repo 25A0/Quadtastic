@@ -9,7 +9,7 @@
 
 ### Unreleased
 
-There are currently no unreleased changes
+ - Quadfiles are saved with a neat, compact layout again where possible
 
 ### Release 0.4.2, 2017-04-10
 
