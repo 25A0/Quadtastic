@@ -13,7 +13,17 @@ function ImageEditor.zoom(state, delta)
   if not state.display.zoom then state.display.zoom = 1 end
   local cx, cy = Rectangle.center(state.scrollpane_state)
   cx, cy = cx / state.display.zoom, cy / state.display.zoom
-  state.display.zoom = math.max(1, math.min(12, state.display.zoom + delta))
+  local new_zoom
+  if state.display.zoom <= 1 then
+    if delta > 0 then
+      new_zoom = state.display.zoom * 2
+    elseif delta < 0 then
+      new_zoom = state.display.zoom / 2
+    else new_zoom = state.display.zoom end
+  else
+    new_zoom = math.floor(state.display.zoom + delta)
+  end
+  state.display.zoom = math.max(1/32, math.min(12, new_zoom))
   cx, cy = cx * state.display.zoom, cy * state.display.zoom
   Scrollpane.set_focus(state.scrollpane_state, {x = cx, y = cy}, "immediate")
 end
