@@ -5,6 +5,7 @@ local imgui = require(current_folder .. ".imgui")
 local Rectangle = require(current_folder .. ".Rectangle")
 local QuadList = require(current_folder .. ".QuadList")
 local fun = require(current_folder .. ".fun")
+local img_analysis = require(current_folder .. ".img_analysis")
 
 local ImageEditor = {}
 
@@ -185,6 +186,28 @@ local function create_tool(app, gui_state, state, img_w, img_h)
         end
       end
     end
+end
+
+local function wand_tool(app, gui_state, state)
+    -- Draw a bright pixel where the mouse is
+    love.graphics.setColor(255, 255, 255, 255)
+    if gui_state.input then
+      local mx, my = gui_state.transform:unproject(
+        gui_state.input.mouse.x, gui_state.input.mouse.y)
+      mx, my = math.floor(mx), math.floor(my)
+      -- Find strip of opaque pixels
+      local quad = img_analysis.outter_bounding_box(state.image, mx, my)
+      if quad then
+        draw_dashed_line(quad, gui_state, state.display.zoom)
+        gui_state.mousestring = string.format("%dx%d", quad.w, quad.h)
+        if gui_state.input.mouse.buttons[1] and
+          gui_state.input.mouse.buttons[1].presses >= 1
+        then
+          app.quadtastic.create(quad)
+        end
+      end
+    end
+
 end
 
 local function select_tool(app, gui_state, state, img_w, img_h)
@@ -387,6 +410,8 @@ local function handle_input(app, gui_state, state, img_w, img_h)
       create_tool(app, gui_state, state, img_w, img_h)
     elseif state.toolstate.type == "select" then
       select_tool(app, gui_state, state, img_w, img_h)
+    elseif state.toolstate.type == "wand" then
+      wand_tool(app, gui_state, state, img_w, img_h)
     end
 
     -- If the middle mouse button was dragged in this scrollpane, pan the image

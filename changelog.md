@@ -10,6 +10,7 @@
 ### Unreleased
 
  - Quadfiles are saved with a neat, compact layout again where possible
+ - Add wand tool to create quads from opaque areas
 
 ### Release 0.4.2, 2017-04-10
 

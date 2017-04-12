@@ -170,6 +170,7 @@ t["tools"]["border"] = {x = 64, y = 48, w = 13, h = 13}
 t["tools"]["create"] = {x = 48, y = 48, w = 13, h = 13}
 t["tools"]["select"] = {x = 64, y = 64, w = 13, h = 13}
 t["tools"]["strip"] = {x = 80, y = 48, w = 13, h = 13}
+t["tools"]["wand"] = {x = 80, y = 64, w = 13, h = 13}
 
 t["tooltip"] = {}
 t["tooltip"]["border"] = {}

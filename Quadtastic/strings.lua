@@ -86,6 +86,7 @@ strings.tooltips = {
   create_tool = "Create new quads",
   border_tool = "Create quads for a border",
   strip_tool = "Create a strip of similar quads",
+  wand_tool = "Automatically create quads from opaque areas",
   zoom_in = "Zoom in",
   zoom_out = "Zoom out",
   turbo_workflow = s[[Reloads image whenever it changes on disk, and repeats
