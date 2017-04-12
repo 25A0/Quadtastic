@@ -221,28 +221,27 @@ Quadtastic.draw = function(app, state, gui_state)
       do Layout.start(gui_state)
         if Button.draw(gui_state, nil, nil, nil, nil, nil,
                        gui_state.style.quads.tools.select,
-                       {pressed = state.toolstate.type == "select"})
+                       {pressed = state.tool == "select"})
         then
-          state.toolstate = {type = "select"}
+          app.quadtastic.switch_tool("select")
         end
         Tooltip.draw(gui_state, S.tooltips.select_tool)
         Layout.next(gui_state, "|")
 
         if Button.draw(gui_state, nil, nil, nil, nil, nil,
                        gui_state.style.quads.tools.create,
-                       {pressed = state.toolstate.type == "create"})
+                       {pressed = state.tool == "create"})
         then
-          state.toolstate = {type = "create"}
-
+          app.quadtastic.switch_tool("create")
         end
         Tooltip.draw(gui_state, S.tooltips.create_tool)
         Layout.next(gui_state, "|")
 
         if Button.draw(gui_state, nil, nil, nil, nil, nil,
                        gui_state.style.quads.tools.border,
-                       {pressed = state.toolstate.type == "border"})
+                       {pressed = state.tool == "border"})
         then
-          state.toolstate = {type = "border"}
+          app.quadtastic.switch_tool("border")
           imgui.show_toast(gui_state, "NYI", nil, 2)
         end
         Tooltip.draw(gui_state, S.tooltips.border_tool)
@@ -250,9 +249,9 @@ Quadtastic.draw = function(app, state, gui_state)
 
         if Button.draw(gui_state, nil, nil, nil, nil, nil,
                        gui_state.style.quads.tools.strip,
-                       {pressed = state.toolstate.type == "strip"})
+                       {pressed = state.tool == "strip"})
         then
-          state.toolstate = {type = "strip"}
+          app.quadtastic.switch_tool("strip")
           imgui.show_toast(gui_state, "NYI", nil, 2)
         end
         Tooltip.draw(gui_state, S.tooltips.strip_tool)
@@ -260,9 +259,9 @@ Quadtastic.draw = function(app, state, gui_state)
 
         if Button.draw(gui_state, nil, nil, nil, nil, nil,
                        gui_state.style.quads.tools.wand,
-                       {pressed = state.toolstate.type == "wand"})
+                       {pressed = state.tool == "wand"})
         then
-          state.toolstate = {type = "wand"}
+          app.quadtastic.switch_tool("wand")
         end
         Tooltip.draw(gui_state, S.tooltips.wand_tool)
         Layout.next(gui_state, "|")

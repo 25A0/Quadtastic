@@ -102,8 +102,8 @@ local function show_quad(gui_state, state, quad, quadname)
     love.graphics.push("all")
     love.graphics.setLineStyle("rough")
     love.graphics.setLineWidth(1/state.display.zoom)
-    if quad == state.hovered and (state.toolstate.type == "select" or
-                                  state.toolstate.type == "create") or
+    if quad == state.hovered and (state.tool == "select" or
+                                  state.tool == "create") or
        state.selection:is_selected(quad)
     then
       -- Use a dashed line to outline the quad
@@ -419,11 +419,11 @@ local function select_tool(app, gui_state, state, img_w, img_h)
 end
 
 local function handle_input(app, gui_state, state, img_w, img_h)
-    if state.toolstate.type == "create" then
+    if state.tool == "create" then
       create_tool(app, gui_state, state, img_w, img_h)
-    elseif state.toolstate.type == "select" then
+    elseif state.tool == "select" then
       select_tool(app, gui_state, state, img_w, img_h)
-    elseif state.toolstate.type == "wand" then
+    elseif state.tool == "wand" then
       wand_tool(app, gui_state, state, img_w, img_h)
     end
 

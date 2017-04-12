@@ -663,7 +663,12 @@ function QuadtasticLogic.transitions(interface) return {
     data.history:mark() -- A new file doesn't have any changes worth saving
                         -- until the user actually does something
 
-    data.toolstate = { type = "create"}
+    app.quadtastic.switch_tool("create")
+  end,
+
+  switch_tool = function(app, data, tool)
+    data.tool = tool
+    data.toolstate = {}
   end,
 
   save = function(app, data, callback)
