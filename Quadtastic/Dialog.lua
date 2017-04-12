@@ -119,6 +119,9 @@ end
 function Dialog.show_dialog(message, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
+    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
+    love.graphics.rectangle("fill", 0, 0, w, h)
+    love.graphics.setColor(255, 255, 255, 255)
     local min_w = data.min_w or 0
     local min_h = data.min_h or 0
     local x = data.win_x or (w - min_w) / 2
@@ -162,6 +165,9 @@ end
 function Dialog.query(message, input, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
+    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
+    love.graphics.rectangle("fill", 0, 0, w, h)
+    love.graphics.setColor(255, 255, 255, 255)
     local min_w = data.min_w or 0
     local min_h = data.min_h or 0
     local x = data.win_x or (w - min_w) / 2
@@ -243,6 +249,9 @@ end
 function Dialog.open_file(basepath)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
+    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
+    love.graphics.rectangle("fill", 0, 0, w, h)
+    love.graphics.setColor(255, 255, 255, 255)
     local min_w = data.min_w or 0
     local min_h = data.min_h or 0
     local x = data.win_x or (w - min_w) / 2
@@ -360,6 +369,9 @@ end
 function Dialog.save_file(basepath, default_extension)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
+    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
+    love.graphics.rectangle("fill", 0, 0, w, h)
+    love.graphics.setColor(255, 255, 255, 255)
     local min_w = data.min_w or 0
     local min_h = data.min_h or 0
     local x = data.win_x or (w - min_w) / 2
@@ -529,6 +541,9 @@ function Dialog.show_about_dialog()
 
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
+    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
+    love.graphics.rectangle("fill", 0, 0, w, h)
+    love.graphics.setColor(255, 255, 255, 255)
     local min_w = data.min_w or 0
     local min_h = data.min_h or 0
     local win_x = data.win_x or (w - min_w) / 2
@@ -572,6 +587,9 @@ end
 function Dialog.show_ack_dialog()
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
+    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
+    love.graphics.rectangle("fill", 0, 0, w, h)
+    love.graphics.setColor(255, 255, 255, 255)
     local min_w = data.min_w or 0
     local min_h = data.min_h or 0
     local x = data.win_x or (w - min_w) / 2

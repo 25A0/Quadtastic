@@ -143,9 +143,6 @@ function love.draw()
       if not is_active then imgui.cover_input(gui_state) end
       local f = state.draw
       -- Draw that state with the draw function
-      love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
-      love.graphics.rectangle("fill", 0, 0, w, h)
-      love.graphics.setColor(255, 255, 255, 255)
       f(app, state.data, gui_state, w, h)
       if not is_active then imgui.uncover_input(gui_state) end
     end
