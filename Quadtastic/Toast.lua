@@ -9,7 +9,7 @@ local Toast = {}
 local function find_toast_position(bounds, textwidth, textheight, border_width, border_height
 )
   -- The toast should be centered in the bounds, and 4px away from the bottom
-  local x = bounds.x + (bounds.w - (textwidth + border_width)) / 2
+  local x = bounds.x + math.floor((bounds.w - (textwidth + border_width)) / 2)
   local margin = 4
   local y = bounds.y + bounds.h - margin - border_height - textheight
   return x, y
@@ -48,7 +48,7 @@ function Toast.draw(gui_state, label, bounds, start, duration, options)
     if elapsed < anim_time then
       local d = bounds.y + bounds.h - y
       local r = elapsed / anim_time
-      y = y + (1 - r) * d
+      y = math.floor(y + (1 - r) * d)
     end
   end
 
