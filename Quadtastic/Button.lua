@@ -138,8 +138,8 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
     elseif options and options.bg_color_default then
       love.graphics.setColor(options.bg_color_default)
     end
-    if label and (pressed or hovered) and not (options and options.disabled) or
-      options and options.bg_color_default
+    if label and (pressed or hovered) and not (options and options.disabled)
+       or options and options.bg_color_default
     then
       love.graphics.rectangle("fill", x, y, w, h)
     end

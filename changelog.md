@@ -12,6 +12,7 @@
  - Quadfiles are saved with a neat, compact layout again where possible
  - Add wand tool to create quads from opaque areas
  - Lower minimum zoom level for bigger sprite sheets
+ - Fix opened menu items not being highlighted
 
 ### Release 0.4.2, 2017-04-10
 
