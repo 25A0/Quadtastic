@@ -45,5 +45,28 @@ local keybindings = {
 	new     = {"n", {mac and "*gui" or "*ctrl"}},
 }
 
+local subs = {
+	["*ctrl"] = "ctrl",
+	["*gui"] = "cmd",
+	["*shift"] = "shift",
+	["*alt"] = "alt",
+}
+
+function keybindings.to_string(keybinding)
+	-- This lets us do keybindings.to_string("undo")
+	if type(keybinding) == "string" then
+		keybinding = keybindings[keybinding]
+	end
+	local s = {}
+	-- Iterate through modifiers
+	if keybinding[2] then
+		for _,v in ipairs(keybinding[2]) do
+			table.insert(s, subs[v] or v)
+		end
+	end
+	table.insert(s, keybinding[1])
+	return table.concat(s, "+")
+end
+
 return keybindings
 
