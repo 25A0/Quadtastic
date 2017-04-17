@@ -318,8 +318,15 @@ function QuadtasticLogic.transitions(interface) return {
     do_action()
     if state.turbo_workflow then app.quadtastic.save() end
 
-    state.selection:set_selection({new_quad})
-    interface.move_quad_into_view(state.quad_scrollpane_state, new_quad)
+    if libquadtastic.is_quad(new_quad) then
+      state.selection:set_selection({new_quad})
+      interface.move_quad_into_view(state.quad_scrollpane_state, new_quad)
+    else
+      assert(type(new_quad) == "table")
+      assert(#new_quad >= 1)
+      state.selection:set_selection(new_quad)
+      interface.move_quad_into_view(state.quad_scrollpane_state, new_quad[1])
+    end
   end,
 
   --[[
