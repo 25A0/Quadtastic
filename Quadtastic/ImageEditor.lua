@@ -223,7 +223,7 @@ local function wand_tool(app, gui_state, state)
           draw_dashed_line(r, gui_state, state.display.zoom)
         end
         gui_state.mousestring = string.format("%d quads", #rects)
-        if not gui_state.input.mouse.buttons[1].pressed then
+        if not gui_state.input.mouse.buttons[1].pressed and #rects > 0 then
           app.quadtastic.create(rects)
         end
       else
