@@ -525,15 +525,21 @@ function QuadtasticLogic.transitions(interface) return {
 
     -- Do the second pass, this time with destructive actions
     local new_group = {}
-    local num_index = 1 -- a counter for numeric indices
+    local numeric_indices = {}
     for _,v in ipairs(quads) do
       local key = individual_keys[v]
-      -- No point in preserving a numeric key
+      -- We don't necessarily want to preserve the numeric index, but we do
+      -- want to preserve the order of those quads with numeric indices
       if type(key) == "number" then
-        key = num_index
-        num_index = num_index + 1
+        table.insert(numeric_indices, key)
+      else
+        new_group[key] = v
       end
-      new_group[key] = v
+    end
+
+    table.sort(numeric_indices)
+    for i,old_key in ipairs(numeric_indices) do
+      new_group[i] = shared_parent[old_key]
     end
 
     local do_action = function()

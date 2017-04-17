@@ -639,6 +639,42 @@ do
   assert(testutils.equals(data.quads, old_quads))
 end
 
+-- Test that group preserves order
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  local quads = {
+    random_quad(), random_quad(), random_quad(),
+    random_quad(), random_quad(), random_quad(),
+  }
+  data.quads = {
+    quads[1],
+    quads[2],
+    quads[3],
+    quads[4],
+    quads[5],
+    quads[6]
+  }
+  local old_quads = testutils.clone(data.quads)
+  logic.group(app_stub, data, {quads[2], quads[4], quads[5]})
+  assert(not data.history:is_marked())
+
+  local expected = {
+    quads[1],
+    {
+      quads[2], quads[4], quads[5]
+    },
+    quads[3],
+    quads[6]
+  }
+  assert(testutils.equals(data.quads, expected))
+
+  logic.undo(app_stub, data)
+  assert(data.history:is_marked())
+  assert(testutils.equals(data.quads, old_quads))
+end
+
 --[[
  _   _ _ __   __ _ _ __ ___  _   _ _ __
 | | | | '_ \ / _` | '__/ _ \| | | | '_ \

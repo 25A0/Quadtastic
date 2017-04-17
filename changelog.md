@@ -13,6 +13,7 @@
  - Show keybindings in menus and tooltips
  - Add palette tool that creates a quad for each unique color in the
    selected region
+ - Grouping quads now preserves the order of quads with numeric indices
 
 ### Release 0.4.2, 2017-04-10
 
