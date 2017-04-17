@@ -1,3 +1,5 @@
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+local Keybindings = require(current_folder .. ".Keybindings")
 -- Module that contains all strings that are used in the application
 
 local function f(str)
@@ -91,11 +93,11 @@ strings.tooltips = {
   zoom_out = "Zoom out",
   turbo_workflow = s[[Reloads image whenever it changes on disk, and repeats
                       export whenever quads change.]],
-  rename = "Rename",
-  delete = "Delete selected quad(s)",
+  rename = "Rename (" .. Keybindings.to_string("rename") .. ")",
+  delete = "Delete selected quad(s) (" .. Keybindings.to_string("delete") .. ")",
   sort = "Sort unnamed quads from top to bottom, left to right",
-  group = "Form new group from selected quads",
-  ungroup = "Break up selected group(s)",
+  group = "Form new group from selected quads (" .. Keybindings.to_string("group") .. ")",
+  ungroup = "Break up selected group(s) (" .. Keybindings.to_string("ungroup") .. ")",
 }
 
 strings.image_editor_no_image = s[[no image :(
