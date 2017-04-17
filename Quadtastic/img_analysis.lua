@@ -300,23 +300,25 @@ local function collect_chunks(img, x, y, w, h, condition, states)
       end
     end
 
-    local co = coroutine.create(strip_iterator)
-    local _, event, strip = coroutine.resume(co, previous_strips, new_strips)
-    local state = states[1]
-    local prev_strip, new_strip -- temp variable
     local abandoned = {} -- strips that need to be checked for connections to
                          -- remaining strips
-    while event ~= evt_finished do
-      state, prev_strip, new_strip = state(event, strip, abandoned,
-                                           prev_strip, new_strip)
-      _, event, strip = coroutine.resume(co)
+    do
+      local co = coroutine.create(strip_iterator)
+      local _, event, strip = coroutine.resume(co, previous_strips, new_strips)
+      local state = states[1]
+      local prev_strip, new_strip -- temp variable
+      while event ~= evt_finished do
+        state, prev_strip, new_strip = state(event, strip, abandoned,
+                                             prev_strip, new_strip)
+        _, event, strip = coroutine.resume(co)
+      end
     end
 
     -- Check if the abandoned previous strips are reachable from new strips
     if #abandoned > 0 then
       local seen_strips = {}
       local open_strips = {}
-      for _,strip in ipairs(new_strips) do table.insert(open_strips, strip) end
+      for _,s in ipairs(new_strips) do table.insert(open_strips, s) end
       while #open_strips > 0 do
         local strip = table.remove(open_strips)
         seen_strips[strip] = true
@@ -340,10 +342,14 @@ local function collect_chunks(img, x, y, w, h, condition, states)
 
   local rects = {}
   local seen_strips = {}
-  for _,strip in ipairs(chunks) do
-    local open_strips = {strip}
-    if not seen_strips[strip] then
-      local chunk = {min_x = strip[1], max_x = strip[2], min_y = strip.y, max_y = strip.y}
+  for _,chunk_strip in ipairs(chunks) do
+    local open_strips = {chunk_strip}
+    if not seen_strips[chunk_strip] then
+      local chunk = {
+        min_x = chunk_strip[1],
+        max_x = chunk_strip[2],
+        min_y = chunk_strip.y,
+        max_y = chunk_strip.y}
       while #open_strips > 0 do
         local strip = table.remove(open_strips)
 
@@ -442,7 +448,7 @@ function analysis.palette(image_or_imagedata, x, y, w, h)
     else error("did not expect event " .. event) end
   end
 
-  states[6] = function(event, strip, abandoned_strips, prev_strip, new_strip)
+  states[6] = function(event, _, abandoned_strips, prev_strip, new_strip)
     if event == evt_new_strip_ends then
       return states[3], prev_strip
     elseif event == evt_prev_strip_ends then

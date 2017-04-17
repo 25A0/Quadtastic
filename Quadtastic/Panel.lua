@@ -3,8 +3,6 @@ local State = require(current_folder .. ".State")
 local Frame = require(current_folder .. ".Frame")
 local imgui = require(current_folder .. ".imgui")
 
-local unpack = unpack or table.unpack
-
 local Panel = {}
 
 -- x and y is the position that the arrow will point at
@@ -37,15 +35,16 @@ function Panel.finish(gui_state, x, y, w, h)
   gui_state.layout.adv_x, gui_state.layout.adv_y = 0, 0
 end
 
-function Panel.new(name, gui_state, x, y, panel_w, panel_h, draw_function)
+function Panel.new(name, gui_state_at_creation, x, y, panel_w, panel_h, draw_function)
   local transitions = {
-    close = function(...) return true end
+    close = function() return true end
   }
-  local panel = State(name, transitions, data)
+  local state_data = {}
+  local panel = State(name, transitions, state_data)
 
-  local abs_bounds = gui_state.transform:project_bounds({x = x, y = y, w = panel_w, h = panel_h})
+  local abs_bounds = gui_state_at_creation.transform:project_bounds({x = x, y = y, w = panel_w, h = panel_h})
 
-  panel.draw = function(app, data, gui_state, w, h)
+  panel.draw = function(app, data, gui_state)
     local p_bounds = gui_state.transform:unproject_bounds(abs_bounds)
     Panel.begin(gui_state, p_bounds.x, p_bounds.y, p_bounds.w, p_bounds.h)
     draw_function(app, data, gui_state, p_bounds.w, p_bounds.h)

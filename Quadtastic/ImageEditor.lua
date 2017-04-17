@@ -244,7 +244,7 @@ local function wand_tool(app, gui_state, state)
   end
 end
 
-local function palette_tool(app, gui_state, state, img_w, img_h)
+local function palette_tool(app, gui_state, state)
   -- Draw a bright pixel where the mouse is
   love.graphics.setColor(255, 255, 255, 255)
   if gui_state.input then
