@@ -84,22 +84,21 @@ Button.draw = function(state, x, y, w, h, label, iconquad, options)
   state.layout.adv_y = h
 
   -- Highlight if mouse is over button
+  local clicked, pressed, hovered
   if state and state.input and not (options and options.disabled) then
-    local clicked, pressed, hovered = handle_input(state, x, y, w, h, options)
-    pressed = pressed or options and options.pressed
-    if pressed then
-      love.graphics.setColor(0, 0, 0, 70)
-    elseif hovered then
-      love.graphics.setColor(255, 255, 255, 70)
-    end
-    if pressed or hovered then
-      love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
-    end
-    love.graphics.setColor(255, 255, 255, 255)
-    return clicked, pressed, hovered
-  else
-    return false
+    clicked, pressed, hovered = handle_input(state, x, y, w, h, options)
   end
+  pressed = pressed or options and options.pressed
+  if pressed then
+    love.graphics.setColor(0, 0, 0, 70)
+  elseif hovered then
+    love.graphics.setColor(255, 255, 255, 70)
+  end
+  if pressed or hovered then
+    love.graphics.rectangle("fill", x + 2, y + 2, w - 4, h - 4)
+  end
+  love.graphics.setColor(255, 255, 255, 255)
+  return clicked, pressed, hovered
 end
 
 -- Draws a borderless button. Here, icons needs to be a table containing quads
@@ -126,27 +125,25 @@ Button.draw_flat = function(state, x, y, w, h, label, icons, options)
   local clicked, pressed, hovered
   if state and state.input and not (options and options.disabled) then
     clicked, pressed, hovered = handle_input(state, x, y, w, h, options)
-    pressed = pressed or options and options.pressed
-    if pressed then
-      local pressed_color = options and options.bg_color_pressed or
-                            state.style.palette.shades.darkest(90)
-      love.graphics.setColor(pressed_color)
-    elseif hovered then
-      local hovered_color = options and options.bg_color_hovered or
-                            state.style.palette.shades.brightest
-      love.graphics.setColor(hovered_color)
-    elseif options and options.bg_color_default then
-      love.graphics.setColor(options.bg_color_default)
-    end
-    if label and (pressed or hovered) and not (options and options.disabled)
-       or options and options.bg_color_default
-    then
-      love.graphics.rectangle("fill", x, y, w, h)
-    end
-    love.graphics.setColor(255, 255, 255, 255)
-  else
-    clicked, pressed, hovered = false, false, false
   end
+  pressed = pressed or options and options.pressed
+  if pressed then
+    local pressed_color = options and options.bg_color_pressed or
+                          state.style.palette.shades.darkest(90)
+    love.graphics.setColor(pressed_color)
+  elseif hovered then
+    local hovered_color = options and options.bg_color_hovered or
+                          state.style.palette.shades.brightest
+    love.graphics.setColor(hovered_color)
+  elseif options and options.bg_color_default then
+    love.graphics.setColor(options.bg_color_default)
+  end
+  if label and (pressed or hovered) and not (options and options.disabled)
+     or options and options.bg_color_default
+  then
+    love.graphics.rectangle("fill", x, y, w, h)
+  end
+  love.graphics.setColor(255, 255, 255, 255)
 
   -- Print label
   if not options then options = {} end
