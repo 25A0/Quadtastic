@@ -138,7 +138,9 @@ QuadList.draw = function(gui_state, state, x, y, w, h, last_hovered)
   end Frame.finish(gui_state)
 
   -- Move viewport to focus quad if necessary
-  if state.quad_scrollpane_state.focus_quad then
+  if state.quad_scrollpane_state.focus_quad and
+     quad_bounds[state.quad_scrollpane_state.focus_quad]
+  then
     Scrollpane.move_into_view(
       state.quad_scrollpane_state,
       quad_bounds[state.quad_scrollpane_state.focus_quad])
