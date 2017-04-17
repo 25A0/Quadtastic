@@ -119,12 +119,23 @@ Quadtastic.draw = function(app, state, gui_state)
 
     do Menu.menubar_start(gui_state, w, 12)
       if Menu.menu_start(gui_state, w/4, h - 12, S.menu.file()) then
-        if Menu.action_item(gui_state, S.menu.file.new) then app.quadtastic.new() end
-        if Menu.action_item(gui_state, S.menu.file.open) then app.quadtastic.choose_quad() end
-        if Menu.action_item(gui_state, S.menu.file.save) then
+        if Menu.action_item(gui_state, S.menu.file.new,
+           {keybinding = Keybindings.to_string("new")})
+        then
+          app.quadtastic.new()
+        end
+        if Menu.action_item(gui_state, S.menu.file.open,
+           {keybinding = Keybindings.to_string("open")})
+        then
+          app.quadtastic.choose_quad()
+        end
+        if Menu.action_item(gui_state, S.menu.file.save,
+           {keybinding = Keybindings.to_string("save")})
+        then
           app.quadtastic.save(save_toast_callback)
         end
-        if Menu.action_item(gui_state, S.menu.file.save_as) then
+        if Menu.action_item(gui_state, S.menu.file.save_as,
+           {keybinding = Keybindings.to_string("save_as")}) then
           app.quadtastic.save_as(save_toast_callback)
         end
         if #state.settings.recent > 0 then
@@ -139,17 +150,23 @@ Quadtastic.draw = function(app, state, gui_state)
           end
         end
         Menu.separator(gui_state)
-        if Menu.action_item(gui_state, S.menu.file.quit) then love.event.quit() end
+        if Menu.action_item(gui_state, S.menu.file.quit,
+           {keybinding = Keybindings.to_string("quit")})
+        then
+          love.event.quit()
+        end
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
       if Menu.menu_start(gui_state, w/4, h - 12, S.menu.edit()) then
         if Menu.action_item(gui_state, S.menu.edit.undo,
-                            {disabled = not state.history:can_undo()})
+                            {disabled = not state.history:can_undo(),
+                             keybinding = Keybindings.to_string("undo")})
         then
           app.quadtastic.undo()
         end
         if Menu.action_item(gui_state, S.menu.edit.redo,
-                            {disabled = not state.history:can_redo()})
+                            {disabled = not state.history:can_redo(),
+                             keybinding = Keybindings.to_string("redo")})
         then
           app.quadtastic.redo()
         end
