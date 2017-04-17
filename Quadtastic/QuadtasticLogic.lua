@@ -291,12 +291,27 @@ function QuadtasticLogic.transitions(interface) return {
       group = state.quads
     end
 
-    local new_index = #group + 1
-    local do_action = function()
-      group[new_index] = new_quad
-    end
-    local undo_action = function()
-      group[new_index] = nil
+    local do_action, undo_action
+    if libquadtastic.is_quad(new_quad) then
+      local new_index = #group + 1
+      do_action = function()
+        group[new_index] = new_quad
+      end
+      undo_action = function()
+        group[new_index] = nil
+      end
+    else
+      assert(type(new_quad) == "table")
+      do_action = function()
+        for _,quad in ipairs(new_quad) do
+          table.insert(group, quad)
+        end
+      end
+      undo_action = function()
+        for _,quad in ipairs(new_quad) do
+          table.remove(group)
+        end
+      end
     end
 
     state.history:add(do_action, undo_action)
