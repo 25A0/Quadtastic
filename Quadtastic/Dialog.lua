@@ -19,6 +19,29 @@ local lfs = require("lfs")
 
 local Dialog = {}
 
+local function window_start(data, gui_state, w, h)
+    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
+    love.graphics.rectangle("fill", 0, 0, w, h)
+    love.graphics.setColor(255, 255, 255, 255)
+    local min_w = data.min_w or 0
+    local min_h = data.min_h or 0
+    local x = data.win_x or (w - min_w) / 2
+    local y = data.win_y or (h - min_h) / 2
+    Window.start(gui_state, x, y, min_w, min_h)
+end
+
+local function window_finish(data, gui_state, w, h)
+    local dx, dy
+    local min_w = data.min_w or 0
+    local min_h = data.min_h or 0
+    local x = data.win_x or (w - min_w) / 2
+    local y = data.win_y or (h - min_h) / 2
+    data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
+      gui_state, x, y, data.dragging)
+    if dx then data.win_x = (data.win_x or x) + dx end
+    if dy then data.win_y = (data.win_y or y) + dy end
+end
+
 local function show_buttons(gui_state, buttons, options)
   local clicked_button
   do Layout.start(gui_state)
@@ -119,15 +142,7 @@ end
 function Dialog.show_dialog(message, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
-    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
-    love.graphics.rectangle("fill", 0, 0, w, h)
-    love.graphics.setColor(255, 255, 255, 255)
-    local min_w = data.min_w or 0
-    local min_h = data.min_h or 0
-    local x = data.win_x or (w - min_w) / 2
-    local y = data.win_y or (h - min_h) / 2
-    local dx, dy
-    do Window.start(gui_state, x, y, min_w, min_h)
+    do window_start(data, gui_state, w, h)
       do Layout.start(gui_state)
         imgui.push_style(gui_state, "font", gui_state.style.small_font)
         Label.draw(gui_state, nil, nil,
@@ -139,12 +154,8 @@ function Dialog.show_dialog(message, buttons)
         if clicked_button then
           app.dialog.respond(clicked_button)
         end
-        Layout.next(gui_state, "|")
       end Layout.finish(gui_state, "|")
-    end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
-      gui_state, x, y, data.dragging)
-    if dx then data.win_x = (data.win_x or x) + dx end
-    if dy then data.win_y = (data.win_y or y) + dy end
+    end window_finish(data, gui_state, w, h)
   end
 
   assert(coroutine.running(), "This function must be run in a coroutine.")
@@ -165,15 +176,7 @@ end
 function Dialog.query(message, input, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
-    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
-    love.graphics.rectangle("fill", 0, 0, w, h)
-    love.graphics.setColor(255, 255, 255, 255)
-    local min_w = data.min_w or 0
-    local min_h = data.min_h or 0
-    local x = data.win_x or (w - min_w) / 2
-    local y = data.win_y or (h - min_h) / 2
-    local dx, dy
-    do Window.start(gui_state, x, y, min_w, min_h)
+    do window_start(data, gui_state, w, h)
       do Layout.start(gui_state)
         imgui.push_style(gui_state, "font", gui_state.style.small_font)
         Label.draw(gui_state, nil, nil,
@@ -196,11 +199,7 @@ function Dialog.query(message, input, buttons)
           app.query.respond(S.buttons.ok)
         end
       end Layout.finish(gui_state, "|")
-      Layout.next(gui_state, "|")
-    end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
-      gui_state, x, y, data.dragging)
-    if dx then data.win_x = (data.win_x or x) + dx end
-    if dy then data.win_y = (data.win_y or y) + dy end
+    end window_finish(data, gui_state, w, h)
     data.was_drawn = true
   end
 
@@ -249,15 +248,6 @@ end
 function Dialog.open_file(basepath)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
-    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
-    love.graphics.rectangle("fill", 0, 0, w, h)
-    love.graphics.setColor(255, 255, 255, 255)
-    local min_w = data.min_w or 0
-    local min_h = data.min_h or 0
-    local x = data.win_x or (w - min_w) / 2
-    local y = data.win_y or (h - min_h) / 2
-    local dx, dy
-
     if not data.basepath then
       data.basepath = "/"
     end
@@ -295,7 +285,7 @@ function Dialog.open_file(basepath)
     local new_basepath
 
     local intended_width = 180
-    do Window.start(gui_state, x, y, min_w, min_h)
+    do window_start(data, gui_state, w, h)
       imgui.push_style(gui_state, "font", gui_state.style.small_font)
       data.editing_basepath, new_basepath = InputField.draw(gui_state,
         nil, nil, intended_width, nil, data.editing_basepath or data.basepath)
@@ -327,11 +317,7 @@ function Dialog.open_file(basepath)
 
         app.open_file.respond(clicked_button)
       end
-      Layout.next(gui_state, "|")
-    end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
-      gui_state, x, y, data.dragging)
-    if dx then data.win_x = (data.win_x or x) + dx end
-    if dy then data.win_y = (data.win_y or y) + dy end
+    end window_finish(data, gui_state, w, h)
 
     if new_basepath then
       local success, err = switch_to(data, new_basepath)
@@ -369,15 +355,6 @@ end
 function Dialog.save_file(basepath, default_extension)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
-    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
-    love.graphics.rectangle("fill", 0, 0, w, h)
-    love.graphics.setColor(255, 255, 255, 255)
-    local min_w = data.min_w or 0
-    local min_h = data.min_h or 0
-    local x = data.win_x or (w - min_w) / 2
-    local y = data.win_y or (h - min_h) / 2
-    local dx, dy
-
     if not data.basepath then
       data.basepath = "/"
     end
@@ -415,82 +392,80 @@ function Dialog.save_file(basepath, default_extension)
     local new_basepath
 
     local intended_width = 180
-    do Window.start(gui_state, x, y, min_w, min_h)
-      imgui.push_style(gui_state, "font", gui_state.style.small_font)
-      data.editing_basepath, new_basepath = InputField.draw(gui_state,
-        nil, nil, intended_width, nil, data.editing_basepath or data.basepath)
-      Layout.next(gui_state, "|")
+    do window_start(data, gui_state, w, h)
+      do Layout.start(gui_state)
+        imgui.push_style(gui_state, "font", gui_state.style.small_font)
+        data.editing_basepath, new_basepath = InputField.draw(gui_state,
+          nil, nil, intended_width, nil, data.editing_basepath or data.basepath)
+        Layout.next(gui_state, "|")
 
-      local last_chosen_file = data.chosen_file
-      data.chosen_file, data.committed_file, data.scrollpane_state = show_filelist(
-        gui_state, data.scrollpane_state, data.filelist, data.chosen_file)
+        local last_chosen_file = data.chosen_file
+        data.chosen_file, data.committed_file, data.scrollpane_state = show_filelist(
+          gui_state, data.scrollpane_state, data.filelist, data.chosen_file)
 
-      -- Clear editing filename whenever chosen file changes
-      if last_chosen_file ~= data.chosen_file and data.chosen_file.type == "file" then
-        data.editing_filename = nil
-      end
-
-      Layout.next(gui_state, "|")
-      data.editing_filename, data.committed_filename =
-        InputField.draw(gui_state,
-                        nil, nil, intended_width, nil, data.editing_filename or
-                        data.chosen_file and data.chosen_file.type == "file" and
-                        data.chosen_file.name or "")
-
-      if data.committed_filename then
-        local filetype = lfs.attributes(data.committed_filename, "mode")
-        filetype = filetype or "new" -- Assume that this file doesn't exist if
-                                     -- we can't query its mode
-        data.committed_file = {type=filetype, name=data.committed_filename}
-      end
-
-      if data.committed_file then
-        local combined_path = data.basepath .. os.pathsep .. data.committed_file.name
-        if data.committed_file.type == "directory" then
-          new_basepath = combined_path
-        elseif data.committed_file.type == "new" then
-          app.save_file.save(combined_path)
-        elseif data.committed_file.type == "file" then
-          app.save_file.override(combined_path)
+        -- Clear editing filename whenever chosen file changes
+        if last_chosen_file ~= data.chosen_file and data.chosen_file.type == "file" then
+          data.editing_filename = nil
         end
-      end
 
-      imgui.pop_style(gui_state, "font")
-      Layout.next(gui_state, "|")
+        Layout.next(gui_state, "|")
+        data.editing_filename, data.committed_filename =
+          InputField.draw(gui_state,
+                          nil, nil, intended_width, nil, data.editing_filename or
+                          data.chosen_file and data.chosen_file.type == "file" and
+                          data.chosen_file.name or "")
 
-      local clicked_button = show_buttons(gui_state, data.buttons,
-        {disabled = {Open = data.chosen_file == nil or
-                     data.editing_filename == ""}})
-      if clicked_button then
+        if data.committed_filename then
+          local filetype = lfs.attributes(data.committed_filename, "mode")
+          filetype = filetype or "new" -- Assume that this file doesn't exist if
+                                       -- we can't query its mode
+          data.committed_file = {type=filetype, name=data.committed_filename}
+        end
 
-        if clicked_button == S.buttons.save then
-          local filename = data.committed_file and data.committed_file.name or
-                           data.editing_filename
-          if filename then
-            -- Add default file extension unless the user specified one
-            if default_extension and not common.split_extension(filename) then
-              filename = filename .. "." .. default_extension
-            end
-            local filetype = lfs.attributes(filename, "mode")
-            local filepath = (data.basepath or "") .. os.pathsep .. (filename or "")
-            if filetype == "file" then
-              app.save_file.override(filepath)
-            elseif filetype == "directory" then
-              app.save_file.err(S.dialogs.err_save_directory(filepath))
-            else -- it's a new file
-              app.save_file.save(filepath)
-            end
+        if data.committed_file then
+          local combined_path = data.basepath .. os.pathsep .. data.committed_file.name
+          if data.committed_file.type == "directory" then
+            new_basepath = combined_path
+          elseif data.committed_file.type == "new" then
+            app.save_file.save(combined_path)
+          elseif data.committed_file.type == "file" then
+            app.save_file.override(combined_path)
           end
-        else
-          app.save_file.cancel()
         end
 
-      end
-      Layout.next(gui_state, "|")
-    end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
-      gui_state, x, y, data.dragging)
-    if dx then data.win_x = (data.win_x or x) + dx end
-    if dy then data.win_y = (data.win_y or y) + dy end
+        imgui.pop_style(gui_state, "font")
+        Layout.next(gui_state, "|")
+
+        local clicked_button = show_buttons(gui_state, data.buttons,
+          {disabled = {Open = data.chosen_file == nil or
+                       data.editing_filename == ""}})
+        if clicked_button then
+
+          if clicked_button == S.buttons.save then
+            local filename = data.committed_file and data.committed_file.name or
+                             data.editing_filename
+            if filename then
+              -- Add default file extension unless the user specified one
+              if default_extension and not common.split_extension(filename) then
+                filename = filename .. "." .. default_extension
+              end
+              local filetype = lfs.attributes(filename, "mode")
+              local filepath = (data.basepath or "") .. os.pathsep .. (filename or "")
+              if filetype == "file" then
+                app.save_file.override(filepath)
+              elseif filetype == "directory" then
+                app.save_file.err(S.dialogs.err_save_directory(filepath))
+              else -- it's a new file
+                app.save_file.save(filepath)
+              end
+            end
+          else
+            app.save_file.cancel()
+          end
+
+        end
+      end Layout.finish(gui_state, "|")
+    end window_finish(data, gui_state, w, h)
 
     if new_basepath then
       local success, err = switch_to(data, new_basepath)
@@ -541,15 +516,7 @@ function Dialog.show_about_dialog()
 
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
-    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
-    love.graphics.rectangle("fill", 0, 0, w, h)
-    love.graphics.setColor(255, 255, 255, 255)
-    local min_w = data.min_w or 0
-    local min_h = data.min_h or 0
-    local win_x = data.win_x or (w - min_w) / 2
-    local win_y = data.win_y or (h - min_h) / 2
-    local dx, dy
-    do Window.start(gui_state, win_x, win_y, min_w, min_h)
+    do window_start(data, gui_state, w, h)
       do Layout.start(gui_state)
 
         local icon_w, icon_h = 32, 32
@@ -567,10 +534,7 @@ function Dialog.show_about_dialog()
           app.about_dialog.close()
         end
       end Layout.finish(gui_state, "|")
-    end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
-      gui_state, win_x, win_y, data.dragging)
-    if dx then data.win_x = (data.win_x or win_x) + dx end
-    if dy then data.win_y = (data.win_y or win_y) + dy end
+    end window_finish(data, gui_state, w, h)
   end
 
   assert(coroutine.running(), "This function must be run in a coroutine.")
@@ -587,15 +551,7 @@ end
 function Dialog.show_ack_dialog()
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
-    love.graphics.setColor(gui_state.style.palette.shades.darkest(60))
-    love.graphics.rectangle("fill", 0, 0, w, h)
-    love.graphics.setColor(255, 255, 255, 255)
-    local min_w = data.min_w or 0
-    local min_h = data.min_h or 0
-    local x = data.win_x or (w - min_w) / 2
-    local y = data.win_y or (h - min_h) / 2
-    local dx, dy
-    do Window.start(gui_state, x, y, min_w, min_h)
+    do window_start(data, gui_state, w, h)
       imgui.push_style(gui_state, "font", gui_state.style.small_font)
       do Layout.start(gui_state)
         Label.draw(gui_state, nil, nil, nil, nil, S.dialogs.acknowledgements)
@@ -635,10 +591,7 @@ function Dialog.show_ack_dialog()
         end
       end Layout.finish(gui_state, "|")
       imgui.pop_style(gui_state, "font")
-    end data.min_w, data.min_h, dx, dy, data.dragging = Window.finish(
-      gui_state, x, y, data.dragging)
-    if dx then data.win_x = (data.win_x or x) + dx end
-    if dy then data.win_y = (data.win_y or y) + dy end
+    end window_finish(data, gui_state, w, h)
   end
 
   assert(coroutine.running(), "This function must be run in a coroutine.")
