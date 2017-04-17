@@ -202,48 +202,79 @@ local function create_tool(app, gui_state, state, img_w, img_h)
 end
 
 local function wand_tool(app, gui_state, state)
-    -- Draw a bright pixel where the mouse is
-    love.graphics.setColor(255, 255, 255, 255)
-    if gui_state.input then
-      -- If a rectangle larger than 1px is dragged, scan the dragged
-      local rect
-      if gui_state.input.mouse.buttons[1] and (
-          gui_state.input.mouse.buttons[1].pressed or
-          gui_state.input.mouse.buttons[1].releases >= 1
-        )
-      then
-        local img_w, img_h = state.image:getDimensions()
-        rect = get_dragged_rect(state, gui_state, img_w, img_h)
-      end
+  love.graphics.setColor(255, 255, 255, 255)
+  if gui_state.input then
+    -- If a rectangle larger than 1px is dragged, scan the dragged
+    local rect
+    if gui_state.input.mouse.buttons[1] and (
+        gui_state.input.mouse.buttons[1].pressed or
+        gui_state.input.mouse.buttons[1].releases >= 1
+      )
+    then
+      local img_w, img_h = state.image:getDimensions()
+      rect = get_dragged_rect(state, gui_state, img_w, img_h)
+    end
 
-      if rect and rect.w > 1 and rect.h > 1 then
-        show_quad(gui_state, state, rect)
-        local rects = img_analysis.enclosed_chunks(state.image, rect.x, rect.y, rect.w, rect.h)
-        for _, r in ipairs(rects) do
-          draw_dashed_line(r, gui_state, state.display.zoom)
-        end
-        gui_state.mousestring = string.format("%d quads", #rects)
-        if not gui_state.input.mouse.buttons[1].pressed and #rects > 0 then
-          app.quadtastic.create(rects)
-        end
-      else
-        local mx, my = gui_state.transform:unproject(
-          gui_state.input.mouse.x, gui_state.input.mouse.y)
-        mx, my = math.floor(mx), math.floor(my)
-        -- Find strip of opaque pixels
-        local quad = img_analysis.outter_bounding_box(state.image, mx, my)
-        if quad then
-          draw_dashed_line(quad, gui_state, state.display.zoom)
-          gui_state.mousestring = string.format("%dx%d", quad.w, quad.h)
-          if gui_state.input.mouse.buttons[1] and
-            gui_state.input.mouse.buttons[1].presses >= 1
-          then
-            app.quadtastic.create(quad)
-          end
+    if rect and rect.w > 1 and rect.h > 1 then
+      show_quad(gui_state, state, rect)
+      local rects = img_analysis.enclosed_chunks(state.image, rect.x, rect.y, rect.w, rect.h)
+      for _, r in ipairs(rects) do
+        draw_dashed_line(r, gui_state, state.display.zoom)
+      end
+      gui_state.mousestring = string.format("%d quads", #rects)
+      if not gui_state.input.mouse.buttons[1].pressed and #rects > 0 then
+        app.quadtastic.create(rects)
+      end
+    else
+      local mx, my = gui_state.transform:unproject(
+        gui_state.input.mouse.x, gui_state.input.mouse.y)
+      mx, my = math.floor(mx), math.floor(my)
+      -- Find strip of opaque pixels
+      local quad = img_analysis.outter_bounding_box(state.image, mx, my)
+      if quad then
+        draw_dashed_line(quad, gui_state, state.display.zoom)
+        gui_state.mousestring = string.format("%dx%d", quad.w, quad.h)
+        if gui_state.input.mouse.buttons[1] and
+          gui_state.input.mouse.buttons[1].presses >= 1
+        then
+          app.quadtastic.create(quad)
         end
       end
     end
+  end
+end
 
+local function palette_tool(app, gui_state, state, img_w, img_h)
+  -- Draw a bright pixel where the mouse is
+  love.graphics.setColor(255, 255, 255, 255)
+  if gui_state.input then
+    local mx, my = gui_state.transform:unproject(
+      gui_state.input.mouse.x, gui_state.input.mouse.y)
+    mx, my = math.floor(mx), math.floor(my)
+    love.graphics.rectangle("fill", mx, my, 1, 1)
+    -- If a rectangle larger than 1px is dragged, scan the dragged
+    local rect
+    if gui_state.input.mouse.buttons[1] and (
+        gui_state.input.mouse.buttons[1].pressed or
+        gui_state.input.mouse.buttons[1].releases >= 1
+      )
+    then
+      local img_w, img_h = state.image:getDimensions()
+      rect = get_dragged_rect(state, gui_state, img_w, img_h)
+    end
+
+    if rect and rect.w > 0 and rect.h > 0 then
+      show_quad(gui_state, state, rect)
+      local rects = img_analysis.palette(state.image, rect.x, rect.y, rect.w, rect.h)
+      for _, r in ipairs(rects) do
+        draw_dashed_line(r, gui_state, state.display.zoom)
+      end
+      gui_state.mousestring = string.format("%d quads", #rects)
+      if not gui_state.input.mouse.buttons[1].pressed and #rects > 0 then
+        app.quadtastic.create(rects)
+      end
+    end
+  end
 end
 
 local function select_tool(app, gui_state, state, img_w, img_h)
@@ -448,6 +479,8 @@ local function handle_input(app, gui_state, state, img_w, img_h)
       select_tool(app, gui_state, state, img_w, img_h)
     elseif state.tool == "wand" then
       wand_tool(app, gui_state, state, img_w, img_h)
+    elseif state.tool == "palette" then
+      palette_tool(app, gui_state, state, img_w, img_h)
     end
 
     -- If the middle mouse button was dragged in this scrollpane, pan the image

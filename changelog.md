@@ -2,8 +2,6 @@
 
 ### Planned
 
- - Add palette tool that creates a quad for each unique color in the
-   selected region, and then asks for a palette name
  - Use relative paths in quadfile's metadata if possible
 
 ### Unreleased
@@ -13,6 +11,8 @@
  - Lower minimum zoom level for bigger sprite sheets
  - Fix opened menu items not being highlighted
  - Show keybindings in menus and tooltips
+ - Add palette tool that creates a quad for each unique color in the
+   selected region
 
 ### Release 0.4.2, 2017-04-10
 

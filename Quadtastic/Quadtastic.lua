@@ -283,6 +283,15 @@ Quadtastic.draw = function(app, state, gui_state)
         Tooltip.draw(gui_state, S.tooltips.wand_tool)
         Layout.next(gui_state, "|")
 
+        if Button.draw(gui_state, nil, nil, nil, nil, nil,
+                       gui_state.style.quads.tools.palette,
+                       {pressed = state.tool == "palette"})
+        then
+          app.quadtastic.switch_tool("palette")
+        end
+        Tooltip.draw(gui_state, S.tooltips.palette_tool)
+        Layout.next(gui_state, "|")
+
       end Layout.finish(gui_state, "|")
 
       Layout.next(gui_state, "-")

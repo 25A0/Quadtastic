@@ -184,6 +184,7 @@ return {
     add = {x = 32, y = 48, w = 13, h = 13},
     border = {x = 64, y = 48, w = 13, h = 13},
     create = {x = 48, y = 48, w = 13, h = 13},
+    palette = {x = 32, y = 64, w = 13, h = 13},
     select = {x = 64, y = 64, w = 13, h = 13},
     strip = {x = 80, y = 48, w = 13, h = 13},
     wand = {x = 80, y = 64, w = 13, h = 13},

@@ -9,25 +9,25 @@ local analysis = {}
 -- condition.
 -- If no pixels fulfil the condition, an empty table is returned.
 -- If a strip from pixel 5 to 8 fulfills the condition, then {{5, 8}} is returned.
-local function find_strips(image_data, y, w, condition)
+local function find_strips(image_data, y, min_x, max_x, condition)
   local found = {}
-  local x = 0
+  local x = min_x or 0
   local x_start
-  while x < w do
+  while x <= max_x do
     if condition(image_data, x, y) then
       x_start = x
       x = x + 1
-      while x < w and condition(image_data, x, y, x_start) do
+      while x <= max_x and condition(image_data, x, y, x_start) do
         x = x + 1
       end
       -- Now x is w, or the first pixel that didn't fulfill the condition.
       -- This means that the strip starts at x_start, and stops at x - 1.
       table.insert(found, {x_start, x - 1})
+    else
+      -- Only if the condition was not fulfilled we advance via this branch.
+      -- This prevents that we skip a pixel after the condition is no longer true.
+      x = x + 1
     end
-    -- Note that we advance x by 2 in this iteration in case that we found a
-    -- strip. This is fine because we already checked the previous pixel. If
-    -- that pixel had fulfilled the condition then the strip would not have ended.
-    x = x + 1
   end
 
   return found
@@ -83,8 +83,25 @@ local strip_iterator = function(previous_strips, new_strips)
   return evt_finished
 end
 
-local function is_opaque(image_data, x, y)
+local function cond_is_opaque(image_data, x, y, _)
   return select(4, image_data:getPixel(x, y)) ~= 0
+end
+
+local function same_color(image_data, x1, y1, x2, y2)
+    local color1 = {image_data:getPixel(x1, y1)}
+    local color2 = {image_data:getPixel(x2, y2)}
+    return color1[1] == color2[1] and
+           color1[2] == color2[2] and
+           color1[3] == color2[3] and
+           color1[4] == color2[4]
+end
+
+local function cond_same_color(image_data, x, y, first_x)
+  if first_x then
+    return same_color(image_data, x, y, first_x, y)
+  else
+    return select(4, image_data:getPixel(x, y)) ~= 0
+  end
 end
 
 local function create_strip_node(y, strip)
@@ -113,10 +130,10 @@ function analysis.outter_bounding_box(image_or_imagedata, mx, my)
   local w, h = img:getWidth(), img:getHeight()
 
   if mx < 0 or mx >= w or my < 0 or my >= h then return nil end
-  if not is_opaque(img, mx, my) then return nil end
+  if not cond_is_opaque(img, mx, my) then return nil end
 
   -- The initial set of strips
-  local strips = find_strips(img, my, w, is_opaque)
+  local strips = find_strips(img, my, 0, w - 1, cond_is_opaque)
   for _, strip in ipairs(strips) do
     create_strip_node(my, strip)
   end
@@ -173,7 +190,7 @@ function analysis.outter_bounding_box(image_or_imagedata, mx, my)
     local previous_strips = initial_strips
     py = py + dy
     while py >= 0 and py < h do
-      local new_strips = find_strips(img, py, w, is_opaque)
+      local new_strips = find_strips(img, py, 0, w - 1, cond_is_opaque)
       -- Stop if this line didn't contain any strips
       if #new_strips == 0 then break end
 
@@ -239,14 +256,7 @@ function analysis.outter_bounding_box(image_or_imagedata, mx, my)
   }
 end
 
-function analysis.enclosed_chunks(image_or_imagedata, x, y, w, h)
-  local img
-  if image_or_imagedata:type() == "Image" then
-    img = image_or_imagedata:getData()
-  else
-    assert(image_or_imagedata:type() == "ImageData")
-    img = image_or_imagedata
-  end
+local function collect_chunks(img, x, y, w, h, condition, states)
   local img_w, img_h = img:getWidth(), img:getHeight()
 
   -- Move x and y to the upper left corner
@@ -276,55 +286,10 @@ function analysis.enclosed_chunks(image_or_imagedata, x, y, w, h)
     return {}
   end
 
-  local states = {}
-  states[1] = function(event, strip)
-    if event == evt_prev_strip_starts then
-      return states[3], strip
-    elseif event == evt_new_strip_starts then
-      return states[2], nil, strip
-    else error("did not expect event " .. event) end
-  end
-
-  states[2] = function(event, strip, _, _, new_strip)
-    if event == evt_new_strip_ends then
-      return states[1]
-    elseif event == evt_prev_strip_starts then
-      connect_nodes(strip, new_strip)
-      return states[4], strip, new_strip
-    else error("did not expect event " .. event) end
-  end
-
-  states[3] = function(event, strip, abandoned_strips, prev_strip)
-    if event == evt_prev_strip_ends then
-      table.insert(abandoned_strips, strip)
-      return states[1]
-    elseif event == evt_new_strip_starts then
-      connect_nodes(prev_strip, strip)
-      return states[4], prev_strip, strip
-    else error("did not expect event " .. event) end
-  end
-
-  states[4] = function(event, _, _, prev_strip, new_strip)
-    if event == evt_prev_strip_ends then
-      return states[2], nil, new_strip
-    elseif event == evt_new_strip_ends then
-      return states[5], prev_strip
-    else error("did not expect event " .. event) end
-  end
-
-  states[5] = function(event, strip, _, prev_strip, _)
-    if event == evt_new_strip_starts then
-      connect_nodes(strip, prev_strip)
-      return states[4], prev_strip, strip
-    elseif event == evt_prev_strip_ends then
-      return states[1]
-    else error("did not expect event " .. event) end
-  end
-
   local chunks = {}
   local previous_strips = {}
   for scan_y=y,y + h - 1 do
-    local candidate_strips = find_strips(img, scan_y, img_w, is_opaque)
+    local candidate_strips = find_strips(img, scan_y, x, x + w - 1, condition)
     local new_strips = {}
     for _,strip in ipairs(candidate_strips) do
       if strip[2] >= x and strip[1] < x + w then
@@ -405,6 +370,155 @@ function analysis.enclosed_chunks(image_or_imagedata, x, y, w, h)
   end
 
   return rects
+end
+
+-- Returns a table of rectangles which enclose all chunks of the same color
+-- in the given rectangle
+function analysis.palette(image_or_imagedata, x, y, w, h)
+  local img
+  if image_or_imagedata:type() == "Image" then
+    img = image_or_imagedata:getData()
+  else
+    assert(image_or_imagedata:type() == "ImageData")
+    img = image_or_imagedata
+  end
+
+  local function strip_same_color(s1, s2)
+    return same_color(img,  s1[1], s1.y, s2[1], s2.y)
+  end
+
+  local states = {}
+  states[1] = function(event, strip)
+    if event == evt_prev_strip_starts then
+      return states[3], strip
+    elseif event == evt_new_strip_starts then
+      return states[2], nil, strip
+    else error("did not expect event " .. event) end
+  end
+
+  states[2] = function(event, strip, _, _, new_strip)
+    if event == evt_new_strip_ends then
+      return states[1]
+    elseif event == evt_prev_strip_starts then
+      if strip_same_color(strip, new_strip) then
+        connect_nodes(strip, new_strip)
+        return states[4], strip, new_strip
+      else
+        return states[6], strip, new_strip
+      end
+    else error("did not expect event " .. event) end
+  end
+
+  states[3] = function(event, strip, abandoned_strips, prev_strip)
+    if event == evt_prev_strip_ends then
+      table.insert(abandoned_strips, strip)
+      return states[1]
+    elseif event == evt_new_strip_starts then
+      if strip_same_color(prev_strip, strip) then
+        connect_nodes(prev_strip, strip)
+        return states[4], prev_strip, strip
+      else
+        return  states[6], prev_strip, strip
+      end
+    else error("did not expect event " .. event) end
+  end
+
+  states[4] = function(event, _, _, prev_strip, new_strip)
+    if event == evt_prev_strip_ends then
+      return states[2], nil, new_strip
+    elseif event == evt_new_strip_ends then
+      return states[5], prev_strip
+    else error("did not expect event " .. event) end
+  end
+
+  states[5] = function(event, strip, _, prev_strip, _)
+    if event == evt_new_strip_starts then
+      if strip_same_color(prev_strip, strip) then
+        connect_nodes(strip, prev_strip)
+      end
+      return states[4], prev_strip, strip
+    elseif event == evt_prev_strip_ends then
+      return states[1]
+    else error("did not expect event " .. event) end
+  end
+
+  states[6] = function(event, strip, abandoned_strips, prev_strip, new_strip)
+    if event == evt_new_strip_ends then
+      return states[3], prev_strip
+    elseif event == evt_prev_strip_ends then
+      table.insert(abandoned_strips, prev_strip)
+      return states[2], nil, new_strip
+    else error("did not expect event " .. event) end
+  end
+
+  local rects = collect_chunks(img, x, y, w, h, cond_same_color, states)
+
+  -- Sort the quads
+  local function sort(quad_a, quad_b)
+    return quad_a.y < quad_b.y or quad_a.y == quad_b.y and quad_a.x < quad_b.x
+  end
+  table.sort(rects, sort)
+  return rects
+end
+
+-- Returns a table of rectangles which enclose all opaque chunks in the
+-- given rectangle
+function analysis.enclosed_chunks(image_or_imagedata, x, y, w, h)
+  local img
+  if image_or_imagedata:type() == "Image" then
+    img = image_or_imagedata:getData()
+  else
+    assert(image_or_imagedata:type() == "ImageData")
+    img = image_or_imagedata
+  end
+
+  local states = {}
+  states[1] = function(event, strip)
+    if event == evt_prev_strip_starts then
+      return states[3], strip
+    elseif event == evt_new_strip_starts then
+      return states[2], nil, strip
+    else error("did not expect event " .. event) end
+  end
+
+  states[2] = function(event, strip, _, _, new_strip)
+    if event == evt_new_strip_ends then
+      return states[1]
+    elseif event == evt_prev_strip_starts then
+      connect_nodes(strip, new_strip)
+      return states[4], strip, new_strip
+    else error("did not expect event " .. event) end
+  end
+
+  states[3] = function(event, strip, abandoned_strips, prev_strip)
+    if event == evt_prev_strip_ends then
+      table.insert(abandoned_strips, strip)
+      return states[1]
+    elseif event == evt_new_strip_starts then
+      connect_nodes(prev_strip, strip)
+      return states[4], prev_strip, strip
+    else error("did not expect event " .. event) end
+  end
+
+  states[4] = function(event, _, _, prev_strip, new_strip)
+    if event == evt_prev_strip_ends then
+      return states[2], nil, new_strip
+    elseif event == evt_new_strip_ends then
+      return states[5], prev_strip
+    else error("did not expect event " .. event) end
+  end
+
+  states[5] = function(event, strip, _, prev_strip, _)
+    if event == evt_new_strip_starts then
+      connect_nodes(strip, prev_strip)
+      return states[4], prev_strip, strip
+    elseif event == evt_prev_strip_ends then
+      return states[1]
+    else error("did not expect event " .. event) end
+  end
+
+  return collect_chunks(img, x, y, w, h, cond_is_opaque, states)
+
 end
 
 return analysis
