@@ -1,5 +1,6 @@
 local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
 local Layout = require(current_folder .. ".Layout")
+local Label = require(current_folder .. ".Label")
 local imgui = require(current_folder .. ".imgui")
 local Button = require(current_folder .. ".Button")
 local Rectangle = require(current_folder .. ".Rectangle")
@@ -174,6 +175,11 @@ function Menu.menu_item(gui_state, label, options)
   end
 
   options.trigger_on_release = true
+  if options and options.keybinding then
+    Label.draw(gui_state, nil, nil, gui_state.layout.max_w, nil,
+               options.keybinding,
+               {alignment_h = ">", font_color = options.font_color})
+  end
   local clicked, _, hovered = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
     label, nil, options)
   Layout.next(gui_state, "|")
