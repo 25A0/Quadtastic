@@ -50,6 +50,7 @@ local subs = {
 	["*gui"] = "cmd",
 	["*shift"] = "shift",
 	["*alt"] = "alt",
+	["return"] = "enter",
 }
 
 function keybindings.to_string(keybinding)
@@ -64,7 +65,7 @@ function keybindings.to_string(keybinding)
 			table.insert(s, subs[v] or v)
 		end
 	end
-	table.insert(s, keybinding[1])
+	table.insert(s, subs[keybinding[1]] or keybinding[1])
 	return table.concat(s, "+")
 end
 
