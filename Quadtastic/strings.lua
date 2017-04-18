@@ -20,7 +20,8 @@ end
 
 local strings = {}
 
-strings.github_url = "https://www.github.com/25A0/Quadtastic"
+strings.source_code_url = "https://www.github.com/25A0/Quadtastic"
+strings.documentation_url = "https://www.github.com/25A0/Quadtastic/wiki"
 strings.report_email = "moritz@25a0.com"
 
 strings.toast = {
@@ -47,7 +48,8 @@ strings.menu = {
       reload_image = "Reload image",
     }),
   help = menu_table("Help", {
-      github = "GitHub",
+      documentation = "Documentation",
+      source_code = "Source Code",
       libquadtastic = menu_table("libquadtastic.lua", {
         copy = "Copy to clipboard",
       }),

@@ -189,8 +189,11 @@ Quadtastic.draw = function(app, state, gui_state)
       end
       if Menu.menu_start(gui_state, w/4, h - 12, S.menu.help()) then
 
-        if Menu.action_item(gui_state, S.menu.help.github) then
-          love.system.openURL(S.github_url)
+        if Menu.action_item(gui_state, S.menu.help.documentation) then
+          love.system.openURL(S.documentation_url)
+        end
+        if Menu.action_item(gui_state, S.menu.help.source_code) then
+          love.system.openURL(S.source_code_url)
         end
         if Menu.menu_start(gui_state, w/4, h-12, S.menu.help.libquadtastic()) then
           if Menu.action_item(gui_state, S.menu.help.libquadtastic.copy) then
