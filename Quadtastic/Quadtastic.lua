@@ -203,12 +203,12 @@ Quadtastic.draw = function(app, state, gui_state)
         if Menu.menu_start(gui_state, w/4, h - 12, S.menu.help.report()) then
 
           if Menu.action_item(gui_state, S.menu.help.report.github) then
-            local version_info = love.filesystem.read("res/version.txt")
+            local version_info = common.get_version()
             local body = S.menu.help.report.issue_body(version_info)
             love.system.openURL("https://www.github.com/25A0/Quadtastic/issues/new?body="..body)
           end
           if Menu.action_item(gui_state, S.menu.help.report.email) then
-            local version_info = love.filesystem.read("res/version.txt")
+            local version_info = common.get_version()
             local subject = S.menu.help.report.email_subject(version_info)
             local body = S.menu.help.report.issue_body(version_info)
             love.system.openURL("mailto:moritz@25a0.com?subject="..subject..

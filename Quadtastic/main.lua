@@ -14,6 +14,7 @@ local libquadtastic = require(current_folder .. ".libquadtastic")
 local Transform = require(current_folder .. '.transform')
 local Toast = require(current_folder .. '.Toast')
 local Text = require(current_folder .. '.Text')
+local common = require(current_folder .. '.common')
 local transform = Transform()
 
 -- Cover love transformation functions
@@ -35,7 +36,7 @@ local app
 local gui_state
 
 function love.load()
-  local version_info = love.filesystem.read("res/version.txt")
+  local version_info = common.get_version()
   love.window.setTitle(love.window.getTitle() .. " " .. version_info)
   -- Disable buffering of stdout
   io.stdout:setvbuf("no")

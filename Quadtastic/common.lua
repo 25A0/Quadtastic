@@ -5,6 +5,12 @@ local libquadtastic = require(current_folder.. ".libquadtastic")
 
 local common = {}
 
+function common.get_version()
+  local success, more = pcall(love.filesystem.read, "res/version.txt")
+  if success then return more
+  else return "Unknown version" end
+end
+
 -- Load imagedata from outside the game's source and save folder
 function common.load_imagedata(filepath)
   local filehandle, err = io.open(filepath, "rb")
