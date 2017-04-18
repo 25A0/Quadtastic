@@ -3,7 +3,6 @@
 ### Planned
 
  - Use relative paths in quadfile's metadata if possible
- - Add version number to quadfile
  - Try to find a way to notify user when new version is available
 
 ### Unreleased
@@ -27,6 +26,7 @@
  - Add menu item to copy current libquadtastic version to clipboard
  - Add example project
  - Add libquadtastic as distribution target
+ - Add version number to quadfile
 
 ### Release 0.4.1, 2017-04-08
 

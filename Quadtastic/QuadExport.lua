@@ -19,6 +19,10 @@ QuadExport.export = function(quads, filepath_or_filehandle)
     error("Cannot access filepath or filehandle")
   end
 
+  -- Insert version info into quads
+  if not quads._META then quads._META = {} end
+  quads._META.version = common.get_version()
+
   common.export_table_to_file(filehandle, quads)
 end
 
