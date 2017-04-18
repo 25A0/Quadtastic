@@ -9,16 +9,33 @@
   Features
 </h3>
 <ul>
-  <li>Sample from sprite sheets without ever typing out coordinates or dimensions</li>
-  <li>Name your quads to make it easier to access them</li>
-  <li>Create groups of quads to organize them hierarchically</li>
-  <li>Quads are saved as a simple lua table. They look something like this:
+  <li>Create quads straight on your spritesheet -- no need to ever type out coordinates again</li>
+  <li>Keep your quads neatly organized by giving them descriptive names and grouping them</li>
+  <li>
+    Use the wand tool to create quads from opaque areas automatically
+    <img src="http://imgur.com/b8KJzHC.gif">
+  </li>
+  <li>
+    Use the palette tool to create quads from areas that have the same color
+    <img src="http://imgur.com/d27NDVI.gif">
+  </li>
+  <li>Save quads as a simple lua table.
     <pre>
-  return {
-    head = {x = 3, y = 3, w = 16, h = 16},
-    torso = {x = 2, y = 22, w = 16, h = 32},
-    legs = {x = 3, y = 58, w = 16, h = 16},
-  }</pre>
+ return {
+  base = {x = 16, y = 27, w = 16, h = 8},
+  bubbles = {
+    {x = 2, y = 18, w = 5, h = 5},
+    {x = 1, y = 25, w = 3, h = 4},
+    {x = 10, y = 18, w = 5, h = 3},
+    {x = 7, y = 24, w = 7, h = 6},
+    {x = 3, y = 8, w = 5, h = 4},
+    {x = 10, y = 11, w = 4, h = 3},
+    {x = 7, y = 3, w = 6, h = 4},
+  },
+  lid = {x = 16, y = 7, w = 16, h = 15},
+  liquid = {x = 0, y = 32, w = 3, h = 3},
+  stand = {x = 32, y = 32, w = 16, h = 16},
+}</pre>
   </li>
   <li>As you expand your sprite sheet, you can re-open this quadfile in Quadtastic
     to add or modify quads
@@ -32,14 +49,10 @@
   local libquadtastic = require("libquadtastic")
 
   -- do this once in love.load
-  local image = love.graphics.newImage(
-    "path/to/spritesheet"
-  )
+  local image = love.graphics.newImage("path/to/spritesheet")
 
-  local quads = libquadtastic.import_quads(
-    require("path/to/quadfile"),
-    image:getWidth(), image:getHeight()
-  )
+  local quads = libquadtastic.import_quads(require("path/to/quadfile"),
+                                           image:getWidth(), image:getHeight())
 
    -- do this whenever you want to draw the quads
   love.graphics.draw(image, quads.head, 2, 0)
@@ -50,8 +63,12 @@
 </ul>
 
 <p align="center">
+  <a href="https://github.com/25a0/Quadtastic/wiki">
+    <img src="http://imgur.com/Kkquk1h.png">
+  </a>
+
   <a href="https://github.com/25a0/Quadtastic">
-    <img src="http://imgur.com/5GAt2H1.png">
+    <img src="http://imgur.com/9hlS14p.png">
   </a>
 </p>
 
