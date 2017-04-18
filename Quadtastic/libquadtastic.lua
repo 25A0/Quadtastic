@@ -61,7 +61,7 @@ function libquadtastic.create_quads(table, width, height)
 end
 
 -- Creates a color palette from the quads that are defined in the given table.
--- Returns a new table which contains the RGBA value of the upper left corner of
+-- Returns a new table which contains the RGBA value of the center of
 -- each defined quad in the input table.
 -- The defined colors are stored as a table, containing the R, G, B and A
 -- component of the color at index 1 through 4. Furthermore, each color is
@@ -71,8 +71,9 @@ function libquadtastic.create_palette(table, image)
   local function create_palette(tab, imagedata)
 
     if libquadtastic.is_quad(tab) then
-      -- Grab the pixel color of the quad's upper left corner
-      local color = {imagedata:getPixel(tab.x, tab.y)}
+      -- Grab the pixel color of the quad's center
+      local color = {imagedata:getPixel(tab.x + math.floor(tab.w/2),
+                                        tab.y + math.floor(tab.h/2))}
       -- Make the table callable to easily modify the alpha value
       setmetatable(color, {
         __call = function(t, alpha)

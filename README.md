@@ -150,8 +150,8 @@ You can just as easily use them with a spritebatch:
 #### Using Palettes
 
 You can also use this tool to create color palettes. The command
-`import_palette` will take the upper left pixel of each defined quad and store
-its RGBA value.
+`import_palette` will take the pixel in the center of each defined quad, and
+store its RGBA value.
 
 ```lua
   local libquadtastic = require("libquadtastic")

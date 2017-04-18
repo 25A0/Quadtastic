@@ -14,6 +14,7 @@
  - Add palette tool that creates a quad for each unique color in the
    selected region
  - Grouping quads now preserves the order of quads with numeric indices
+ - Sample palette color from center of quad instead of upper left corner
 
 ### Release 0.4.2, 2017-04-10
 
