@@ -29,8 +29,8 @@ end
 Rectangle.contains = function(self, px, py, pw, ph)
   return px >= self.x and px < self.x + self.w and
          py >= self.y and py < self.y + self.h and
-         (not pw or px + pw >= self.x and px + pw < self.x + self.w) and
-         (not ph or py + ph >= self.y and py + ph < self.y + self.h)
+         (not pw or px + pw >= self.x and px + pw <= self.x + self.w) and
+         (not ph or py + ph >= self.y and py + ph <= self.y + self.h)
 end
 
 setmetatable(Rectangle, {
