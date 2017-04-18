@@ -15,6 +15,8 @@
    selected region
  - Grouping quads now preserves the order of quads with numeric indices
  - Sample palette color from center of quad instead of upper left corner
+ - Show a bright pixel under the cursor when using the wand tool
+ - When grouping quads, select the newly created group
 
 ### Release 0.4.2, 2017-04-10
 
