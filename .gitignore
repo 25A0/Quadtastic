@@ -2,3 +2,6 @@ dist
 
 # Auto-generated resources
 Quadtastic/res/version.txt
+
+# Large files that we don't want in the index
+screenshots/*.mov
