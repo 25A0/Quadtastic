@@ -513,6 +513,7 @@ end
 function Dialog.show_about_dialog()
   local version_info = common.get_version()
   local copyright_info = love.filesystem.read("res/copyright.txt")
+  local edition = love.filesystem.read("res/edition.txt")
 
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
@@ -530,6 +531,12 @@ function Dialog.show_about_dialog()
 
         Label.draw(gui_state, nil, nil, nil, nil, S.dialogs.about(version_info), options)
         Layout.next(gui_state, "|")
+        if edition then
+          edition = common.trim_whitespace(edition)
+          local edition_text = S.editions[edition] or "Unknown edition"
+          Label.draw(gui_state, nil, nil, nil, nil, edition_text, options)
+          Layout.next(gui_state, "|")
+        end
         Label.draw(gui_state, nil, nil, nil, nil, copyright_info, options)
         Layout.next(gui_state, "|")
         if Button.draw(gui_state, nil, nil, nil, nil, S.buttons.close) then

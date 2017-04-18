@@ -30,6 +30,12 @@ strings.toast = {
   copied_to_clipboard = "Copied to clipboard",
 }
 
+strings.editions = {
+  windows = "Windows edition",
+  osx = "MacOS edition",
+  love = "cross-platform edition",
+}
+
 strings.menu = {
   file = menu_table("File", {
       new = "New",

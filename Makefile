@@ -7,6 +7,7 @@ APPCOPYRIGHT = 2017 Moritz Neikes
 macos-love-distname = love-0.10.2-macosx-x64
 windows-love-distname = love-0.10.2-win32
 
+# When changing these edition identifiers, remember to change them in strings.lua
 EDITION_WINDOWS = windows
 EDITION_MACOS = osx
 EDITION_CROSSPLATFORM = love
