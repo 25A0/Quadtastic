@@ -511,7 +511,7 @@ function Dialog.save_file(basepath, default_extension)
 end
 
 function Dialog.show_about_dialog()
-  local version_info = comomon.get_version()
+  local version_info = common.get_version()
   local copyright_info = love.filesystem.read("res/copyright.txt")
 
   -- Draw the dialog
