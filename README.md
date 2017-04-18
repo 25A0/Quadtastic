@@ -1,7 +1,7 @@
 <h1 align="center">Quadtastic!</h1>
 
 <p align="center">
-  A little standalone tool to manage sprite sheets and color palettes for
+  A simple standalone tool to manage sprite sheets and color palettes for
   <a href="https://www.love2d.org">LÖVE</a> projects.
 </p>
 
@@ -32,8 +32,9 @@
  ![Using the palette tool](screenshots/palette.gif)
  - Learn more about how to [**use Quadtastic**](https://github.com/25a0/Quadtastic/wiki/Using-Quadtastic)
  - Save quads as a simple lua table.
-   You can then later go back and load this file to add or modify quads
- ```lua
+   As you expand your sprite sheet, you can re-open this file in Quadtastic
+   to add or modify quads
+```lua
 return {
   base = {x = 16, y = 27, w = 16, h = 8},
   bubbles = {
@@ -50,14 +51,17 @@ return {
   stand = {x = 32, y = 32, w = 16, h = 16},
 }
  ```
- - In your LOVE project, turn these quads into LOVE Quad objects with just a
+ - Enable ![Turbo Workflow](screenshots/turboworkflow.gif) to reload the
+   spritesheet whenever it changes on disk, and to re-export the quads whenever
+   you change them
+ - In your LÖVE project, turn these quads into LÖVE Quad objects with just a
    few lines of code
 ```lua
   -- load the raw quad definitions that you created with Quadtastic
   local raw_quads = require("res/quads")
   image = love.graphics.newImage("res/sheet.png") -- load spritesheet
 
-  -- Create LOVE Quads from raw quad definitions
+  -- Create LÖVE Quads from raw quad definitions
   quads = libquadtastic.create_quads(raw_quads, image:getWidth(), image:getHeight())
 ```
  - You can then draw these quads like so:
@@ -65,9 +69,9 @@ return {
   love.graphics.draw(image, quads.base)
 ```
 
- - Learn more about how to [**use quads and palettes in your LOVE project**](https://github.com/25a0/Quadtastic/wiki/Using-quads-and-palettes)
+ - Learn more about how to [**use quads and palettes in your LÖVE project**](https://github.com/25a0/Quadtastic/wiki/Using-quads-and-palettes)
 
-## Download
+## Binary downloads
 
 You can find executables of Quadtastic for Windows and OS X [on itch.io](https://25a0.itch.io/quadtastic), as well as a cross-platform `.love` archive.
 
@@ -77,6 +81,20 @@ If you have [luarocks](https://luarocks.org/) installed, you can install LuaFile
 ```
   luarocks install luafilesystem
 ```
+
+## Running Quadtastic from source
+
+If you prefer to run Quadtastic from source, here is what you'll need to do
+
+ 1. Install [LÖVE](https://www.love2d.org), and make `love` available on your path
+ 2. **On linux**, install luafilesystem if not already installed,
+    e.g. with `luarocks install luafilesystem`.
+    (On Windows and MacOS, Quadtastic will use the compiled version of
+     luafilesystem that is included in this repo)
+ 3. Clone this repository, e.g. with `git clone git@github.com:25a0/Quadtastic.git`
+ 4. `cd Quadtastic/`
+ 6. `love Quadtastic`
+
 
 ## [Changelog](./changelog.md)
 
