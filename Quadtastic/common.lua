@@ -6,8 +6,16 @@ local libquadtastic = require(current_folder.. ".libquadtastic")
 local common = {}
 
 function common.get_version()
-  return love.filesystem.read("res/version.txt")
-         or "Unknown version"
+  local version_info = love.filesystem.read("res/version.txt")
+  if version_info then
+    -- Trim leading whitespace
+    version_info = string.gmatch(version_info, "%s*(%S[%s%S]*)")()
+    -- Trim trailing whitespace
+    version_info = string.gmatch(version_info, "([%s%S]*%S)%s")()
+    return version_info
+  else
+    return "Unknown version"
+  end
 end
 
 -- Load imagedata from outside the game's source and save folder
