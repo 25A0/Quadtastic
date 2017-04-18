@@ -15,7 +15,21 @@
   </a>
 </p>
 
-## Usage
+<p align="center">
+  <a href="https://github.com/25a0/Quadtastic/wiki">
+    <img src="http://imgur.com/Kkquk1h.png" alt="Documentation">
+  </a>
+</p>
+
+## Features
+
+ - Create quads straight on your spritesheet -- no need to ever type out coordinates again
+ - Keep your quads neatly organized by giving them descriptive names and grouping them
+ - Move and resize existing quads
+ - Use the wand tool to create quads from opaque areas automatically
+ ![Using the wand tool](screenshots/wand.gif)
+ - Use the palette tool to create quads from areas that have the same color
+ ![Using the palette tool](screenshots/palette.gif)
 
 ## Download
 
