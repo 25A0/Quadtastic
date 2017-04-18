@@ -231,9 +231,6 @@ local function wand_tool(app, gui_state, state)
         app.quadtastic.create(rects)
       end
     else
-      local mx, my = gui_state.transform:unproject(
-        gui_state.input.mouse.x, gui_state.input.mouse.y)
-      mx, my = math.floor(mx), math.floor(my)
       -- Find strip of opaque pixels
       local quad = img_analysis.outter_bounding_box(state.image, mx, my)
       if quad then
