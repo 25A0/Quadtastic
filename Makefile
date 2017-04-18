@@ -146,10 +146,11 @@ ${APPNAME}/res/version.txt:
 %.png: %.ase
 	${aseprite} -b $*.ase --save-as $*.png
 
-screenshots/example.gif: screenshots/example.mov
-	ffmpeg -i screenshots/example.mov -r 10 -vcodec png screenshots/out-static-%04d.png 
-	time convert -verbose +dither -layers Optimize -resize 106x120\> screenshots/out-static*.png  GIF:- > screenshots/example.gif
-	rm screenshots/out-static-*
+%.gif: %.mov
+	mkdir -p .tmp
+	ffmpeg -i $*.mov -r 10 -vcodec png .tmp/out-static-%04d.png 
+	time convert -verbose +dither -layers Optimize .tmp/out-static*.png  GIF:- > $*.gif
+	rm .tmp/out-static-*
 
 tests/test_*.lua:
 	lua $@
