@@ -1,6 +1,3 @@
-[submodule "luafilesystem"]
-	path = lib/luafilesystem
-	url = git@github.com:keplerproject/luafilesystem.git
 [submodule "wiki"]
 	path = wiki
 	url = git@github.com:25A0/Quadtastic.wiki.git
