@@ -202,8 +202,13 @@ local function create_tool(app, gui_state, state, img_w, img_h)
 end
 
 local function wand_tool(app, gui_state, state)
-  love.graphics.setColor(255, 255, 255, 255)
   if gui_state.input then
+    -- Draw a bright pixel where the mouse is
+    love.graphics.setColor(255, 255, 255, 255)
+    local mx, my = gui_state.transform:unproject(
+      gui_state.input.mouse.x, gui_state.input.mouse.y)
+    mx, my = math.floor(mx), math.floor(my)
+    love.graphics.rectangle("fill", mx, my, 1, 1)
     -- If a rectangle larger than 1px is dragged, scan the dragged
     local rect
     if gui_state.input.mouse.buttons[1] and (
@@ -245,9 +250,9 @@ local function wand_tool(app, gui_state, state)
 end
 
 local function palette_tool(app, gui_state, state)
-  -- Draw a bright pixel where the mouse is
-  love.graphics.setColor(255, 255, 255, 255)
   if gui_state.input then
+    -- Draw a bright pixel where the mouse is
+    love.graphics.setColor(255, 255, 255, 255)
     local mx, my = gui_state.transform:unproject(
       gui_state.input.mouse.x, gui_state.input.mouse.y)
     mx, my = math.floor(mx), math.floor(my)
