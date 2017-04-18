@@ -526,9 +526,11 @@ function Dialog.show_about_dialog()
         gui_state.layout.adv_x, gui_state.layout.adv_y = icon_w, icon_h
         Layout.next(gui_state, "|")
 
-        Label.draw(gui_state, nil, nil, nil, nil, S.dialogs.about(version_info))
+        local options = {alignment_h = ":"}
+
+        Label.draw(gui_state, nil, nil, nil, nil, S.dialogs.about(version_info), options)
         Layout.next(gui_state, "|")
-        Label.draw(gui_state, nil, nil, nil, nil, copyright_info)
+        Label.draw(gui_state, nil, nil, nil, nil, copyright_info, options)
         Layout.next(gui_state, "|")
         if Button.draw(gui_state, nil, nil, nil, nil, S.buttons.close) then
           app.about_dialog.close()
