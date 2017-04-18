@@ -7,6 +7,11 @@ APPCOPYRIGHT = 2017 Moritz Neikes
 macos-love-distname = love-0.10.2-macosx-x64
 windows-love-distname = love-0.10.2-win32
 
+EDITION_WINDOWS = windows
+EDITION_MACOS = osx
+EDITION_CROSSPLATFORM = love
+EDITION_LIBQUADTASTIC = libquadtastic
+
 .PHONY: clean test check tests/* run all distfiles app_resources run_debug release* publish
 
 all: run_debug
@@ -71,6 +76,7 @@ dist/releases/${APPVERSION}/libquadtastic/libquadtastic.lua: Quadtastic/libquadt
 	cp Quadtastic/libquadtastic.lua dist/releases/${APPVERSION}/libquadtastic/
 
 dist/${APPNAME}.love: ${APPNAME}/*.lua ${APP_RESOURCES}
+	echo ${EDITION_CROSSPLATFORM} > ${APPNAME}/res/edition.txt
 	cd ${APPNAME}; zip ../dist/${APPNAME}.love -Z store -FS -r . -x .\*
 	cp -R shared dist/
 
@@ -78,7 +84,16 @@ dist/macos/${APPNAME}.app: dist/res/love.app dist/${APPNAME}.love dist/res/icon.
 	mkdir -p dist/macos
 	mkdir -p dist/macos/${APPNAME}.app
 	rsync -qat dist/res/love.app/ dist/macos/${APPNAME}.app/
-	cp dist/${APPNAME}.love dist/macos/${APPNAME}.app/Contents/Resources/
+	cp dist/${APPNAME}.love dist/macos/
+
+	# Update edition in this version of the .love archive
+	mkdir -p dist/macos/res
+	echo ${EDITION_MACOS} > dist/macos/res/edition.txt
+	cd dist/macos; zip ${APPNAME}.love -Z store res/edition.txt
+	rm dist/macos/res/edition.txt
+	rm -d dist/macos/res
+
+	mv dist/macos/${APPNAME}.love dist/macos/${APPNAME}.app/Contents/Resources/
 	cp -R dist/shared dist/macos/${APPNAME}.app/Contents/Resources/
 	cp dist/res/icon.icns dist/macos/${APPNAME}.app/Contents/Resources/
 
@@ -96,7 +111,17 @@ dist/macos/${APPNAME}.app: dist/res/love.app dist/${APPNAME}.love dist/res/icon.
 dist/windows/${APPNAME}.zip: dist/res/${windows-love-distname}.zip dist/${APPNAME}.love
 	mkdir -p dist/windows/${APPNAME}
 	rsync -qat dist/res/${windows-love-distname}/ dist/windows/${APPNAME}/
-	cat dist/${APPNAME}.love >> dist/windows/${APPNAME}/love.exe
+	cp dist/${APPNAME}.love dist/windows/
+
+	# Update edition in this version of the .love archive
+	mkdir -p dist/windows/res
+	echo ${EDITION_WINDOWS} > dist/windows/res/edition.txt
+	cd dist/windows; zip ${APPNAME}.love -Z store res/edition.txt
+	rm dist/windows/res/edition.txt
+	rm -d dist/windows/res
+
+	cat dist/windows/${APPNAME}.love >> dist/windows/${APPNAME}/love.exe
+	rm dist/windows/${APPNAME}.love
 	mv dist/windows/${APPNAME}/love.exe dist/windows/${APPNAME}/${APPNAME}.exe
 	cp -r dist/shared dist/windows/${APPNAME}/
 	cd dist/windows/${APPNAME}; zip ../${APPNAME}.zip -Z store -FS -r . -x .\*
@@ -186,6 +211,7 @@ ${APPNAME}/libquadtastic.lua:
 	    Quadtastic/libquadtastic.lua
 
 # Build as $ make release-0.2.0
+# Tag names MUST follow the major.minor.patch pattern.
 release-%: test ${LICENSES}
 	@# Only proceed if that version doesn't already exist
 	@test ! -f .git/refs/tags/$* || \
@@ -254,11 +280,11 @@ publish: ${DISTFILES}
 	fi
 	# Uses itch.io's butler to push dist files to the Quadtastic page on itch.io
 	butler push dist/releases/${APPVERSION}/windows/${APPNAME}.zip \
-	       25a0/quadtastic:windows       --userversion ${APPVERSION}
+	       25a0/quadtastic:${EDITION_WINDOWS}       --userversion ${APPVERSION}
 	butler push dist/releases/${APPVERSION}/macos \
-	       25a0/quadtastic:osx           --userversion ${APPVERSION}
+	       25a0/quadtastic:${EDITION_MACOS}         --userversion ${APPVERSION}
 	butler push dist/releases/${APPVERSION}/love \
-	       25a0/quadtastic:love          --userversion ${APPVERSION}
+	       25a0/quadtastic:${EDITION_CROSSPLATFORM} --userversion ${APPVERSION}
 	butler push dist/releases/${APPVERSION}/libquadtastic \
-	       25a0/quadtastic:libquadtastic --userversion ${APPVERSION}
+	       25a0/quadtastic:${EDITION_LIBQUADTASTIC} --userversion ${APPVERSION}
 
