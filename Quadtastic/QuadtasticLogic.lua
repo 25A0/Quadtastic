@@ -552,6 +552,8 @@ function QuadtasticLogic.transitions(interface) return {
 
       -- Focus quad list on new group
       interface.move_quad_into_view(data.quad_scrollpane_state, new_group)
+      -- Select the newly created group
+      data.selection:set_selection({new_group})
     end
 
     local undo_action = function()
