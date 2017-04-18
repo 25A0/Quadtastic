@@ -19,12 +19,7 @@
  - Sample palette color from center of quad instead of upper left corner
  - Show a bright pixel under the cursor when using the wand tool
  - When grouping quads, select the newly created group
-
-### Release 0.4.2, 2017-04-10
-
-[Download](https://github.com/25A0/Quadtastic/releases/tag/0.4.2)
-
- - Update README
+ - Add separate items for documentation and source code to help menu
  - Make sure that importing palettes will still work in LOVE 0.11
  - Add Makefile target to push builds to itch.io
  - Add license to libquadtastic since it will likely be used separately from
