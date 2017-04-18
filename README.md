@@ -46,7 +46,7 @@
 ### Using quads
 
 If you don't feel like reading a lot, you can also just tinker around with the
-[example project](./wiki/Example) in the wiki.
+[example project](https://github.com/25a0/Quadtastic/wiki/Example) in the wiki.
 
 #### Accessing quads from LÖVE
 
