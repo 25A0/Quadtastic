@@ -3,6 +3,8 @@
 ### Planned
 
  - Use relative paths in quadfile's metadata if possible
+ - Add version number to quadfile
+ - Try to find a way to notify user when new version is available
 
 ### Unreleased
 
