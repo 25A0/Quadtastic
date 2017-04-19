@@ -4,6 +4,8 @@
 
  - Use relative paths in quadfile's metadata if possible
  - Try to find a way to notify user when new version is available
+   (this is on hold until I find a way to make https requests, preferably
+   without shipping luasec as pre-compiled binary...)
 
 ### Unreleased
 
