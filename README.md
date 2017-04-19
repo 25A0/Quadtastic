@@ -93,6 +93,9 @@ If you prefer to run Quadtastic from source, here is what you'll need to do
      luafilesystem that is included in this repo)
  3. Clone this repository, e.g. with `git clone git@github.com:25a0/Quadtastic.git`
  4. `cd Quadtastic/`
+ 5. If you have Gnu Make, run `make app_resources`.
+    If you don't, you can skip this step, but you won't see the correct version
+    number.
  6. `love Quadtastic`
 
 
