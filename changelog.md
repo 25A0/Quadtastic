@@ -9,6 +9,14 @@
 
 ### Unreleased
 
+There are currently no unreleased changes
+
+### Release 0.5.0, 2017-04-19
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.5.0)
+
+First public release
+
  - Quadfiles are saved with a neat, compact layout again where possible
  - Add wand tool to create quads from opaque areas
  - Lower minimum zoom level for bigger sprite sheets
