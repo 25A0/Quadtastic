@@ -10,10 +10,12 @@ local imgui = require(current_folder .. ".imgui")
 local AppLogic = require(current_folder .. ".AppLogic")
 local Quadtastic = require(current_folder .. ".Quadtastic")
 local libquadtastic = require(current_folder .. ".libquadtastic")
+local url = require("socket.url")
 
 local Transform = require(current_folder .. '.transform')
 local Toast = require(current_folder .. '.Toast')
 local Text = require(current_folder .. '.Text')
+local S = require(current_folder .. '.strings')
 local common = require(current_folder .. '.common')
 local transform = Transform()
 
@@ -34,6 +36,8 @@ local scale = 2
 
 local app
 local gui_state
+
+local version_url
 
 function love.load()
   local version_info = common.get_version()
@@ -122,6 +126,21 @@ function love.load()
   end
 
   gui_state.overlay_canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
+
+  -- Set up second thread for http requests
+  local http_thread = love.thread.newThread("http_thread.lua")
+  http_thread:start()
+
+  -- Check for an update
+  local channel_name = love.filesystem.read("res/edition.txt")
+  if channel_name then
+    channel_name = common.trim_whitespace(channel_name)
+    version_url = url.absolute(S.update_base_url,
+                               string.format("?target=%s&channel_name=%s",
+                                             S.update_target, channel_name))
+    print(string.format("Querying %s", version_url))
+    love.thread.getChannel("http_requests"):push(version_url)
+  end
 end
 
 function love.draw()
@@ -146,6 +165,24 @@ function love.draw()
       -- Draw that state with the draw function
       f(app, state.data, gui_state, w, h)
       if not is_active then imgui.uncover_input(gui_state) end
+    end
+  end
+
+  -- Check for result of version query
+  do
+    local channel = love.thread.getChannel("http_responses")
+    local value = channel:peek()
+    if value and value.url == version_url then
+      channel:pop() -- remove the response from the channel
+      local toast_text
+      if value.success then
+        print("Got response", value.response)
+        toast_text = value.response
+      else
+        print("Got error", value.error)
+        toast_text = value.error
+      end
+      imgui.show_toast(gui_state, toast_text, nil, 2)
     end
   end
 
@@ -252,4 +289,8 @@ end
 
 function love.resize(new_w, new_h)
   gui_state.overlay_canvas = love.graphics.newCanvas(new_w, new_h)
+end
+
+function love.threaderror(_, errorstr)
+  error("Thread error\n"..errorstr)
 end

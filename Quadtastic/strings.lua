@@ -24,6 +24,9 @@ strings.source_code_url = "https://www.github.com/25A0/Quadtastic"
 strings.documentation_url = "https://www.github.com/25A0/Quadtastic/wiki"
 strings.report_email = "moritz@25a0.com"
 
+strings.update_base_url = "http://itch.io/api/1/x/wharf/latest"
+strings.update_target = "25a0/quadtastic"
+
 strings.toast = {
   saved_as = f "Saved as %s",
   reloaded = f "Reloaded %s",
