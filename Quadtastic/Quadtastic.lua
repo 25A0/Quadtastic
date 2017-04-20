@@ -93,6 +93,7 @@ local interface = {
   save_file = Dialog.save_file,
   show_about_dialog = Dialog.show_about_dialog,
   show_ack_dialog = Dialog.show_ack_dialog,
+  check_updates = Dialog.check_updates,
 }
 
 Quadtastic.transitions = QuadtasticLogic.transitions(interface)
@@ -220,6 +221,9 @@ Quadtastic.draw = function(app, state, gui_state)
           Menu.menu_finish(gui_state, w/4, h-12)
         end
         Menu.separator(gui_state)
+        if Menu.action_item(gui_state, S.menu.help.check_updates) then
+          app.quadtastic.check_updates()
+        end
         if Menu.action_item(gui_state, S.menu.help.acknowledgements) then
           app.quadtastic.show_ack_dialog()
         end

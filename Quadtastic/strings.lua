@@ -24,13 +24,14 @@ strings.source_code_url = "https://www.github.com/25A0/Quadtastic"
 strings.documentation_url = "https://www.github.com/25A0/Quadtastic/wiki"
 strings.report_email = "moritz@25a0.com"
 
-strings.update_base_url = "http://itch.io/api/1/x/wharf/latest"
-strings.update_target = "25a0/quadtastic"
+strings.update_base_url = "http://127.0.0.1:8000/quadtastic/latest_version"
+strings.itchio_url = "https://25a0.itch.io/quadtastic"
 
 strings.toast = {
   saved_as = f "Saved as %s",
   reloaded = f "Reloaded %s",
   copied_to_clipboard = "Copied to clipboard",
+  err_cannot_fetch_version = "Could not fetch update information :(",
 }
 
 strings.editions = {
@@ -89,6 +90,7 @@ Affects: %s]]
             return issuebody
           end,
         }),
+      check_updates = "Check for updates",
       acknowledgements = "Acknowledgements",
       about = "About",
     }),
@@ -128,6 +130,7 @@ strings.buttons = {
   discard = "Discard",
   open = "Open",
   close = "Close",
+  download = "Download",
 }
 
 strings.dialogs = {
@@ -166,6 +169,22 @@ strings.dialogs = {
   save_replace = f "File %s already exists. Do you want to replace it?",
   about = f "Quadtastic %s",
   acknowledgements = "Quadtastic uses the following open-source software projects:",
+  update = {
+    fetching = "Fetching update information...",
+    err_cannot_fetch_version = s[[Could not fetch update information :(
+
+                                  Try to check manually on itch.io.]],
+    latest = f "Latest version: %s",
+    current = f "Installed version: %s",
+    unknown_version = "Unknown version",
+    update_available = "There is an update available",
+    no_update_available = "You are on the latest version",
+    unreleased = "Oh look at you, running an unreleased version!",
+  },
+  offer_update = f(s[[There's a new version of Quadtastic available (v%s).
+                      You are using v%s.
+
+                      Would you like to update?]]),
 }
 
 

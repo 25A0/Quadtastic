@@ -5,12 +5,14 @@ local Frame = require(current_folder .. ".Frame")
 local InputField = require(current_folder .. ".Inputfield")
 local Layout = require(current_folder .. ".Layout")
 local Button = require(current_folder .. ".Button")
+local LoadingAnim = require(current_folder .. ".LoadingAnim")
 local Label = require(current_folder .. ".Label")
 local Text = require(current_folder .. ".Text")
 local Window = require(current_folder .. ".Window")
 local imgui = require(current_folder .. ".imgui")
 local licenses = require(current_folder .. ".res.licenses")
 local S = require(current_folder .. ".strings")
+local Version = require(current_folder .. ".Version")
 local common = require(current_folder .. ".common")
 local os = require(current_folder .. ".os")
 
@@ -611,6 +613,110 @@ function Dialog.show_ack_dialog()
     close = function(app, data) return S.buttons.close end,
   }
   local dialog_state = State("ack_dialog", transitions, {})
+  -- Store the draw function in the state
+  dialog_state.draw = draw
+  return coroutine.yield(dialog_state)
+end
+
+function Dialog.check_updates()
+  -- Check for updates
+  local channel_name = love.filesystem.read("res/edition.txt")
+  local version_url
+  if channel_name then
+    channel_name = common.trim_whitespace(channel_name)
+    version_url = string.format("%s/%s", S.update_base_url, channel_name)
+    print(string.format("Querying %s", version_url))
+    love.thread.getChannel("http_requests"):push(version_url)
+  end
+
+  local version_info = common.get_version()
+  local current_version
+  do
+    local success, version = pcall(Version, version_info)
+    if success then current_version = version end
+  end
+
+  local state = channel_name and "waiting" or "unknown_edition"
+  local result
+  local latest_version
+
+  -- Draw the dialog
+  local function draw(app, data, gui_state, w, h)
+    local min_w = math.floor(w/2)
+    local can_update = false
+    do window_start(data, gui_state, w, h)
+      imgui.push_style(gui_state, "font", gui_state.style.small_font)
+      do Layout.start(gui_state)
+        if state == "waiting" then
+          Label.draw(gui_state, nil, nil, nil, nil, S.dialogs.update.fetching)
+          Layout.next(gui_state, "|")
+          LoadingAnim.draw(gui_state, nil, nil, nil, 16)
+
+          local channel = love.thread.getChannel("http_responses")
+          local value = channel:peek()
+          if value and value.url == version_url then
+            channel:pop() -- remove the response from the channel
+            result = value
+            if result.success then
+              local match = string.gmatch(result.response, '{"latest": "(.*)"}')()
+              local success, version = pcall(Version, match)
+              if success then latest_version = version end
+            end
+            state = "got_result"
+          end
+        elseif state == "got_result" then
+          if result.success then
+            if latest_version and current_version then
+              if current_version < latest_version then
+                Label.draw(gui_state, nil, nil, nil, nil,
+                           S.dialogs.update.update_available)
+                can_update = true
+              elseif latest_version < current_version then
+                Label.draw(gui_state, nil, nil, nil, nil,
+                           S.dialogs.update.unreleased)
+              else
+                Label.draw(gui_state, nil, nil, nil, nil,
+                           S.dialogs.update.no_update_available)
+              end
+              Layout.next(gui_state, "|")
+            end
+
+            Label.draw(gui_state, nil, nil, nil, nil,
+                       S.dialogs.update.latest(latest_version or
+                                              S.dialogs.update.unknown_version))
+            Layout.next(gui_state, "|")
+            Label.draw(gui_state, nil, nil, nil, nil,
+                       S.dialogs.update.current(current_version or
+                                               S.dialogs.update.unknown_version))
+          else
+            Label.draw(gui_state, nil, nil, nil, nil, S.dialogs.update.err_cannot_fetch_version)
+            can_update = true
+          end
+        end
+
+        Layout.next(gui_state, "|")
+        local clicked_button = show_buttons(gui_state, {S.buttons.close,
+                                                        S.buttons.download},
+                                            {disabled = {[S.buttons.download] = not can_update}})
+        if clicked_button then
+          app.check_updates[clicked_button]()
+        end
+      end Layout.finish(gui_state, "|")
+      gui_state.layout.adv_x = math.max(min_w, gui_state.layout.adv_x)
+      imgui.pop_style(gui_state, "font")
+    end window_finish(data, gui_state, w, h)
+  end
+
+  assert(coroutine.running(), "This function must be run in a coroutine.")
+  local transitions = {
+    -- luacheck: no unused args
+    [S.buttons.close] = function(app, data) return S.buttons.close end,
+    [S.buttons.download] = function(app, data)
+      love.system.openURL(S.itchio_url)
+      return S.buttons.close
+    end,
+  }
+  local dialog_state = State("check_updates", transitions, {})
   -- Store the draw function in the state
   dialog_state.draw = draw
   return coroutine.yield(dialog_state)

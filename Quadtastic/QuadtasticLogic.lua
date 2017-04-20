@@ -860,6 +860,10 @@ function QuadtasticLogic.transitions(interface) return {
     interface.show_ack_dialog()
   end,
 
+  check_updates = function(app, data)
+    interface.check_updates()
+  end,
+
 }
 end
 

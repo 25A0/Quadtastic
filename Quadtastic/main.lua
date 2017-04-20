@@ -61,6 +61,7 @@ function love.load()
   local icon = love.graphics.newImage("res/icon-32x32.png")
   local turboworkflow_deactivated = love.graphics.newImage("res/turboworkflow-deactivated.png")
   local turboworkflow_activated = love.graphics.newImage("res/turboworkflow-activated.png")
+  local loading = love.graphics.newImage("res/loading.png")
 
   love.keyboard.setKeyRepeat(true)
   gui_state = imgui.init_state(transform)
@@ -71,15 +72,33 @@ function love.load()
 
   gui_state.style.turboworkflow_deactivated = turboworkflow_deactivated
 
-  local frames = {}
-  for i=0,3 do
-    frames[i + 1] = love.graphics.newQuad(i*128, 0, 128, 16, 512, 16)
+  do
+    local frames = {}
+    for i=0,3 do
+      frames[i + 1] = love.graphics.newQuad(i*128, 0, 128, 16, 512, 16)
+    end
+    gui_state.style.turboworkflow_activated = {
+      sheet = turboworkflow_activated,
+      frames = frames,
+      duration = .1,
+      w = 128,
+      h = 16
+    }
   end
-  gui_state.style.turboworkflow_activated = {
-    sheet = turboworkflow_activated,
-    frames = frames,
-    duration = .1,
-  }
+
+  do
+    local frames = {}
+    for i=0,41 do
+      frames[i + 1] = love.graphics.newQuad(i*16, 0, 16, 16, 42 * 16, 16)
+    end
+    gui_state.style.loading = {
+      sheet = loading,
+      frames = frames,
+      duration = .1,
+      w = 16,
+      h = 16
+    }
+  end
 
   gui_state.style.icon = icon
   gui_state.style.raw_quads = require("res/style")
