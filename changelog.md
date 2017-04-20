@@ -6,6 +6,12 @@
 
 ### Unreleased
 
+There are currently no unreleased changes
+
+### Release 0.5.1, 2017-04-20
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.5.1)
+
  - Notify user when a new version is available
 
 ### Release 0.5.0, 2017-04-19
