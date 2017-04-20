@@ -154,6 +154,9 @@ screenshots/turboworkflow.gif: res/turboworkflow-activated.ase Makefile
 ${APPNAME}/res/turboworkflow-activated.png: res/turboworkflow-activated.ase
 	${aseprite} -b res/turboworkflow-activated.ase --sheet ${APPNAME}/res/turboworkflow-activated.png
 
+${APPNAME}/res/loading.png: res/loading.ase
+	${aseprite} -b res/loading.ase --sheet ${APPNAME}/res/loading.png
+
 ${APPNAME}/res/%.png: res/%.ase
 	${aseprite} -b res/$*.ase --save-as ${APPNAME}/res/$*.png
 
