@@ -211,7 +211,7 @@ function love.draw()
             app.quadtastic.offer_update(current_version, latest_version)
           end
         else
-          toast_text = S.toast.err_cannot_fetch_version
+          local toast_text = S.toast.err_cannot_fetch_version
           imgui.show_toast(gui_state, toast_text, nil, 4)
         end
       else

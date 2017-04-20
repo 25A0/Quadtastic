@@ -17,7 +17,7 @@ assert(response_channel)
 while(true) do
   local request_url = request_channel:demand()
   assert(type(request_url) == "string")
-  local response, response_status, response_headers,
+  local response, response_status, _,
         response_status_line = http.request(request_url)
   if not response then
     local err = response_status
