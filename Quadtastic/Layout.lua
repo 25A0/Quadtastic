@@ -37,7 +37,7 @@ local function update_state(state, orientation, spacing)
 
 	-- For a vertical layout it's the same logic with x and y swapped.
 	if orientation == "-" then
-		state.layout.acc_adv_x = state.layout.acc_adv_x + state.layout.adv_x
+		state.layout.acc_adv_x = state.layout.acc_adv_x + state.layout.adv_x + spacing
 		-- Decrease the remaining width by the advance in x
 		state.layout.max_w = math.max(0, state.layout.max_w - state.layout.adv_x - spacing)
 		state.layout.acc_adv_y = math.max(state.layout.acc_adv_y, state.layout.adv_y)
@@ -45,7 +45,7 @@ local function update_state(state, orientation, spacing)
 		state.layout.next_x = state.layout.next_x + state.layout.adv_x + spacing
 	else
 		state.layout.acc_adv_x = math.max(state.layout.acc_adv_x, state.layout.adv_x)
-		state.layout.acc_adv_y = state.layout.acc_adv_y + state.layout.adv_y
+		state.layout.acc_adv_y = state.layout.acc_adv_y + state.layout.adv_y + spacing
 		-- Decrease the remaining height by the advance in y
 		state.layout.max_h = math.max(0, state.layout.max_h - state.layout.adv_y - spacing)
 
