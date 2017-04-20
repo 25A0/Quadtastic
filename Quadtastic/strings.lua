@@ -24,7 +24,7 @@ strings.source_code_url = "https://www.github.com/25A0/Quadtastic"
 strings.documentation_url = "https://www.github.com/25A0/Quadtastic/wiki"
 strings.report_email = "moritz@25a0.com"
 
-strings.update_base_url = "http://127.0.0.1:8000/quadtastic/latest_version"
+strings.update_base_url = "http://www.25a0.com/quadtastic/latest_version"
 strings.itchio_url = "https://25a0.itch.io/quadtastic"
 
 strings.toast = {
