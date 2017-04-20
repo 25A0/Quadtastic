@@ -3,9 +3,6 @@
 ### Planned
 
  - Use relative paths in quadfile's metadata if possible
- - Try to find a way to notify user when new version is available
-   (this is on hold until I find a way to make https requests, preferably
-   without shipping luasec as pre-compiled binary...)
 
 ### Unreleased
 
@@ -37,6 +34,7 @@ First public release
  - Add example project
  - Add libquadtastic as distribution target
  - Add version number to quadfile
+ - Notify user when a new version is available
 
 ### Release 0.4.1, 2017-04-08
 
