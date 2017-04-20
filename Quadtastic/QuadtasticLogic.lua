@@ -864,6 +864,15 @@ function QuadtasticLogic.transitions(interface) return {
     interface.check_updates()
   end,
 
+  offer_update = function(app, data, current_version, latest_version)
+    local ret = interface.show_dialog(S.dialogs.offer_update(latest_version,
+                                                             current_version),
+                                      {enter = S.buttons.yes, escape = S.buttons.no})
+    if ret == S.buttons.yes then
+      love.system.openURL(S.itchio_url)
+    end
+  end,
+
 }
 end
 

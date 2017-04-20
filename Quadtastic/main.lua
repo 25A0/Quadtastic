@@ -10,12 +10,12 @@ local imgui = require(current_folder .. ".imgui")
 local AppLogic = require(current_folder .. ".AppLogic")
 local Quadtastic = require(current_folder .. ".Quadtastic")
 local libquadtastic = require(current_folder .. ".libquadtastic")
-local url = require("socket.url")
 
 local Transform = require(current_folder .. '.transform')
 local Toast = require(current_folder .. '.Toast')
 local Text = require(current_folder .. '.Text')
 local S = require(current_folder .. '.strings')
+local Version = require(current_folder .. '.Version')
 local common = require(current_folder .. '.common')
 local transform = Transform()
 
@@ -38,6 +38,7 @@ local app
 local gui_state
 
 local version_url
+local checked_version = false
 
 function love.load()
   local version_info = common.get_version()
@@ -154,9 +155,7 @@ function love.load()
   local channel_name = love.filesystem.read("res/edition.txt")
   if channel_name then
     channel_name = common.trim_whitespace(channel_name)
-    version_url = url.absolute(S.update_base_url,
-                               string.format("?target=%s&channel_name=%s",
-                                             S.update_target, channel_name))
+    version_url = string.format("%s/%s", S.update_base_url, channel_name)
     print(string.format("Querying %s", version_url))
     love.thread.getChannel("http_requests"):push(version_url)
   end
@@ -188,20 +187,38 @@ function love.draw()
   end
 
   -- Check for result of version query
-  do
+  if not checked_version then
     local channel = love.thread.getChannel("http_responses")
     local value = channel:peek()
     if value and value.url == version_url then
       channel:pop() -- remove the response from the channel
-      local toast_text
       if value.success then
-        print("Got response", value.response)
-        toast_text = value.response
+        local current_version, latest_version
+        do
+          local version_info = common.get_version()
+          local success, version = pcall(Version, version_info)
+          if success then current_version = version end
+        end
+
+        local match = string.gmatch(value.response, '{"latest": "(.*)"}')()
+        if match then
+          local success, version = pcall(Version, match)
+          if success then latest_version = version end
+        end
+
+        if latest_version and current_version then
+          if current_version < latest_version then
+            app.quadtastic.offer_update(current_version, latest_version)
+          end
+        else
+          toast_text = S.toast.err_cannot_fetch_version
+          imgui.show_toast(gui_state, toast_text, nil, 4)
+        end
       else
-        print("Got error", value.error)
-        toast_text = value.error
+        local toast_text = S.toast.err_cannot_fetch_version
+        imgui.show_toast(gui_state, toast_text, nil, 4)
       end
-      imgui.show_toast(gui_state, toast_text, nil, 2)
+      checked_version = true
     end
   end
 
