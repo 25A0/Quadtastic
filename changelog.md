@@ -6,7 +6,7 @@
 
 ### Unreleased
 
-There are currently no unreleased changes
+ - Notify user when a new version is available
 
 ### Release 0.5.0, 2017-04-19
 
@@ -34,7 +34,6 @@ First public release
  - Add example project
  - Add libquadtastic as distribution target
  - Add version number to quadfile
- - Notify user when a new version is available
 
 ### Release 0.4.1, 2017-04-08
 
