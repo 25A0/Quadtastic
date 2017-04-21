@@ -517,7 +517,7 @@ end
 function Dialog.show_about_dialog()
   local version_info = common.get_version()
   local copyright_info = love.filesystem.read("res/copyright.txt")
-  local edition = love.filesystem.read("res/edition.txt")
+  local edition = common.get_edition()
 
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
@@ -620,7 +620,7 @@ end
 
 function Dialog.check_updates()
   -- Check for updates
-  local channel_name = love.filesystem.read("res/edition.txt")
+  local channel_name = common.get_edition()
   local version_url
   if channel_name then
     channel_name = common.trim_whitespace(channel_name)

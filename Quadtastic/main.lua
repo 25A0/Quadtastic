@@ -152,7 +152,7 @@ function love.load()
   http_thread:start()
 
   -- Check for an update
-  local channel_name = love.filesystem.read("res/edition.txt")
+  local channel_name = common.get_edition()
   if channel_name then
     channel_name = common.trim_whitespace(channel_name)
     version_url = string.format("%s/%s", S.update_base_url, channel_name)
@@ -253,7 +253,6 @@ function love.draw()
     love.graphics.pop()
     gui_state.mousestring = nil
   end
-
 
   love.graphics.origin()
   love.graphics.draw(gui_state.overlay_canvas)

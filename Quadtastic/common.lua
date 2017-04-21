@@ -22,6 +22,13 @@ function common.get_version()
   end
 end
 
+function common.get_edition()
+  local edition_info = love.filesystem.read("res/edition.txt")
+  if edition_info then
+    return common.trim_whitespace(edition_info)
+  end
+end
+
 -- Load imagedata from outside the game's source and save folder
 function common.load_imagedata(filepath)
   local filehandle, err = io.open(filepath, "rb")
