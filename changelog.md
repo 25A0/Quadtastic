@@ -6,7 +6,7 @@
 
 ### Unreleased
 
-There are currently no unreleased changes
+ - Display toast that image was reloaded when user reloads manually from menu
 
 ### Release 0.5.1, 2017-04-20
 

@@ -184,7 +184,8 @@ Quadtastic.draw = function(app, state, gui_state)
         if Menu.action_item(gui_state, S.menu.image.reload_image,
                             {disabled = disabled})
         then
-          app.quadtastic.load_image(state.quads._META.image_path)
+          app.quadtastic.load_image(state.quads._META.image_path,
+                                    reload_image_toast_callback)
         end
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
