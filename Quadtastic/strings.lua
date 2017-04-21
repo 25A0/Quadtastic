@@ -69,6 +69,7 @@ strings.menu = {
           email_subject = f "Bug in Quadtastic %s",
           issue_body = function(version_info)
             -- luacheck: ignore 613
+            -- remember to change this in the error handler in main.lua, too
             local issuebody = [[
 [Describe the bug]
 

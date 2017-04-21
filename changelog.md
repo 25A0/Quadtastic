@@ -7,6 +7,7 @@
 ### Unreleased
 
  - Display toast that image was reloaded when user reloads manually from menu
+ - Ask user to report error message when Quadtastic crashes
 
 ### Release 0.5.1, 2017-04-20
 

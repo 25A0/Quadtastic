@@ -269,6 +269,58 @@ function love.quit()
   end
 end
 
+function love.errhand(error_message)
+  local dialog_message = [[
+Quadtastic crashed with the following error message:
+
+%s
+
+Would you like to report this crash so that it can be fixed?]]
+  local titles = {"Oh no", "Oh boy", "Bad news"}
+  local title = titles[love.math.random(#titles)]
+  local message = string.format(dialog_message, error_message or "")
+  local buttons = {"Yes, on GitHub", "Yes, by email", "No"}
+
+  local pressedbutton = love.window.showMessageBox(title, message, buttons)
+  local version
+  do
+    local success, more = pcall(common.get_version)
+    if success then version = more
+    else version = "Unknown version" end
+  end
+  local edition
+  do
+    local success, more = pcall(common.get_edition)
+    if success and more then edition = more
+    else edition = "Unknown edition" end
+  end
+  -- This is basically a copy of the report strings in strings.lua, so that the
+  -- error handling code doesn't depend on strings.lua.
+  local issuebody = [[
+Quadtastic crashed with the following error message:
+
+%s
+
+[If you can, describe what you've been doing when the error occurred]
+
+---
+Affects: %s
+Edition: %s]]
+  issuebody = string.format(issuebody, error_message or "", version, edition)
+  issuebody = string.gsub(issuebody, "\n", "%%0A")
+  issuebody = string.gsub(issuebody, " ", "%%20")
+  issuebody = string.gsub(issuebody, "#", "%%23")
+  if pressedbutton == 1 then
+    local subject = string.format("Crash in Quadtastic %s", version)
+    local url = string.format("https://www.github.com/25A0/Quadtastic/issues/new?title=%s&body=%s",
+                              subject, issuebody)
+    love.system.openURL(url)
+  elseif pressedbutton == 2 then
+    local subject = string.format("Crash in Quadtastic %s", version)
+    love.system.openURL("mailto:moritz@25a0.com?subject="..subject.."&body="..issuebody)
+  end
+end
+
 -- Override isActive function to snooze app when it is not in focus.
 -- This is only noticeable in that the dashed lines around selected quads will
 -- stop changing.
