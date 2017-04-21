@@ -6,6 +6,14 @@
 
 ### Unreleased
 
+There are currently no unreleased changes
+
+### Release 0.5.2, 2017-04-21
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.5.2)
+
+Small update to collect error messages on crash
+
  - Display toast that image was reloaded when user reloads manually from menu
  - Ask user to report error message when Quadtastic crashes
 
