@@ -1,14 +1,21 @@
+local utf8 = require("utf8")
+
 local Text = {}
 
 local unpack = unpack or table.unpack
 
+local function utf8_encode(str)
+  return utf8.char(string.byte(str, 1, string.len(str)))
+end
+
 Text.min_width = function(state, text)
-  return state.style.font and state.style.font:getWidth(text)
+  return state.style.font and state.style.font:getWidth(utf8_encode(text))
 end
 
 -- Returns a table of lines, none of which exceed the given width.
 -- Returns a table with the original text if width is 0 or nil.
 function Text.break_at(state, text, width)
+  text = utf8_encode(text)
   if not width or width <= 0 then return {text} end
 
   local lines = {}
@@ -59,6 +66,7 @@ function Text.break_at(state, text, width)
 end
 
 Text.draw = function(state, x, y, w, h, text, options)
+  text= utf8_encode(text)
   x = x or state.layout.next_x
   y = y or state.layout.next_y
 

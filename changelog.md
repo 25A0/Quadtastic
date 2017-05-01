@@ -7,6 +7,7 @@
 ### Unreleased
 
  - Crash reports now contain the full stack trace
+ - Fix crash related to rendering non-utf8 encoded characters
 
 ### Release 0.5.2, 2017-04-21
 
