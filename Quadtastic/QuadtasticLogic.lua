@@ -774,7 +774,11 @@ function QuadtasticLogic.transitions(interface) return {
 
       if filehandle then
         filehandle:close()
-        local quads = loadfile(filepath)()
+        local filecontent, err = loadfile(filepath)
+        if not filecontent then
+          error(err, 0)
+        end
+        local quads = filecontent()
         local quadpath = filepath
         return {quads, quadpath}
       end
