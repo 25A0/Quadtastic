@@ -295,8 +295,16 @@ Would you like to report this crash so that it can be fixed?]]
     if success and more then edition = more
     else edition = "Unknown edition" end
   end
-  -- This is basically a copy of the report strings in strings.lua, so that the
-  -- error handling code doesn't depend on strings.lua.
+
+  local function url_encode(text)
+    -- This is not complete. Depending on your issue text, you might need to
+    -- expand it!
+    text = string.gsub(text, "\n", "%%0A")
+    text = string.gsub(text, " ", "%%20")
+    text = string.gsub(text, "#", "%%23")
+    return text
+  end
+
   local issuebody = [[
 Quadtastic crashed with the following error message:
 
@@ -307,18 +315,22 @@ Quadtastic crashed with the following error message:
 ---
 Affects: %s
 Edition: %s]]
-  issuebody = string.format(issuebody, full_error, version, edition)
-  issuebody = string.gsub(issuebody, "\n", "%%0A")
-  issuebody = string.gsub(issuebody, " ", "%%20")
-  issuebody = string.gsub(issuebody, "#", "%%23")
   if pressedbutton == 1 then
+    -- Surround traceback in ``` to get a Markdown code block
+    full_error = table.concat({"```",full_error,"\n```"}, "\n")
+    issuebody = string.format(issuebody, full_error, version, edition)
+    issuebody = url_encode(issuebody)
     local subject = string.format("Crash in Quadtastic %s", version)
     local url = string.format("https://www.github.com/25A0/Quadtastic/issues/new?title=%s&body=%s",
                               subject, issuebody)
     love.system.openURL(url)
   elseif pressedbutton == 2 then
+    issuebody = string.format(issuebody, full_error, version, edition)
+    issuebody = url_encode(issuebody)
     local subject = string.format("Crash in Quadtastic %s", version)
-    love.system.openURL("mailto:moritz@25a0.com?subject="..subject.."&body="..issuebody)
+    local url = string.format("mailto:moritz@25a0.com?subject=%s&body=%s",
+                              subject, issuebody)
+    love.system.openURL(url)
   end
 end
 
