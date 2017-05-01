@@ -6,7 +6,7 @@
 
 ### Unreleased
 
-There are currently no unreleased changes
+ - Crash reports now contain the full stack trace
 
 ### Release 0.5.2, 2017-04-21
 

@@ -278,7 +278,8 @@ Quadtastic crashed with the following error message:
 Would you like to report this crash so that it can be fixed?]]
   local titles = {"Oh no", "Oh boy", "Bad news"}
   local title = titles[love.math.random(#titles)]
-  local message = string.format(dialog_message, error_message or "")
+  local full_error = debug.traceback(error_message or "")
+  local message = string.format(dialog_message, full_error)
   local buttons = {"Yes, on GitHub", "Yes, by email", "No"}
 
   local pressedbutton = love.window.showMessageBox(title, message, buttons)
@@ -306,7 +307,7 @@ Quadtastic crashed with the following error message:
 ---
 Affects: %s
 Edition: %s]]
-  issuebody = string.format(issuebody, error_message or "", version, edition)
+  issuebody = string.format(issuebody, full_error, version, edition)
   issuebody = string.gsub(issuebody, "\n", "%%0A")
   issuebody = string.gsub(issuebody, " ", "%%20")
   issuebody = string.gsub(issuebody, "#", "%%23")
