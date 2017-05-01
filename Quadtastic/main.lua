@@ -317,7 +317,7 @@ Affects: %s
 Edition: %s]]
   if pressedbutton == 1 then
     -- Surround traceback in ``` to get a Markdown code block
-    full_error = table.concat({"```",full_error,"\n```"}, "\n")
+    full_error = table.concat({"```",full_error,"```"}, "\n")
     issuebody = string.format(issuebody, full_error, version, edition)
     issuebody = url_encode(issuebody)
     local subject = string.format("Crash in Quadtastic %s", version)
