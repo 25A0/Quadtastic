@@ -6,6 +6,12 @@
 
 ### Unreleased
 
+There are currently no unreleased changes
+
+### Release 0.5.3, 2017-05-02
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.5.3)
+
  - Crash reports now contain the full stack trace
  - Fix crash related to rendering non-utf8 encoded characters
 
