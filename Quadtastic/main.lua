@@ -46,6 +46,26 @@ function love.load()
   -- Disable buffering of stdout
   io.stdout:setvbuf("no")
 
+  -- Direct output to both stdout and a log file
+  do
+    -- Make sure that the save directory exists
+    if not love.filesystem.exists("log.txt") then
+      local file = love.filesystem.newFile("log.txt")
+      file:open("w")
+      file:close()
+    end
+    local logfile = love.filesystem.getSaveDirectory() .. "/" .. "log.txt"
+    io.output(logfile)
+    io.output():setvbuf("no")
+    local lua_print = print
+    print = function(...)
+      -- Print to stdout but also to the log file
+      lua_print(...)
+      io.write(...)
+      io.write('\n')
+    end
+  end
+
   -- Initialize the state
   app = AppLogic(Quadtastic)
   app.quadtastic.new()
