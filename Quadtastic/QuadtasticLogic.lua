@@ -4,6 +4,7 @@ local History = require(current_folder.. ".History")
 local table = require(current_folder.. ".tableplus")
 local libquadtastic = require(current_folder.. ".libquadtastic")
 local common = require(current_folder.. ".common")
+local exporters = require(current_folder.. "Exporters")
 local os = require(current_folder.. ".os")
 local S = require(current_folder.. ".strings")
 
@@ -853,6 +854,15 @@ function QuadtasticLogic.transitions(interface) return {
     else
       -- Try to load this as an image
       app.quadtastic.load_image(filepath)
+    end
+  end,
+
+  reload_exporters = function(app, data)
+    local success, more = pcall(exporters.list)
+    if success then
+      data.exporters = more
+    else
+      interface.show_dialog(S.dialogs.err_reload_exporters(more))
     end
   end,
 

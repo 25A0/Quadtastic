@@ -21,6 +21,7 @@ local Dialog = require(current_folder .. ".Dialog")
 local Menu = require(current_folder .. ".Menu")
 local Keybindings = require(current_folder .. ".Keybindings")
 local S = require(current_folder .. ".strings")
+local exporters = require(current_folder .. ".Exporters")
 
 local lfs = require("lfs")
 
@@ -63,6 +64,7 @@ local Quadtastic = State("quadtastic",
     settings = load_settings() or {recent = {}},
     collapsed_groups = {},
     selection = Selection(),
+    exporters = {},
     -- More fields are initialized in the new() transition.
   })
 
@@ -138,6 +140,32 @@ Quadtastic.draw = function(app, state, gui_state)
         if Menu.action_item(gui_state, S.menu.file.save_as,
            {keybinding = Keybindings.to_string("save_as")}) then
           app.quadtastic.save_as(save_toast_callback)
+        end
+        if Menu.menu_start(gui_state, w/4, h - 12,
+                           S.menu.file.export_as())
+        then
+          for _,exporter in ipairs(state.exporters) do
+            if Menu.action_item(gui_state,
+                                string.format("%s (%s)",
+                                              exporter.name, exporter.ext))
+            then
+              print(exporter.name)
+            end
+          end
+          if #state.exporters > 0 then
+            Menu.separator(gui_state)
+          end
+          if Menu.action_item(gui_state, S.menu.file.export_as.manage_exporters)
+          then
+            love.system.openURL("file://" ..
+                                love.filesystem.getSaveDirectory() .. "/" ..
+                                S.exporters_dirname)
+          end
+          if Menu.action_item(gui_state, S.menu.file.export_as.reload_exporters)
+          then
+            app.quadtastic.reload_exporters()
+          end
+          Menu.menu_finish(gui_state, w/4, h - 12)
         end
         if #state.settings.recent > 0 then
           if Menu.menu_start(gui_state, w/4, h - 12,

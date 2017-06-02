@@ -27,6 +27,8 @@ strings.report_email = "moritz@25a0.com"
 strings.update_base_url = "http://www.25a0.com/quadtastic/latest_version"
 strings.itchio_url = "https://25a0.itch.io/quadtastic"
 
+strings.exporters_dirname = "exporters"
+
 strings.toast = {
   saved_as = f "Saved as %s",
   reloaded = f "Reloaded %s",
@@ -46,6 +48,10 @@ strings.menu = {
       open = "Open...",
       save = "Save",
       save_as = "Save as...",
+      export_as = menu_table("Export as...", {
+        manage_exporters = "Manage exporters",
+        reload_exporters = "Reload exporters"
+      }),
       open_recent = "Open recent",
       quit = "Quit",
     }),
@@ -168,6 +174,7 @@ strings.dialogs = {
   offer_load = "We found a quad file in %s.\nWould you like to load it?",
   err_save_directory = f "%s is a directory.",
   save_replace = f "File %s already exists. Do you want to replace it?",
+  err_reload_exporters = f "An error occurred while reloading the exporters: %s",
   about = f "Quadtastic %s",
   acknowledgements = "Quadtastic uses the following open-source software projects:",
   update = {
