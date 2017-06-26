@@ -145,6 +145,10 @@ Quadtastic.draw = function(app, state, gui_state)
            {keybinding = Keybindings.to_string("save_as")}) then
           app.quadtastic.save_as(save_toast_callback)
         end
+        if Menu.action_item(gui_state, S.menu.file.repeat_export,
+           {disabled = state.prev_exporter == nil}) then
+          app.quadtastic.repeat_export(export_toast_callback)
+        end
         if Menu.menu_start(gui_state, w/4, h - 12,
                            S.menu.file.export_as())
         then

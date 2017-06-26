@@ -49,6 +49,7 @@ strings.menu = {
       open = "Open...",
       save = "Save",
       save_as = "Save as...",
+      repeat_export = "Repeat last export",
       export_as = menu_table("Export as...", {
         manage_exporters = "Manage exporters",
         reload_exporters = "Reload exporters"
