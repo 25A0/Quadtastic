@@ -140,11 +140,27 @@ function common.export_table_content(handle, tab)
 end
 
 function common.export_table_to_file(filehandle, tab)
-  local function handle(...)
-    filehandle:write(...)
-  end
-  common.export_table_content(handle, tab)
+  local writer = common.get_writer(filehandle)
+  common.export_table_content(writer, tab)
   filehandle:close()
+end
+
+-- The name of the "exporter" that exports the quads as a quadfile.
+common.reserved_name_save = "Quadtastic quadfile"
+
+-- This is a table that exposes the default exporter in a way that is compatible
+-- with custom exporters.
+common.exporter_table = {
+  name = common.reserved_name_save,
+  ext = "lua",
+  export = common.export_table_content,
+}
+
+function common.get_writer(filehandle)
+  return function(...)
+    filehandle:write(...)
+    filehandle:write("\n")
+  end
 end
 
 function common.serialize_table(tab)

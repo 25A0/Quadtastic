@@ -3,8 +3,13 @@ local common = require(current_folder.. ".common")
 
 local QuadExport = {}
 
-QuadExport.export = function(quads, filepath_or_filehandle)
+QuadExport.export = function(quads, exporter, filepath_or_filehandle)
   assert(quads and type(quads) == "table")
+  assert(exporter and type(exporter) == "table", tostring(type(exporter)))
+  assert(exporter.export and type(exporter.export) == "function")
+  assert(exporter.ext and type(exporter.ext) == "string")
+  assert(exporter.name and type(exporter.name) == "string")
+
 
   local filehandle, more
   -- Errors need to be handled upstream
@@ -23,7 +28,11 @@ QuadExport.export = function(quads, filepath_or_filehandle)
   if not quads._META then quads._META = {} end
   quads._META.version = common.get_version()
 
-  common.export_table_to_file(filehandle, quads)
+  local writer = common.get_writer(filehandle)
+  local success, more = pcall(exporter.export, writer, quads)
+  filehandle:close()
+
+  if not success then error("Could not export quads.\n" .. more) end
 end
 
 return QuadExport
