@@ -108,6 +108,10 @@ Quadtastic.draw = function(app, state, gui_state)
     imgui.show_toast(gui_state, S.toast.saved_as(path), nil, 2)
   end
 
+  local export_toast_callback = function(path)
+    imgui.show_toast(gui_state, S.toast.exported_as(path), nil, 2)
+  end
+
   local reload_image_toast_callback = function(path)
     imgui.show_toast(gui_state, S.toast.reloaded(path), nil, 2)
   end
@@ -149,7 +153,7 @@ Quadtastic.draw = function(app, state, gui_state)
                                 string.format("%s (%s)",
                                               exporter.name, exporter.ext))
             then
-              print(exporter.name)
+              app.quadtastic.export_as(exporter, export_toast_callback)
             end
           end
           if #state.exporters > 0 then

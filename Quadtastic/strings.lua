@@ -31,6 +31,7 @@ strings.exporters_dirname = "exporters"
 
 strings.toast = {
   saved_as = f "Saved as %s",
+  exported_as = f "Exported as %s",
   reloaded = f "Reloaded %s",
   copied_to_clipboard = "Copied to clipboard",
   err_cannot_fetch_version = "Could not fetch update information :(",

@@ -684,6 +684,12 @@ function QuadtasticLogic.transitions(interface) return {
       _META = {}
     }
     data.quadpath = nil -- path to the file containing the quad definitions
+    -- The name of the last used exporter
+    data.prev_exporter = nil
+    -- A mapping from exporter name to last used path. This is convenient
+    -- in case specific export targets are always saved in the same location.
+    -- These are populated from the loaded application settings.
+    data.exportpath = {}
     data.image = nil -- the loaded image
     interface.reset_view(data)
     -- Reset list of collapsed groups
@@ -706,12 +712,15 @@ function QuadtasticLogic.transitions(interface) return {
     if not data.quadpath or data.quadpath == "" then
       app.quadtastic.save_as(callback)
     else
-      QuadExport.export(data.quads, data.quadpath)
+      app.quadtastic.export_with(data.quadpath, common.exporter_table)
       data.history:mark()
       if callback then callback(data.quadpath) end
     end
   end,
 
+  -- Have user pick a path where to save the quad file.
+  -- This is separate from export_as so that data.quadpath and data.exportpath
+  -- don't get mixed up.
   save_as = function(app, data, callback)
     local basepath
 
@@ -731,6 +740,53 @@ function QuadtasticLogic.transitions(interface) return {
       app.quadtastic.save(callback)
       add_path_to_recent_files(interface, data, filepath)
     end
+  end,
+
+  -- Exports the current quads to the previously used file, using the previously
+  -- used exporter.
+  repeat_export = function(app, data, callback)
+    assert(data.prev_exporter)
+
+    local exporter = data.prev_exporter
+    if not data.exportpath[exporter.name] then
+      -- Have user pick an export file
+      app.quadtastic.export_as(exporter, callback)
+    else
+      app.quadtastic.export_with(data.exportpath[exporter.name], exporter)
+    end
+  end,
+
+  -- Exports the current quads using the given exporter. The user will be asked
+  -- to pick a file.
+  export_as = function(app, data, exporter, callback)
+    local basepath
+
+    if data.exportpath[exporter.name] then
+      basepath = data.exportpath[exporter.name]
+    elseif data.quadpath then
+      basepath = common.split(data.quadpath)
+    elseif data.quads and data.quads._META and data.quads._META.image_path then
+      basepath = common.split(data.quads._META.image_path)
+    elseif data.settings.latest_qua then
+      basepath = data.settings.latest_qua
+    else
+      basepath = love.filesystem.getUserDirectory()
+    end
+
+    local ret, filepath = interface.save_file(basepath, exporter.ext)
+    if ret == S.buttons.save then
+      -- Store that path, so that the file browser starts off at that path in
+      -- the future for this exporter.
+      data.exportpath[exporter.name] = filepath
+      data.prev_exporter = exporter
+      app.quadtastic.export_with(filepath, exporter)
+      if callback then callback(filepath) end
+    end
+
+  end,
+
+  export_with = function(app, data, path, exporter)
+    QuadExport.export(data.quads, exporter, path)
   end,
 
   choose_quad = function(app, data, basepath)
