@@ -505,7 +505,9 @@ Quadtastic.draw = function(app, state, gui_state)
             Layout.next(gui_state, "|")
 
             if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil,
-                           S.buttons.export, nil, {alignment_h = ":"})
+                           S.buttons.export, nil,
+                           {alignment_h = ":",
+                            disabled = state.prev_exporter == nil})
             then
               app.quadtastic.save(save_toast_callback)
             end
