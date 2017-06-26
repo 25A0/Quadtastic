@@ -104,16 +104,18 @@ Quadtastic.transitions = QuadtasticLogic.transitions(interface)
 --                           DRAWING
 -- -------------------------------------------------------------------------- --
 Quadtastic.draw = function(app, state, gui_state)
+  local toast_default_time = 2
+
   local save_toast_callback = function(path)
-    imgui.show_toast(gui_state, S.toast.saved_as(path), nil, 2)
+    imgui.show_toast(gui_state, S.toast.saved_as(path), nil, toast_default_time)
   end
 
   local export_toast_callback = function(path)
-    imgui.show_toast(gui_state, S.toast.exported_as(path), nil, 2)
+    imgui.show_toast(gui_state, S.toast.exported_as(path), nil, toast_default_time)
   end
 
   local reload_image_toast_callback = function(path)
-    imgui.show_toast(gui_state, S.toast.reloaded(path), nil, 2)
+    imgui.show_toast(gui_state, S.toast.reloaded(path), nil, toast_default_time)
   end
 
   local w, h = gui_state.transform:unproject_dimensions(
