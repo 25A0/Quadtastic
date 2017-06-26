@@ -752,7 +752,9 @@ function QuadtasticLogic.transitions(interface) return {
       -- Have user pick an export file
       app.quadtastic.export_as(exporter, callback)
     else
-      app.quadtastic.export_with(data.exportpath[exporter.name], exporter)
+      local path = data.exportpath[exporter.name]
+      app.quadtastic.export_with(path, exporter)
+      if callback then callback(path) end
     end
   end,
 
