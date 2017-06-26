@@ -118,6 +118,11 @@ Quadtastic.draw = function(app, state, gui_state)
     imgui.show_toast(gui_state, S.toast.reloaded(path), nil, toast_default_time)
   end
 
+  local reload_exporters_toast_callback = function(exporters)
+    imgui.show_toast(gui_state, S.toast.exporters_reloaded(#exporters), nil,
+                     toast_default_time)
+  end
+
   local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
@@ -173,7 +178,7 @@ Quadtastic.draw = function(app, state, gui_state)
           end
           if Menu.action_item(gui_state, S.menu.file.export_as.reload_exporters)
           then
-            app.quadtastic.reload_exporters()
+            app.quadtastic.reload_exporters(reload_exporters_toast_callback)
           end
           Menu.menu_finish(gui_state, w/4, h - 12)
         end

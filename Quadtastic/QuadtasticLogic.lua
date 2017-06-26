@@ -915,10 +915,11 @@ function QuadtasticLogic.transitions(interface) return {
     end
   end,
 
-  reload_exporters = function(app, data)
+  reload_exporters = function(app, data, callback)
     local success, more = pcall(exporters.list)
     if success then
       data.exporters = more
+      if callback then callback(data.exporters) end
     else
       interface.show_dialog(S.dialogs.err_reload_exporters(more))
     end
