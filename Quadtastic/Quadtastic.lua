@@ -513,7 +513,7 @@ Quadtastic.draw = function(app, state, gui_state)
                            {alignment_h = ":",
                             disabled = state.prev_exporter == nil})
             then
-              app.quadtastic.save(save_toast_callback)
+              app.quadtastic.repeat_export(export_toast_callback)
             end
 
             Layout.next(gui_state, "|", 2)
