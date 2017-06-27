@@ -23,7 +23,8 @@ You can define your own exporters for an export format of your choice.
 
   -- 'writer' is a function that accepts varargs that can be converted to string
   -- and appends them to the output file. You can treat it like the print()
-  -- function in the standard library.
+  -- function in the standard library, with the exception that this function
+  -- does not append line breaks automatically.
   -- quads is the table that contains the quads you defined, as well as
   -- the metatable under the '_META' key. You can ignore the metatable if you
   -- don't need it.

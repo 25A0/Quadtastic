@@ -159,7 +159,6 @@ common.exporter_table = {
 function common.get_writer(filehandle)
   return function(...)
     filehandle:write(...)
-    filehandle:write("\n")
   end
 end
 
