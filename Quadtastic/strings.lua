@@ -53,7 +53,9 @@ strings.toast = {
   saved_as = f "Saved as %s",
   exported_as = f "Exported as %s",
   reloaded = f "Reloaded %s",
-  exporters_reloaded = f "Successfully loaded %d exporter(s)",
+  exporters_reloaded = c({[0] = "No exporters were found",
+                          [1] = "Successfully loaded one exporter",
+                          ["other"] = f "Successfully loaded %d exporters"}),
   copied_to_clipboard = "Copied to clipboard",
   err_cannot_fetch_version = "Could not fetch update information :(",
 }
