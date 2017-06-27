@@ -275,23 +275,23 @@ function QuadtasticLogic.transitions(interface) return {
     end
   end,
 
-  create = function(app, state, new_quad)
+  create = function(app, data, new_quad)
     -- If a group is currently selected, add the new quad to that group
     -- If a quad is currently selected, add the new quad to the same
     -- group.
-    local selection = state.selection:get_selection()
+    local selection = data.selection:get_selection()
     local group -- the group to which the new quad will be added
     if #selection == 1 then
-      local keys = {table.find_key(state.quads, selection[1])}
+      local keys = {table.find_key(data.quads, selection[1])}
       if libquadtastic.is_quad(selection[1]) then
         -- Remove the last key so that the new quad is added to the
         -- group that contains the currently selected quad
         table.remove(keys)
       end
-      group = table.get(state.quads, unpack(keys))
+      group = table.get(data.quads, unpack(keys))
     else
       -- Just add it to the root
-      group = state.quads
+      group = data.quads
     end
 
     local do_action, undo_action
@@ -317,18 +317,18 @@ function QuadtasticLogic.transitions(interface) return {
       end
     end
 
-    state.history:add(do_action, undo_action)
+    data.history:add(do_action, undo_action)
     do_action()
     if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
     if libquadtastic.is_quad(new_quad) then
-      state.selection:set_selection({new_quad})
-      interface.move_quad_into_view(state.quad_scrollpane_state, new_quad)
+      data.selection:set_selection({new_quad})
+      interface.move_quad_into_view(data.quad_scrollpane_state, new_quad)
     else
       assert(type(new_quad) == "table")
       assert(#new_quad >= 1)
-      state.selection:set_selection(new_quad)
-      interface.move_quad_into_view(state.quad_scrollpane_state, new_quad[1])
+      data.selection:set_selection(new_quad)
+      interface.move_quad_into_view(data.quad_scrollpane_state, new_quad[1])
     end
   end,
 
