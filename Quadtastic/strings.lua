@@ -8,6 +8,26 @@ local function f(str)
   end
 end
 
+-- This function can be used to return different strings for different
+-- numbers of items. For example:
+-- local t = {[0] = "no items",
+--            [1] = "one item",
+--            [2] = "two items",
+--            ["other"] = f("%d items")}
+-- c(t) returns a function that, when called with a count, returns the
+-- appropriate string for that count. If no value is defined for that specific
+-- count, a field "other" is called with the count.
+local function c(tab)
+  return function(count)
+    if tab[count] then
+      return tab[count]
+    else
+      assert(tab["other"])
+      return tab["other"](count)
+    end
+  end
+end
+
 local function menu_table(menu_string, table)
   return setmetatable(table,{__call = function() return menu_string end})
 end
