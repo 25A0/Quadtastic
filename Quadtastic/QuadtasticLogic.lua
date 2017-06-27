@@ -919,9 +919,11 @@ function QuadtasticLogic.transitions(interface) return {
     local success, more, count = pcall(exporters.list)
     if success then
       data.exporters = more
-      -- Clear prev_exporter if that one does not exist any longer
-      if data.prev_exporter and not data.exporters[data.prev_exporter.name] then
-        data.prev_exporter = nil
+      -- Update previous exporter
+      if data.prev_exporter then
+        -- This will clear the previous exporter if there is none with that
+        -- name in the new set of exporters, or update the previous exporter.
+        data.prev_exporter = data.exporters[data.prev_exporter.name]
       end
       if callback then callback(count) end
     else
