@@ -709,7 +709,9 @@ function QuadtasticLogic.transitions(interface) return {
   -- some quads changed.
   turbo_workflow_on_change = function(app, data)
     app.quadtastic.save()
-    app.quadtastic.repeat_export()
+    if data.prev_exporter then
+      app.quadtastic.repeat_export()
+    end
   end,
 
   switch_tool = function(app, data, tool)
