@@ -32,7 +32,7 @@ QuadExport.export = function(quads, exporter, filepath_or_filehandle)
   local success, more = pcall(exporter.export, writer, quads)
   filehandle:close()
 
-  if not success then error("Could not export quads.\n" .. more) end
+  if not success then error(more, 0) end
 end
 
 return QuadExport

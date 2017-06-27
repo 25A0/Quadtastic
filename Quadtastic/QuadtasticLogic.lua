@@ -764,8 +764,12 @@ function QuadtasticLogic.transitions(interface) return {
       app.quadtastic.export_as(exporter, callback)
     else
       local path = data.exportpath[exporter.name]
-      app.quadtastic.export_with(path, exporter)
-      if callback then callback(path) end
+      local success, err = pcall(app.quadtastic.export_with, path, exporter)
+      if success then
+        if callback then callback(path) end
+      else
+        interface.show_dialog(S.dialogs.err_exporting(err))
+      end
     end
   end,
 
@@ -792,8 +796,7 @@ function QuadtasticLogic.transitions(interface) return {
       -- the future for this exporter.
       data.exportpath[exporter.name] = filepath
       data.prev_exporter = exporter
-      app.quadtastic.export_with(filepath, exporter)
-      if callback then callback(filepath) end
+      app.quadtastic.repeat_export(callback)
     end
 
   end,

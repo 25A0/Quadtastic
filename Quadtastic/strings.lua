@@ -200,6 +200,7 @@ strings.dialogs = {
   err_save_directory = f "%s is a directory.",
   save_replace = f "File %s already exists. Do you want to replace it?",
   err_reload_exporters = f "An error occurred while reloading the exporters: %s",
+  err_exporting = f "An error occurred while exporting the quad definitions: %s",
   about = f "Quadtastic %s",
   acknowledgements = "Quadtastic uses the following open-source software projects:",
   update = {
