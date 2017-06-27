@@ -22,6 +22,7 @@ end
 -- the found exporters.
 function exporters.list()
   local found_exporters = {}
+  local num_found = 0
   if love.filesystem.exists(S.exporters_dirname) then
     local files = love.filesystem.getDirectoryItems(S.exporters_dirname)
     for _, file in ipairs(files) do
@@ -44,6 +45,7 @@ function exporters.list()
                                   file, result.name))
             else
               found_exporters[result.name] = result
+              num_found = num_found + 1
             end
           else
             print("Exporter could not be executed: " .. result)
@@ -54,7 +56,7 @@ function exporters.list()
       end
     end
   end
-  return found_exporters
+  return found_exporters, num_found
 end
 
 return exporters

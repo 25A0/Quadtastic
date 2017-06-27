@@ -118,8 +118,8 @@ Quadtastic.draw = function(app, state, gui_state)
     imgui.show_toast(gui_state, S.toast.reloaded(path), nil, toast_default_time)
   end
 
-  local reload_exporters_toast_callback = function(exporters)
-    imgui.show_toast(gui_state, S.toast.exporters_reloaded(#exporters), nil,
+  local reload_exporters_toast_callback = function(exporter_count)
+    imgui.show_toast(gui_state, S.toast.exporters_reloaded(exporter_count), nil,
                      toast_default_time)
   end
 
