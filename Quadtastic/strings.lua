@@ -138,7 +138,7 @@ strings.tooltips = {
   zoom_in = "Zoom in",
   zoom_out = "Zoom out",
   turbo_workflow = s[[Reloads image whenever it changes on disk, and repeats
-                      export whenever quads change.]],
+                      export and saves whenever quads change.]],
   rename = "Rename (" .. Keybindings.to_string("rename") .. ")",
   delete = "Delete selected quad(s) (" .. Keybindings.to_string("delete") .. ")",
   sort = "Sort unnamed quads from top to bottom, left to right",

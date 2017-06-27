@@ -96,7 +96,7 @@ function QuadtasticLogic.transitions(interface) return {
 
         data.history:add(do_action, undo_action)
         do_action()
-        if data.turbo_workflow then app.quadtastic.save() end
+        if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
       end
 
@@ -128,7 +128,9 @@ function QuadtasticLogic.transitions(interface) return {
 
             data.history:add(do_action, undo_action)
             do_action()
-            if data.turbo_workflow then app.quadtastic.save() end
+            if data.turbo_workflow then
+              app.quadtastic.turbo_workflow_on_change()
+            end
 
           elseif action == S.buttons.replace then
             replace(data.quads, current_keys, new_keys, quad)
@@ -217,7 +219,7 @@ function QuadtasticLogic.transitions(interface) return {
 
     data.history:add(do_action, undo_action)
     do_action()
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
   end,
 
@@ -268,7 +270,7 @@ function QuadtasticLogic.transitions(interface) return {
 
       data.history:add(do_action, undo_action)
       do_action()
-      if data.turbo_workflow then app.quadtastic.save() end
+      if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
     end
   end,
@@ -317,7 +319,7 @@ function QuadtasticLogic.transitions(interface) return {
 
     state.history:add(do_action, undo_action)
     do_action()
-    if state.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
     if libquadtastic.is_quad(new_quad) then
       state.selection:set_selection({new_quad})
@@ -408,7 +410,7 @@ function QuadtasticLogic.transitions(interface) return {
     data.history:add(do_action, undo_action)
     -- Note that we deliberately do not call the do_action here, since the quads
     -- are already at the position where the user wants them.
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
   end,
 
@@ -499,7 +501,7 @@ function QuadtasticLogic.transitions(interface) return {
     data.history:add(do_action, undo_action)
     -- Note that we deliberately do not call the do_action here, since the quads
     -- are already resized to the size that the user wants.
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
   end,
 
@@ -571,7 +573,7 @@ function QuadtasticLogic.transitions(interface) return {
 
     data.history:add(do_action, undo_action)
     do_action()
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
   end,
 
@@ -648,7 +650,7 @@ function QuadtasticLogic.transitions(interface) return {
     end
     data.history:add(do_action, undo_action)
     do_action()
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
   end,
 
@@ -666,14 +668,14 @@ function QuadtasticLogic.transitions(interface) return {
     if not data.history:can_undo() then return end
     local undo_action = data.history:undo()
     undo_action()
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
   end,
 
   redo = function(app, data)
     if not data.history:can_redo() then return end
     local redo_action = data.history:redo()
     redo_action()
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
   end,
 
   new = function(app, data)
@@ -701,6 +703,13 @@ function QuadtasticLogic.transitions(interface) return {
                         -- until the user actually does something
 
     app.quadtastic.switch_tool("create")
+  end,
+
+  -- The steps that need to be taken when turbo workflow is enabled and
+  -- some quads changed.
+  turbo_workflow_on_change = function(app, data)
+    app.quadtastic.save()
+    app.quadtastic.repeat_export()
   end,
 
   switch_tool = function(app, data, tool)
