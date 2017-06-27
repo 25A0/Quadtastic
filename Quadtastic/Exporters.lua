@@ -34,13 +34,16 @@ function exporters.list()
           local run_success, result = pcall(more)
           if run_success then
             if not result.name then
-              print(string.format("Exprter in %s misses name attribute.", file))
+              print(string.format("Exporter in %s misses name attribute.", file))
             elseif not result.ext then
-              print(string.format("Exprter in %s misses extension.", file))
+              print(string.format("Exporter in %s misses extension.", file))
             elseif not result.export then
-              print(string.format("Exprter in %s misses export function.", file))
+              print(string.format("Exporter in %s misses export function.", file))
+            elseif found_exporters[result.name] then
+              print(string.format("Exporter in %s declares a name (%s) that already exists.",
+                                  file, result.name))
             else
-              table.insert(found_exporters, result)
+              found_exporters[result.name] = result
             end
           else
             print("Exporter could not be executed: " .. result)

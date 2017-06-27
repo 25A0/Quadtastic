@@ -159,7 +159,7 @@ Quadtastic.draw = function(app, state, gui_state)
         if Menu.menu_start(gui_state, w/4, h - 12,
                            S.menu.file.export_as())
         then
-          for _,exporter in ipairs(state.exporters) do
+          for _,exporter in pairs(state.exporters) do
             if Menu.action_item(gui_state,
                                 string.format("%s (%s)",
                                               exporter.name, exporter.ext))
@@ -167,7 +167,7 @@ Quadtastic.draw = function(app, state, gui_state)
               app.quadtastic.export_as(exporter, export_toast_callback)
             end
           end
-          if #state.exporters > 0 then
+          if next(state.exporters) then
             Menu.separator(gui_state)
           end
           if Menu.action_item(gui_state, S.menu.file.export_as.manage_exporters)
