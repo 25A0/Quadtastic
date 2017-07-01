@@ -3,8 +3,6 @@ local common = require("Quadtastic.common")
 local exporters = require("Quadtastic.exporters")
 local libquadtastic = require("Quadtastic.libquadtastic")
 
-local test_exporter = {}
-
 -- Test whether the exporter declares that it can export the specified
 -- project, and in that case test that it can in fact export the project.
 -- If expected is not null, check that the produced output matches expected.
@@ -76,7 +74,7 @@ end
 
 -- Test the given exporter by letting it export the default test cases and
 -- the test cases specifically provided by that exporter.
-function test_exporter.test_exporter(exporter)
+local function test_exporter(exporter)
   -- Test the default test cases
   for k,v in pairs(default_test_cases) do
     print(string.format("Testing test case %s.", k))
@@ -120,7 +118,7 @@ function love.load(arg)
               if is_exporter then
                 print(string.format("Testing exporter %s in file %s",
                                     result.name, file))
-                test_exporter.test_exporter(result)
+                test_exporter(result)
               else
                 print(string.format("The module in file %s is not a valid exporter:\n%s",
                                     file, reason))
