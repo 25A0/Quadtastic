@@ -1,11 +1,38 @@
 local exporter = {}
 local libquadtastic = require("libquadtastic")
+local utf8 = require("utf8")
 
 -- This is the name under which the exporter will be listed in the menu
 exporter.name = "JSON"
 -- This is the default file extension that will be used when the user does not
 -- specify one.
 exporter.ext = "json"
+
+local should_escape = {
+  [utf8.codepoint("\"")] = true,
+  [utf8.codepoint("\\")] = true,
+  [utf8.codepoint("/" )] = true,
+  [utf8.codepoint("\b")] = true,
+  [utf8.codepoint("\f")] = true,
+  [utf8.codepoint("\n")] = true,
+  [utf8.codepoint("\r")] = true,
+  [utf8.codepoint("\t")] = true,
+}
+
+local function utf8_encode(str)
+  return utf8.char(string.byte(str, 1, string.len(str)))
+end
+
+-- Returns a new string in which all special characters of s are escaped,
+-- according to the json spec on http://json.org/
+local function escape(s)
+  local escaped_s = {}
+  for p, c in utf8.codes(utf8_encode(s)) do
+    if should_escape[c] then table.insert(escaped_s, "\\") end
+    table.insert(escaped_s, utf8.char(c))
+  end
+  return table.concat(escaped_s)
+end
 
 local function indent(write, i)
   write(string.rep("  ", i))
@@ -16,7 +43,7 @@ function exporter.export(write, quads, ind)
 
   for k,v in pairs(quads) do
     indent(write, ind)
-    write(string.format("\"%s\": ", k))
+    write(string.format("\"%s\": ", escape(k)))
     if libquadtastic.is_quad(v) then
       write(string.format("{\"x\":%d, \"y\": %d, \"w\": %d, \"h\": %d}",
                           v.x, v.y, v.w, v.h))
@@ -26,7 +53,7 @@ function exporter.export(write, quads, ind)
       indent(write, ind)
       write("}")
     elseif type(v) == "string" then
-      write(string.format("\"%s\"", v))
+      write(string.format("\"%s\"", escape(v)))
     elseif type(v) == "number" then
       write(string.format("%d", v))
     end
