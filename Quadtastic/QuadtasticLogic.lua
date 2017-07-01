@@ -764,6 +764,22 @@ function QuadtasticLogic.transitions(interface) return {
       app.quadtastic.export_as(exporter, callback)
     else
       local path = data.exportpath[exporter.name]
+
+      -- Check that the exporter can indeed export the quad definitions
+      do
+        local success, can_export, msg = pcall(exporter.can_export, data.quads)
+        if success then
+          if not can_export then
+            interface.show_dialog(S.dialogs.err_cannot_export(msg))
+            return
+          end
+        else
+          local err = can_export -- the second returned value contains the error
+          interface.show_dialog(S.dialogs.err_exporting(err))
+          return
+        end
+      end
+
       local success, err = pcall(app.quadtastic.export_with, path, exporter)
       if success then
         if callback then callback(path) end

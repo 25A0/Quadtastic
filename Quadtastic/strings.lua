@@ -201,6 +201,7 @@ strings.dialogs = {
   save_replace = f "File %s already exists. Do you want to replace it?",
   err_reload_exporters = f "An error occurred while reloading the exporters: %s",
   err_exporting = f "An error occurred while exporting the quad definitions: %s",
+  err_cannot_export = f "These quads cannot be exported with the chosen exporter: %s",
   about = f "Quadtastic %s",
   acknowledgements = "Quadtastic uses the following open-source software projects:",
   update = {

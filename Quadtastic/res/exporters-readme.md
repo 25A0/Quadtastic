@@ -32,6 +32,20 @@ You can define your own exporters for an export format of your choice.
 
   end
 
+  -- In case your exporter cannot handle arbitrary quad definitions, you can
+  -- use this function to check the quad definitions before they are passed to
+  -- the export function. This function should return true if your exporter
+  -- is able to process the quad definitions, and false otherwise.
+  --
+  -- If false is returned, a string can be returned as the second return value
+  -- that will be displayed as the reason why your exporter cannot handle the
+  -- quad definitions. For example, JSON cannot handle tables that have both,
+  -- numeric and string keys. You should make use of this to explain how users
+  -- can alter their quad definitions so that they can be exported.
+  function exporter.can_export(quads)
+    return true
+  end
+
   return exporter
 
 ```
