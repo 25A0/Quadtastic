@@ -946,7 +946,7 @@ function QuadtasticLogic.transitions(interface) return {
   end,
 
   reload_exporters = function(app, data, callback)
-    local success, more, count = pcall(exporters.list)
+    local success, more, count = pcall(exporters.list, S.exporters_dirname)
     if success then
       data.exporters = more
       -- Update previous exporter

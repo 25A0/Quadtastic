@@ -69,12 +69,12 @@ function love.load()
 
   -- Initialize the exporters directory structure
   do
-    local success, err = pcall(exporters.init)
+    local success, err = pcall(exporters.init, S.exporters_dirname)
     if not success then
       print("Could not initialize exporters: " .. err)
     else
       -- Fetch exporters
-      local success, more = pcall(exporters.list)
+      local success, more = pcall(exporters.list, S.exporters_dirname)
       if not success then
         print("Could not fetch list of exporters: " .. more)
       else
