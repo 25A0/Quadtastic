@@ -1,6 +1,9 @@
-local exporter = {}
-local libquadtastic = require("libquadtastic")
+local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
+
+local libquadtastic = require("Quadtastic.libquadtastic")
 local utf8 = require("utf8")
+
+local exporter = {}
 
 -- This is the name under which the exporter will be listed in the menu
 exporter.name = "JSON"
