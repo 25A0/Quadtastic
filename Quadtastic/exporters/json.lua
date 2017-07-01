@@ -41,28 +41,54 @@ end
 function exporter.export(write, quads, ind)
   if not ind then ind = 0 end
 
-  for k,v in pairs(quads) do
-    indent(write, ind)
-    write(string.format("\"%s\": ", escape(k)))
-    if libquadtastic.is_quad(v) then
-      write(string.format("{\"x\":%d, \"y\": %d, \"w\": %d, \"h\": %d}",
-                          v.x, v.y, v.w, v.h))
-    elseif type(v) == "table" then
+  if libquadtastic.is_quad(quads) then
+    write(string.format("{\"x\":%d, \"y\": %d, \"w\": %d, \"h\": %d}",
+                        quads.x, quads.y, quads.w, quads.h))
+  elseif type(quads) == "table" then
+    -- We need to distinguish between JSON arrays and objects. The function
+    -- `can_export` made sure that all tables have either string or numeric
+    -- indices, so we can determine whether a given table should be an array
+    -- or an object by looking at the type of the first key.
+    -- Note that the type can be either "string", "number", or "nil". For Lua
+    -- tables with "string" keys, a JSON object will be created. For "number"
+    -- keys, an array will be created. If the key type is "nil", then the table
+    -- is empty. In this case we simply produce an empty array ("[]").
+    local keytype = type(next(quads))
+
+    -- Opening token
+    if keytype == "string" then -- start a JSON object
       write("{\n")
-      exporter.export(write, v, ind + 1)
-      indent(write, ind)
-      write("}")
-    elseif type(v) == "string" then
-      write(string.format("\"%s\"", escape(v)))
-    elseif type(v) == "number" then
-      write(string.format("%d", v))
+    else -- start an array
+      write("[\n")
     end
 
-    -- Check if we need to insert a comma
-    if next(quads, k) then
-      write(",")
+    for k,v in pairs(quads) do
+      indent(write, ind + 1)
+
+      if keytype == "string" then
+        write(string.format("\"%s\": ", escape(k)))
+      end
+      exporter.export(write, v, ind + 1)
+
+      -- Check if we need to insert a comma
+      if next(quads, k) then
+        write(",")
+      end
+      write("\n")
     end
-    write("\n")
+    indent(write, ind)
+
+    -- Closing token
+    if keytype == "string" then -- complete a JSON object
+      write("}")
+    else -- complete an array
+      write("]")
+    end
+
+  elseif type(quads) == "string" then
+    write(string.format("\"%s\"", escape(quads)))
+  elseif type(quads) == "number" then
+    write(string.format("%d", quads))
   end
 
 end
