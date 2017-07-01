@@ -77,14 +77,14 @@ end
 local function test_exporter(exporter)
   -- Test the default test cases
   for k,v in pairs(default_test_cases) do
-    print(string.format("Testing test case %s.", k))
+    print(string.format("Testing test case '%s'.", k))
     test(exporter, v[1], v[2])
   end
 
   if exporter.test_cases then
     -- Test the test cases provided by the exporter
     for k,v in pairs(exporter.test_cases) do
-      print(string.format("Testing test case %s.", k))
+      print(string.format("Testing test case '%s'.", k))
       test(exporter, v[1], v[2])
     end
   end
