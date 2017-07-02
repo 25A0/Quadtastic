@@ -92,6 +92,10 @@ function exporter.export(write, quads, ind)
     write(string.format("\"%s\"", escape(quads)))
   elseif type(quads) == "number" then
     write(string.format("%d", quads))
+  elseif type(quads) == "boolean" then
+    write(string.format("%s", quads))
+  elseif type(quads) == "nil" then
+    write("null")
   end
 
 end

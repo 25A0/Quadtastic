@@ -60,6 +60,10 @@ local function export_table(write, table, ind)
       write(string.format("<string key=%s>%s</string>", xml_attr(k), escape(v)))
     elseif type(v) == "number" then
       write(string.format("<number key=%s>%d</number>", xml_attr(k), v))
+    elseif type(v) == "boolean" then
+      write(string.format("<boolean key=%s>%s</boolean>", xml_attr(k), v))
+    elseif type(v) == "nil" then
+      write(string.format("<nil key=%s/>", xml_attr(k)))
     end
 
     write("\n")
