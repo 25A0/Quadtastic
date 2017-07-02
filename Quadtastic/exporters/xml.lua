@@ -1,5 +1,5 @@
 local exporter = {}
-local libquadtastic = require("libquadtastic")
+local libquadtastic = require("Quadtastic.libquadtastic")
 
 -- This is the name under which the exporter will be listed in the menu
 exporter.name = "XML"
