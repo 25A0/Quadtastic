@@ -1,6 +1,6 @@
 -- A set of test projects that exporters might encounter
 return {
-  ["empty project"] = {},
+  ["empty project"] = {{}},
 
   ["Single quad"] = {
     {["a quad"] = {x = 4, y = 12, w = 8, h = 8}},
