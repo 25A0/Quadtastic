@@ -13,7 +13,7 @@ return {
     },
   },
 
-  ["Nested group"] = {
+  ["Group"] = {
     {
       ["a group"] = {
         ["first quad"] = {x = 4, y = 12, w = 4, h = 8},
@@ -22,6 +22,48 @@ return {
         ["fourth quad"] = {x = 16, y = 12, w = 4, h = 8},
       },
       ["a quad"] = {x = 4, y = 4, w = 8, h = 8},
+    },
+  },
+
+  ["Nested group"] = {
+    {
+      scrollpane = {
+        buttons = {
+          down = {
+            default = {x = 80, y = 9, w = 7, h = 7},
+            hovered = {x = 112, y = 9, w = 7, h = 7},
+            pressed = {x = 112, y = 25, w = 7, h = 7},
+          },
+          left = {
+            default = {x = 96, y = 9, w = 7, h = 7},
+            hovered = {x = 121, y = 9, w = 7, h = 7},
+            pressed = {x = 121, y = 25, w = 7, h = 7},
+          },
+          right = {
+            default = {x = 96, y = 0, w = 7, h = 7},
+            hovered = {x = 121, y = 0, w = 7, h = 7},
+            pressed = {x = 121, y = 16, w = 7, h = 7},
+          },
+          up = {
+            default = {x = 80, y = 0, w = 7, h = 7},
+            hovered = {x = 112, y = 0, w = 7, h = 7},
+            pressed = {x = 112, y = 16, w = 7, h = 7},
+          },
+        },
+        corner = {x = 105, y = 9, w = 7, h = 7},
+        scrollbar_h = {
+          background = {x = 105, y = 0, w = 1, h = 7},
+          center = {x = 108, y = 0, w = 1, h = 7},
+          left = {x = 106, y = 0, w = 2, h = 7},
+          right = {x = 109, y = 0, w = 2, h = 7},
+        },
+        scrollbar_v = {
+          background = {x = 105, y = 0, w = 7, h = 1},
+          bottom = {x = 105, y = 4, w = 7, h = 2},
+          center = {x = 105, y = 3, w = 7, h = 1},
+          top = {x = 105, y = 1, w = 7, h = 2},
+        },
+      },
     },
   },
 
