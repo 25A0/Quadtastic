@@ -96,7 +96,7 @@ return {
       ["a group"] = {
         ["first qüäd"] = {x = 4, y = 12, w = 4, h = 8},
         ["ßecønd quad"] = {x = 8, y = 12, w = 4, h = 8},
-        ["third/\\}\";'' quad"] = {x = 12, y = 12, w = 4, h = 8},
+        ["third/\\}\";'' quad < & > '"] = {x = 12, y = 12, w = 4, h = 8},
       },
       ["a quad"] = {x = 4, y = 4, w = 8, h = 8},
     },
