@@ -20,7 +20,9 @@ end
 -- Checks whether the given module conforms to the requirements of an exporter.
 -- That is, the module needs to define the mandatory functions and fields.
 function exporters.is_exporter(module)
-  if not module.name then
+  if not module or type(module) ~= "table" then
+    return false, "No module returned."
+  elseif not module.name then
     return false, "Module misses name attribute."
   elseif not module.ext then
     return false, "Module misses extension attribute."
