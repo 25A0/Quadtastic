@@ -39,14 +39,8 @@ local function indent(write, i)
   write(string.rep("  ", i))
 end
 
-local function xml_key(key)
-  if type(key) == "string" then
-    return string.format("\"%s\"", escape(key))
-  elseif type(key) == "number" then
-    return string.format("%d", escape(key))
-  else
-    error("Key of unexpected type " .. type(key))
-  end
+local function xml_attr(key)
+  return string.format("\"%s\"", escape(key))
 end
 
 local function export_table(write, table, ind)
@@ -55,17 +49,17 @@ local function export_table(write, table, ind)
   for k,v in pairs(table) do
     indent(write, ind)
     if libquadtastic.is_quad(v) then
-      write(string.format("<quad key=%s, x=%d, y=%d, w=%d, h=%d />",
-                          xml_key(k), v.x, v.y, v.w, v.h))
+      write(string.format("<quad key=%s, x=\"%d\", y=\"%d\", w=\"%d\", h=\"%d\" />",
+                          xml_attr(k), v.x, v.y, v.w, v.h))
     elseif type(v) == "table" then
-      write(string.format("<group key=%s>\n", xml_key(k)))
+      write(string.format("<group key=%s>\n", xml_attr(k)))
       export_table(write, v, ind + 1)
       indent(write, ind)
       write("</group>")
     elseif type(v) == "string" then
-      write(string.format("<string key=%s>%s</string>", xml_key(k), escape(v)))
+      write(string.format("<string key=%s>%s</string>", xml_attr(k), escape(v)))
     elseif type(v) == "number" then
-      write(string.format("<number key=%s>%d</number>", xml_key(k), v))
+      write(string.format("<number key=%s>%d</number>", xml_attr(k), v))
     end
 
     write("\n")
