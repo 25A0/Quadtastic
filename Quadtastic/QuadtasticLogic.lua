@@ -765,8 +765,10 @@ function QuadtasticLogic.transitions(interface) return {
     else
       local path = data.exportpath[exporter.name]
 
-      -- Check that the exporter can indeed export the quad definitions
-      do
+      -- Check that the exporter can indeed export the quad definitions.
+      -- If the exporter does not define this function, we assume that it can
+      -- export everything.
+      if exporter.can_export then
         local success, can_export, msg = pcall(exporter.can_export, data.quads)
         if success then
           if not can_export then
