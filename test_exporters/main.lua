@@ -3,6 +3,8 @@ local common = require("Quadtastic.common")
 local exporters = require("Quadtastic.exporters")
 local libquadtastic = require("Quadtastic.libquadtastic")
 
+local verbose = false
+
 -- Test whether the exporter declares that it can export the specified
 -- project, and in that case test that it can in fact export the project.
 -- If expected is not null, check that the produced output matches expected.
@@ -41,8 +43,15 @@ local function test(exporter, project, expected)
   -- project.
   local success, more = pcall(exporter.export, writer, project)
   if success then
+    local concatenated_output = table.concat(output)
+    if verbose then
+      print("Input:")
+      print(common.serialize_table(project))
+      print("Output:")
+      print(concatenated_output)
+    end
+
     if expected then
-      local concatenated_output = table.concat(output)
       -- Check that the produced output matches what was expected
       local matches = expected == concatenated_output
       if matches then return true
@@ -91,9 +100,38 @@ local function test_exporter(exporter)
 
 end
 
+local function test_exporter_in_file(file)
+  -- Load the file
+  local chunk, more = loadfile(file)
+  if chunk then
+
+    -- Run the chunk
+    local run_success, result = pcall(chunk)
+    if run_success then
+
+      -- Check that the module is a valid exporter
+      local is_exporter, reason = exporters.is_exporter(result)
+      if is_exporter then
+        print(string.format("Testing exporter %s in file %s",
+                            result.name, file))
+        test_exporter(result)
+      else
+        print(string.format("The module in file %s is not a valid exporter:\n%s",
+                            file, reason))
+      end -- if is exporter
+
+    else
+      print(string.format("Could not run file %s:\n%s", file, result))
+    end -- if could run
+
+  else
+    print(string.format("Could not load file %s:\n%s", file, more))
+  end -- if could load
+end
+
 function love.load(arg)
   local function print_usage()
-    print(string.format("Usage: %s <path-to-exporter> [...]", arg[0]))
+    print(string.format("Usage: %s [-v] <path-to-exporter> [...]", arg[0]))
   end
 
   -- Check if called from command line with exporter as argument
@@ -102,37 +140,15 @@ function love.load(arg)
     if not arg[2] then
       print_usage()
     else
-      for i,file in ipairs(arg) do
+      for i,a in ipairs(arg) do
         if i > 1 then -- this skips special fields in arg that we don't want
-
-          -- Load the file
-          local chunk, more = loadfile(file)
-          if chunk then
-
-            -- Run the chunk
-            local run_success, result = pcall(chunk)
-            if run_success then
-
-              -- Check that the module is a valid exporter
-              local is_exporter, reason = exporters.is_exporter(result)
-              if is_exporter then
-                print(string.format("Testing exporter %s in file %s",
-                                    result.name, file))
-                test_exporter(result)
-              else
-                print(string.format("The module in file %s is not a valid exporter:\n%s",
-                                    file, reason))
-              end -- if is exporter
-
-            else
-              print(string.format("Could not run file %s:\n%s", file, result))
-            end -- if could run
-
+          local verbose_flag = string.find(a, "-v")
+          if verbose_flag then
+            verbose = true
           else
-            print(string.format("Could not load file %s:\n%s", file, more))
-          end -- if could load
-
-        end -- if i > 0
+            test_exporter_in_file(a)
+          end
+        end -- if i > 1
       end -- for each arg
     end -- if not arg[1]
   end -- if arg
