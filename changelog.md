@@ -11,11 +11,13 @@
     - `~/Library/Application\ Support/Quadtastic/` on macOS,
     - `~/.local/share/love/`                       on Linux
  - Add custom exporters. Custom exporters can be used to export quad definitions
-   to formats other than the default quad file used by Quadtastic. There are a
-   few default exporters for common formats like JSON and XML, but you can also
-   write your own exporter, or use an exporter from the community.
+   to formats other than the default quad file used by Quadtastic. There are
+   default exporters for JSON and XML, but you can also write your own exporter,
+   or use an exporter from the community. Documentation for writing exporters is
+   available in the wiki on GitHub (https://github.com/25A0/Quadtastic/wiki).
  - When Turbo-Workflow is enabled, not only will the quad file be saved whenever
    quads change, but now the last export will be repeated, too.
+ - Use <kbd>ctrl+e</kbd> or <kbd>cmd+e</kbd> to repeat the previous export
 
 ### Release 0.5.3, 2017-05-02
 
