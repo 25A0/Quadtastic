@@ -9,11 +9,11 @@ function exporters.init(dirname)
     love.filesystem.createDirectory(dirname)
   end
 
-  -- Copy the Readme to the exporters directory
-  local readme_content = love.filesystem.read("res/exporters-readme.md")
-  assert(readme_content)
-  local success = love.filesystem.write(dirname .. "/Readme.md",
-                                        readme_content)
+  -- Copy the template to the exporters directory
+  local template_content = love.filesystem.read("res/exporter-template.lua")
+  assert(template_content)
+  local success = love.filesystem.write(dirname .. "/exporter-template.lua",
+                                        template_content)
   assert(success)
 end
 
