@@ -116,6 +116,8 @@ local function export_table_content(handle, tab, indentation)
       handle(tostring(v))
     elseif type(v) == "string" then
       handle("\"", v, "\"")
+    elseif type(v) == "boolean" then
+      handle(tostring(v))
     else
       error("Cannot handle table values of type "..type(v))
     end
