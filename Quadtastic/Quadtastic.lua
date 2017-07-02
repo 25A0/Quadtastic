@@ -153,7 +153,8 @@ Quadtastic.draw = function(app, state, gui_state)
           app.quadtastic.save_as(save_toast_callback)
         end
         if Menu.action_item(gui_state, S.menu.file.repeat_export,
-           {disabled = state.prev_exporter == nil}) then
+           {disabled = state.prev_exporter == nil,
+            keybinding = Keybindings.to_string("export")}) then
           app.quadtastic.repeat_export(export_toast_callback)
         end
         if Menu.menu_start(gui_state, w/4, h - 12,
@@ -633,6 +634,7 @@ Quadtastic.draw = function(app, state, gui_state)
     if is_pressed(Keybindings.open) then app.quadtastic.choose_quad() end
     if is_pressed(Keybindings.save) then app.quadtastic.save(save_toast_callback) end
     if is_pressed(Keybindings.save_as) then app.quadtastic.save_as(save_toast_callback) end
+    if is_pressed(Keybindings.export) then app.quadtastic.repeat_export(export_toast_callback) end
     if is_pressed(Keybindings.quit) then app.quadtastic.quit() end
     if is_pressed(Keybindings.new) then app.quadtastic.new() end
 

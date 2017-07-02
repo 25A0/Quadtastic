@@ -39,6 +39,7 @@ local keybindings = {
 	open    = {"o", {mac and "*gui" or "*ctrl"}},
 	save    = {"s", {mac and "*gui" or "*ctrl"}},
 	save_as = {"s", {mac and "*gui" or "*ctrl", "*shift"}},
+	export  = {"e", {mac and "*gui" or "*ctrl"}},
 	quit    = mac and {"q", {"*gui"}} or
 	          linux and {"q", {"*ctrl"}} or
 	          win and {"f4", {"*alt"}} or nil,

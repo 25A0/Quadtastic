@@ -756,7 +756,7 @@ function QuadtasticLogic.transitions(interface) return {
   -- Exports the current quads to the previously used file, using the previously
   -- used exporter.
   repeat_export = function(app, data, callback)
-    assert(data.prev_exporter)
+    if not data.prev_exporter then return end
 
     local exporter = data.prev_exporter
     if not data.exportpath[exporter.name] then
