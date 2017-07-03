@@ -382,6 +382,18 @@ function Dialog.save_file(basepath, default_extension)
         elseif mode == "directory" then
           success, err = switch_to(data, data.basepath)
         end
+      else -- Check if the containing directory exists
+        local dir, filename = common.split(data.basepath)
+        local dir_mode, dir_err = lfs.attributes(dir, "mode")
+        if dir_mode and dir_mode == "directory" then
+          success, err = switch_to(data, dir)
+          if success then
+            data.chosen_file = {
+              type = "file",
+              name = filename
+            }
+          end
+        end
       end
 
       -- If switching to the basepath doesn't work the first time the file

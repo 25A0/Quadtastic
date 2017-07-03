@@ -799,7 +799,11 @@ function QuadtasticLogic.transitions(interface) return {
     if data.exportpath[exporter.name] then
       basepath = data.exportpath[exporter.name]
     elseif data.quadpath then
-      basepath = common.split(data.quadpath)
+      local path, filename = common.split(data.quadpath)
+      local export_filename = string.format("%s.%s",
+                                            common.split_extension(filename),
+                                            exporter.ext)
+      basepath = path .. export_filename
     elseif data.quads and data.quads._META and data.quads._META.image_path then
       basepath = common.split(data.quads._META.image_path)
     elseif data.settings.latest_qua then
