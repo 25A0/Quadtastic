@@ -33,7 +33,8 @@
  - Learn more about how to [**use Quadtastic**](https://github.com/25a0/Quadtastic/wiki/Using-Quadtastic)
  - Save quads as a simple lua table.
    As you expand your sprite sheet, you can re-open this file in Quadtastic
-   to add or modify quads
+   to add or modify quads.
+   You can also [export your quads](https://github.com/25A0/Quadtastic/wiki/Exporters) to JSON or XML.
 ```lua
 return {
   base = {x = 16, y = 27, w = 16, h = 8},
