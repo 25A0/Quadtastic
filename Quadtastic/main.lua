@@ -74,8 +74,8 @@ function love.load()
       print("Could not initialize exporters: " .. err)
     else
       -- Fetch exporters
-      local success, more = pcall(exporters.list, S.exporters_dirname)
-      if not success then
+      local list_success, more = pcall(exporters.list, S.exporters_dirname)
+      if not list_success then
         print("Could not fetch list of exporters: " .. more)
       else
         Quadtastic.data.exporters = more

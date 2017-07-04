@@ -21,7 +21,6 @@ local Dialog = require(current_folder .. ".Dialog")
 local Menu = require(current_folder .. ".Menu")
 local Keybindings = require(current_folder .. ".Keybindings")
 local S = require(current_folder .. ".strings")
-local exporters = require(current_folder .. ".Exporters")
 
 local lfs = require("lfs")
 

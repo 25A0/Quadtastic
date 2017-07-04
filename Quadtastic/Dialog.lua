@@ -393,6 +393,8 @@ function Dialog.save_file(basepath, default_extension)
               name = filename
             }
           end
+        elseif not dir_mode then
+          err = dir_err
         end
       end
 

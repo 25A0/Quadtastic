@@ -43,7 +43,7 @@ function exporters.list(dirname)
     local files = love.filesystem.getDirectoryItems(dirname)
     for _, file in ipairs(files) do
 
-      local filename, extension = common.split_extension(file)
+      local _, extension = common.split_extension(file)
       if extension == "lua" then
 
         -- try to load the exporter
