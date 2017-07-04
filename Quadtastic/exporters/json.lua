@@ -41,7 +41,7 @@ local function indent(write, i)
   write(string.rep("  ", i))
 end
 
-function exporter.export(write, quads, ind)
+function exporter.export(write, quads, info, ind)
   if not ind then ind = 0 end
 
   if libquadtastic.is_quad(quads) then
@@ -71,7 +71,7 @@ function exporter.export(write, quads, ind)
       if keytype == "string" then
         write(string.format("\"%s\": ", escape(k)))
       end
-      exporter.export(write, v, ind + 1)
+      exporter.export(write, v, info, ind + 1)
 
       -- Check if we need to insert a comma
       if next(quads, k) then
