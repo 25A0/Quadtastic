@@ -1,6 +1,5 @@
-local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
-
 local libquadtastic = require("Quadtastic.libquadtastic")
+local common = require("Quadtastic.common")
 local utf8 = require("utf8")
 
 local exporter = {}
@@ -65,7 +64,8 @@ function exporter.export(write, quads, info, ind)
       write("[\n")
     end
 
-    for k,v in pairs(quads) do
+    local det_next = common.det_pairs(quads)
+    for k,v in det_next, quads do
       indent(write, ind + 1)
 
       if keytype == "string" then
@@ -74,7 +74,7 @@ function exporter.export(write, quads, info, ind)
       exporter.export(write, v, info, ind + 1)
 
       -- Check if we need to insert a comma
-      if next(quads, k) then
+      if det_next(quads, k) then
         write(",")
       end
       write("\n")
@@ -114,6 +114,8 @@ function exporter.can_export(quads)
     local has_numeric_keys = false
     local last_numeric_key
 
+    -- This iterator does not need to be deterministic, so we might as well use
+    -- the fast default iterator.
     for k,v in pairs(quads) do
 
       if type(k) == "number" then

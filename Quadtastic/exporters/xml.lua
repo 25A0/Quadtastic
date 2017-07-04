@@ -1,4 +1,5 @@
 local libquadtastic = require("Quadtastic.libquadtastic")
+local common = require("Quadtastic.common")
 local utf8 = require("utf8")
 
 local exporter = {}
@@ -46,7 +47,7 @@ end
 local function export_table(write, table, ind)
   if not ind then ind = 0 end
 
-  for k,v in pairs(table) do
+  for k,v in common.det_pairs(table) do
     indent(write, ind)
     if libquadtastic.is_quad(v) then
       write(string.format("<quad key=%s, x=\"%d\", y=\"%d\", w=\"%d\", h=\"%d\" />",
