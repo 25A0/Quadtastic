@@ -28,7 +28,11 @@ exporter.ext = "txt"
 -- `project` is the table that contains the quads you defined, as well as
 -- the metatable under the '_META' key. You can ignore the metatable if you
 -- don't need it.
-function exporter.export(write, project)
+-- Finally, the info table contains additional information that might be useful
+-- for the exporter. Currently it only contains `filepath`, the full path and
+-- name of the file that the `write` function will write to, but more elements
+-- might be added in the future.
+function exporter.export(write, project, info)
   write("This does not actually export anything. What a disappointment!")
 end
 

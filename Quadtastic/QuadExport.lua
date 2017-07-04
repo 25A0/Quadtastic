@@ -19,7 +19,10 @@ QuadExport.export = function(quads, exporter, filepath)
   quads._META.version = common.get_version()
 
   local writer = common.get_writer(filehandle)
-  local success, export_err = pcall(exporter.export, writer, quads)
+  local info = {
+    filepath = filepath,
+  }
+  local success, export_err = pcall(exporter.export, writer, quads, info)
   filehandle:close()
 
   if not success then error(export_err, 0) end
