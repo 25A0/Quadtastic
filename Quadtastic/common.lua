@@ -74,6 +74,90 @@ function common.is_lua_Name(str)
   return str and str == string.gmatch(str, "[A-Za-z_][A-Za-z0-9_]*")()
 end
 
+-- A slow but deterministic table iterator. Can only handle string and number
+-- keys.
+function common.det_pairs(tab)
+  local numeric_keys = {}
+  local string_keys = {}
+
+  -- Collect keys
+  for k in pairs(tab) do
+    if type(k) == "number" then table.insert(numeric_keys, k)
+    elseif type(k) == "string" then table.insert(string_keys, k) end
+  end
+
+  -- Sort keys separately. Note that this will lead to a deterministic order
+  -- even though sort is not stable; since we sort the keys of a table, we know
+  -- that there are no duplicates, since each key is necessarily unique.
+  table.sort(numeric_keys)
+  table.sort(string_keys)
+
+  -- So, this is going to be a bit complicated. I want det_pairs to work the
+  -- same way pairs works, so the function should return the next index and the
+  -- associated value each time it is called with the current index.
+  -- We have the two tables above with the numeric and string keys, but that
+  -- alone isn't enough to quickly find index i+1, given index i. Instead, we
+  -- can build a sort of linked list. Say we have the following indices that we
+  -- want to encounter in exactly this order:
+  -- indices = {1, 4, "a", "c", "ce", "f", "z"}
+  -- We can build a table that, under each index, contains the next index:
+  --
+  -- first_index = 1
+  -- next_index = {
+  --   [1] = 4,
+  --   [4] = "a",
+  --   a = "c",
+  --   c = "ce",
+  --   ce = "f",
+  --   f = "z",
+  -- }
+  --
+  -- Note that there is no value for key "z", since "z" is the last index. Note
+  -- also that it is easy to mix number and string indices. However, we do need
+  -- to store the first index separately since the table itself does not tell us
+  -- where to start.
+
+  -- By choice, we iterate over numeric keys first, and then move on to string
+  -- keys.
+  local first_index
+  local next_index = {}
+  do
+    local prev_index
+
+    for _,v in ipairs(numeric_keys) do
+      if not first_index then
+        first_index = v
+      else
+        next_index[prev_index] = v
+      end
+      prev_index = v
+    end
+
+    for _,v in ipairs(string_keys) do
+      if not first_index then
+        first_index = v
+      else
+        next_index[prev_index] = v
+      end
+      prev_index = v
+    end
+  end
+
+  -- We ignore the table that is passed to this function. This function will
+  -- not work with any other function anyway.
+  local det_next = function(_, index)
+    if not index then
+      return first_index, tab[first_index]
+    else
+      local i = next_index[index]
+      return i, tab[i]
+    end
+  end
+
+  -- Return the same things pairs() would return
+  return det_next, tab, nil
+end
+
 local function escape(str)
   str = string.gsub(str, "\\", "\\\\")
   str = string.gsub(str, "\"", "\\\"")
