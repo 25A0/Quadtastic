@@ -2,6 +2,7 @@ local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
 local Layout = require(current_folder .. ".Layout")
 local Rectangle = require(current_folder .. ".Rectangle")
 local imgui = require(current_folder .. ".imgui")
+local os = require(current_folder .. ".os")
 
 local Scrollpane = {}
 
@@ -9,20 +10,41 @@ local scrollbar_margin = 7
 
 local scroll_delta = 2
 
+local scrollwheel_multipliers = {
+  mac = 4,
+  win = 16,
+  linux = 16,
+}
+
+local scrollwheel_multiplier = scrollwheel_multipliers[os.os] or 1
+
 local function handle_input(state, scrollpane_state)
   assert(state.input)
+
+  local scroll_dx = state.input.mouse.wheel_dx
+  local scroll_dy = state.input.mouse.wheel_dy
+
+  -- Scroll horizontally instead of vertically when shift is pressed
+  if (os.win or os.linux) and scroll_dx == 0 then
+    if imgui.is_key_pressed(state, "lshift") or
+       imgui.is_key_pressed(state, "rshift")
+    then
+      scroll_dx = -scroll_dy
+      scroll_dy = 0
+    end
+  end
 
   -- Only handle image panning if the mousewheel was triggered inside
   -- this widget.
   if Scrollpane.is_mouse_inside_widget(state, scrollpane_state) then
       local threshold = 3
-    if state.input.mouse.wheel_dx ~= 0 then
-      scrollpane_state.tx = scrollpane_state.x + 4*state.input.mouse.wheel_dx
+    if scroll_dx ~= 0 then
+      scrollpane_state.tx = scrollpane_state.x + scrollwheel_multiplier*scroll_dx
     elseif math.abs(scrollpane_state.last_dx) > threshold then
       scrollpane_state.tx = scrollpane_state.x + scrollpane_state.last_dx
     end
-    if state.input.mouse.wheel_dy ~= 0 then
-      scrollpane_state.ty = scrollpane_state.y - 4*state.input.mouse.wheel_dy
+    if scroll_dy ~= 0 then
+      scrollpane_state.ty = scrollpane_state.y - scrollwheel_multiplier*scroll_dy
     elseif math.abs(scrollpane_state.last_dy) > threshold then
       scrollpane_state.ty = scrollpane_state.y + scrollpane_state.last_dy
     end
