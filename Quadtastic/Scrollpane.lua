@@ -2,12 +2,21 @@ local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
 local Layout = require(current_folder .. ".Layout")
 local Rectangle = require(current_folder .. ".Rectangle")
 local imgui = require(current_folder .. ".imgui")
+local os = require(current_folder .. ".os")
 
 local Scrollpane = {}
 
 local scrollbar_margin = 7
 
 local scroll_delta = 2
+
+local scrollwheel_multipliers = {
+  mac = 4,
+  win = 16,
+  linux = 16,
+}
+
+local scrollwheel_multiplier = scrollwheel_multipliers[os.os] or 1
 
 local function handle_input(state, scrollpane_state)
   assert(state.input)
@@ -17,12 +26,12 @@ local function handle_input(state, scrollpane_state)
   if Scrollpane.is_mouse_inside_widget(state, scrollpane_state) then
       local threshold = 3
     if state.input.mouse.wheel_dx ~= 0 then
-      scrollpane_state.tx = scrollpane_state.x + 4*state.input.mouse.wheel_dx
+      scrollpane_state.tx = scrollpane_state.x + scrollwheel_multiplier*state.input.mouse.wheel_dx
     elseif math.abs(scrollpane_state.last_dx) > threshold then
       scrollpane_state.tx = scrollpane_state.x + scrollpane_state.last_dx
     end
     if state.input.mouse.wheel_dy ~= 0 then
-      scrollpane_state.ty = scrollpane_state.y - 4*state.input.mouse.wheel_dy
+      scrollpane_state.ty = scrollpane_state.y - scrollwheel_multiplier*state.input.mouse.wheel_dy
     elseif math.abs(scrollpane_state.last_dy) > threshold then
       scrollpane_state.ty = scrollpane_state.y + scrollpane_state.last_dy
     end

@@ -6,6 +6,7 @@
 
 ### Unreleased
 
+ - Fix slow scrolling on Linux and Windows
  - Capture output in a log file `log.txt`. This file can be found in:
     - `%appdata%\Quadtastic\`                      on Windows,
     - `~/Library/Application\ Support/Quadtastic/` on macOS,
