@@ -6,7 +6,7 @@
 
 ### Unreleased
 
-There are currently no unreleased changes
+ - Fix slow scrolling on Linux and Windows
 
 ### Release 0.5.3, 2017-05-02
 
