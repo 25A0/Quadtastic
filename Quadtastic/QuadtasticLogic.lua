@@ -812,7 +812,9 @@ function QuadtasticLogic.transitions(interface) return {
       basepath = love.filesystem.getUserDirectory()
     end
 
-    local ret, filepath = interface.save_file(basepath, exporter.ext)
+    local buttons = {escape = S.buttons.cancel,
+                     enter = S.buttons.export_as(exporter.name)}
+    local ret, filepath = interface.save_file(basepath, exporter.ext, buttons)
     if ret == S.buttons.save then
       -- Store that path, so that the file browser starts off at that path in
       -- the future for this exporter.

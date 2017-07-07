@@ -160,6 +160,7 @@ strings.buttons = {
   swap = "Swap",
   replace = "Replace",
   save = "Save",
+  export_as = f "Export as %s",
   discard = "Discard",
   open = "Open",
   close = "Close",

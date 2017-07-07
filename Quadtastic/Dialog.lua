@@ -356,7 +356,7 @@ function Dialog.open_file(basepath)
   return coroutine.yield(file_state)
 end
 
-function Dialog.save_file(basepath, default_extension)
+function Dialog.save_file(basepath, default_extension, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
     if not data.basepath then
@@ -519,8 +519,8 @@ function Dialog.save_file(basepath, default_extension)
 
   local file_state = State("save_file", transitions,
                              {basepath = basepath or "/",
-                              buttons = {escape = S.buttons.cancel,
-                                         enter = S.buttons.save},
+                              buttons = buttons or {escape = S.buttons.cancel,
+                                                    enter = S.buttons.save},
                              })
 
   -- Store the draw function in the state
