@@ -10,6 +10,8 @@ QuadExport.export = function(quads, exporter, filepath)
   assert(exporter.ext and type(exporter.ext) == "string")
   assert(exporter.name and type(exporter.name) == "string")
 
+  -- Use clone of quads table instead of the original one
+  quads = common.clone(quads)
 
   local filehandle, open_err = io.open(filepath, "w")
   if not filehandle then error(open_err) end

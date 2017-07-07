@@ -231,6 +231,23 @@ function common.export_table_to_file(filehandle, tab)
   filehandle:close()
 end
 
+-- Clones table tab.
+-- Values are deeply cloned. Can handle string and number keys.
+function common.clone(tab)
+  assert(type(tab) == "table")
+  local clone = {}
+
+  for k,v in pairs(tab) do
+    if type(v) == "table" then
+      clone[k] = common.clone(v)
+    else
+      clone[k] = v
+    end
+  end
+
+  return clone
+end
+
 -- The name of the "exporter" that exports the quads as a quadfile.
 common.reserved_name_save = "Quadtastic quadfile"
 
