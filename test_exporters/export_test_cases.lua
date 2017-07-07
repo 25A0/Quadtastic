@@ -6,10 +6,6 @@ return {
     {["a quad"] = {x = 4, y = 12, w = 8, h = 8}},
   },
 
-  ["nil values"] = {
-    {["a nil value"] = nil},
-  },
-
   ["boolean values "] = {
     {
       ["a boolean value"] = true,
