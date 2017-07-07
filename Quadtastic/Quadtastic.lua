@@ -63,6 +63,7 @@ local Quadtastic = State("quadtastic",
     settings = load_settings() or {recent = {}},
     collapsed_groups = {},
     selection = Selection(),
+    exporters = {},
     -- More fields are initialized in the new() transition.
   })
 
@@ -102,12 +103,23 @@ Quadtastic.transitions = QuadtasticLogic.transitions(interface)
 --                           DRAWING
 -- -------------------------------------------------------------------------- --
 Quadtastic.draw = function(app, state, gui_state)
+  local toast_default_time = 2
+
   local save_toast_callback = function(path)
-    imgui.show_toast(gui_state, S.toast.saved_as(path), nil, 2)
+    imgui.show_toast(gui_state, S.toast.saved_as(path), nil, toast_default_time)
+  end
+
+  local export_toast_callback = function(path)
+    imgui.show_toast(gui_state, S.toast.exported_as(path), nil, toast_default_time)
   end
 
   local reload_image_toast_callback = function(path)
-    imgui.show_toast(gui_state, S.toast.reloaded(path), nil, 2)
+    imgui.show_toast(gui_state, S.toast.reloaded(path), nil, toast_default_time)
+  end
+
+  local reload_exporters_toast_callback = function(exporter_count)
+    imgui.show_toast(gui_state, S.toast.exporters_reloaded(exporter_count), nil,
+                     toast_default_time)
   end
 
   local w, h = gui_state.transform:unproject_dimensions(
@@ -138,6 +150,37 @@ Quadtastic.draw = function(app, state, gui_state)
         if Menu.action_item(gui_state, S.menu.file.save_as,
            {keybinding = Keybindings.to_string("save_as")}) then
           app.quadtastic.save_as(save_toast_callback)
+        end
+        if Menu.action_item(gui_state, S.menu.file.repeat_export,
+           {disabled = state.prev_exporter == nil,
+            keybinding = Keybindings.to_string("export")}) then
+          app.quadtastic.repeat_export(export_toast_callback)
+        end
+        if Menu.menu_start(gui_state, w/4, h - 12,
+                           S.menu.file.export_as())
+        then
+          for _,exporter in pairs(state.exporters) do
+            if Menu.action_item(gui_state,
+                                string.format("%s (%s)",
+                                              exporter.name, exporter.ext))
+            then
+              app.quadtastic.export_as(exporter, export_toast_callback)
+            end
+          end
+          if next(state.exporters) then
+            Menu.separator(gui_state)
+          end
+          if Menu.action_item(gui_state, S.menu.file.export_as.manage_exporters)
+          then
+            love.system.openURL("file://" ..
+                                love.filesystem.getSaveDirectory() .. "/" ..
+                                S.custom_exporters_dirname)
+          end
+          if Menu.action_item(gui_state, S.menu.file.export_as.reload_exporters)
+          then
+            app.quadtastic.reload_exporters(reload_exporters_toast_callback)
+          end
+          Menu.menu_finish(gui_state, w/4, h - 12)
         end
         if #state.settings.recent > 0 then
           if Menu.menu_start(gui_state, w/4, h - 12,
@@ -473,9 +516,11 @@ Quadtastic.draw = function(app, state, gui_state)
             Layout.next(gui_state, "|")
 
             if Button.draw(gui_state, nil, nil, gui_state.layout.max_w, nil,
-                           S.buttons.export, nil, {alignment_h = ":"})
+                           S.buttons.export, nil,
+                           {alignment_h = ":",
+                            disabled = state.prev_exporter == nil})
             then
-              app.quadtastic.save(save_toast_callback)
+              app.quadtastic.repeat_export(export_toast_callback)
             end
 
             Layout.next(gui_state, "|", 2)
@@ -588,6 +633,7 @@ Quadtastic.draw = function(app, state, gui_state)
     if is_pressed(Keybindings.open) then app.quadtastic.choose_quad() end
     if is_pressed(Keybindings.save) then app.quadtastic.save(save_toast_callback) end
     if is_pressed(Keybindings.save_as) then app.quadtastic.save_as(save_toast_callback) end
+    if is_pressed(Keybindings.export) then app.quadtastic.repeat_export(export_toast_callback) end
     if is_pressed(Keybindings.quit) then app.quadtastic.quit() end
     if is_pressed(Keybindings.new) then app.quadtastic.new() end
 

@@ -3,27 +3,29 @@ local common = require(current_folder.. ".common")
 
 local QuadExport = {}
 
-QuadExport.export = function(quads, filepath_or_filehandle)
+QuadExport.export = function(quads, exporter, filepath)
   assert(quads and type(quads) == "table")
+  assert(exporter and type(exporter) == "table", tostring(type(exporter)))
+  assert(exporter.export and type(exporter.export) == "function")
+  assert(exporter.ext and type(exporter.ext) == "string")
+  assert(exporter.name and type(exporter.name) == "string")
 
-  local filehandle, more
-  -- Errors need to be handled upstream
-  if io.type(filepath_or_filehandle) == "file" then
-    filehandle = filepath_or_filehandle
-  elseif io.type(filepath_or_filehandle) == nil and
-    type(filepath_or_filehandle) == "string"
-  then
-    filehandle, more = io.open(filepath_or_filehandle, "w")
-    if not filehandle then error(more) end
-  else
-    error("Cannot access filepath or filehandle")
-  end
+
+  local filehandle, open_err = io.open(filepath, "w")
+  if not filehandle then error(open_err) end
 
   -- Insert version info into quads
   if not quads._META then quads._META = {} end
   quads._META.version = common.get_version()
 
-  common.export_table_to_file(filehandle, quads)
+  local writer = common.get_writer(filehandle)
+  local info = {
+    filepath = filepath,
+  }
+  local success, export_err = pcall(exporter.export, writer, quads, info)
+  filehandle:close()
+
+  if not success then error(export_err, 0) end
 end
 
 return QuadExport

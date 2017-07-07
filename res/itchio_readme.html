@@ -1,6 +1,5 @@
 <h3>
-  A tool to manage sprite sheets and color palettes for
-  <a href="https://www.love2d.org">LÖVE</a> projects.
+  A tool to manage sprite sheets and color palettes.
 </h3>
 
 <hr>
@@ -19,33 +18,14 @@
     Use the palette tool to create quads from areas that have the same color
     <img src="http://imgur.com/d27NDVI.gif">
   </li>
-  <li>Save quads as a simple lua table.
-    <pre>
- return {
-  base = {x = 16, y = 27, w = 16, h = 8},
-  bubbles = {
-    {x = 2, y = 18, w = 5, h = 5},
-    {x = 1, y = 25, w = 3, h = 4},
-    {x = 10, y = 18, w = 5, h = 3},
-    {x = 7, y = 24, w = 7, h = 6},
-    {x = 3, y = 8, w = 5, h = 4},
-    {x = 10, y = 11, w = 4, h = 3},
-    {x = 7, y = 3, w = 6, h = 4},
-  },
-  lid = {x = 16, y = 7, w = 16, h = 15},
-  liquid = {x = 0, y = 32, w = 3, h = 3},
-  stand = {x = 32, y = 32, w = 16, h = 16},
-}</pre>
-  </li>
-  <li>As you expand your sprite sheet, you can re-open this quadfile in Quadtastic
-    to add or modify quads
+  <li>Save quads as a simple lua table, or export them to other formats like JSON or XML
   </li>
   <li>Enable <img src="http://i.imgur.com/uYNOhGl.gif" alt="Turbo-Workflow">
     to reload the spritesheet whenever it changes on disk,
     and to re-export the quads whenever you change them
   </li>
   <li>
-    Using <code>libquadtastic.lua</code>, use these quads in your LÖVE projects like so:
+    If you're using LÖVE, you can use the quads in your LÖVE projects like so:
     <pre>
   local libquadtastic = require("libquadtastic")
 

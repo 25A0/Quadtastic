@@ -356,7 +356,7 @@ function Dialog.open_file(basepath)
   return coroutine.yield(file_state)
 end
 
-function Dialog.save_file(basepath, default_extension)
+function Dialog.save_file(basepath, default_extension, buttons)
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
     if not data.basepath then
@@ -381,6 +381,20 @@ function Dialog.save_file(basepath, default_extension)
           end
         elseif mode == "directory" then
           success, err = switch_to(data, data.basepath)
+        end
+      else -- Check if the containing directory exists
+        local dir, filename = common.split(data.basepath)
+        local dir_mode, dir_err = lfs.attributes(dir, "mode")
+        if dir_mode and dir_mode == "directory" then
+          success, err = switch_to(data, dir)
+          if success then
+            data.chosen_file = {
+              type = "file",
+              name = filename
+            }
+          end
+        elseif not dir_mode then
+          err = dir_err
         end
       end
 
@@ -505,8 +519,8 @@ function Dialog.save_file(basepath, default_extension)
 
   local file_state = State("save_file", transitions,
                              {basepath = basepath or "/",
-                              buttons = {escape = S.buttons.cancel,
-                                         enter = S.buttons.save},
+                              buttons = buttons or {escape = S.buttons.cancel,
+                                                    enter = S.buttons.save},
                              })
 
   -- Store the draw function in the state

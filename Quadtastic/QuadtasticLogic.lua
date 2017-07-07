@@ -4,6 +4,7 @@ local History = require(current_folder.. ".History")
 local table = require(current_folder.. ".tableplus")
 local libquadtastic = require(current_folder.. ".libquadtastic")
 local common = require(current_folder.. ".common")
+local exporters = require(current_folder.. "Exporters")
 local os = require(current_folder.. ".os")
 local S = require(current_folder.. ".strings")
 
@@ -95,7 +96,7 @@ function QuadtasticLogic.transitions(interface) return {
 
         data.history:add(do_action, undo_action)
         do_action()
-        if data.turbo_workflow then app.quadtastic.save() end
+        if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
       end
 
@@ -127,7 +128,9 @@ function QuadtasticLogic.transitions(interface) return {
 
             data.history:add(do_action, undo_action)
             do_action()
-            if data.turbo_workflow then app.quadtastic.save() end
+            if data.turbo_workflow then
+              app.quadtastic.turbo_workflow_on_change()
+            end
 
           elseif action == S.buttons.replace then
             replace(data.quads, current_keys, new_keys, quad)
@@ -216,7 +219,7 @@ function QuadtasticLogic.transitions(interface) return {
 
     data.history:add(do_action, undo_action)
     do_action()
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
   end,
 
@@ -267,28 +270,28 @@ function QuadtasticLogic.transitions(interface) return {
 
       data.history:add(do_action, undo_action)
       do_action()
-      if data.turbo_workflow then app.quadtastic.save() end
+      if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
     end
   end,
 
-  create = function(app, state, new_quad)
+  create = function(app, data, new_quad)
     -- If a group is currently selected, add the new quad to that group
     -- If a quad is currently selected, add the new quad to the same
     -- group.
-    local selection = state.selection:get_selection()
+    local selection = data.selection:get_selection()
     local group -- the group to which the new quad will be added
     if #selection == 1 then
-      local keys = {table.find_key(state.quads, selection[1])}
+      local keys = {table.find_key(data.quads, selection[1])}
       if libquadtastic.is_quad(selection[1]) then
         -- Remove the last key so that the new quad is added to the
         -- group that contains the currently selected quad
         table.remove(keys)
       end
-      group = table.get(state.quads, unpack(keys))
+      group = table.get(data.quads, unpack(keys))
     else
       -- Just add it to the root
-      group = state.quads
+      group = data.quads
     end
 
     local do_action, undo_action
@@ -314,18 +317,18 @@ function QuadtasticLogic.transitions(interface) return {
       end
     end
 
-    state.history:add(do_action, undo_action)
+    data.history:add(do_action, undo_action)
     do_action()
-    if state.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
     if libquadtastic.is_quad(new_quad) then
-      state.selection:set_selection({new_quad})
-      interface.move_quad_into_view(state.quad_scrollpane_state, new_quad)
+      data.selection:set_selection({new_quad})
+      interface.move_quad_into_view(data.quad_scrollpane_state, new_quad)
     else
       assert(type(new_quad) == "table")
       assert(#new_quad >= 1)
-      state.selection:set_selection(new_quad)
-      interface.move_quad_into_view(state.quad_scrollpane_state, new_quad[1])
+      data.selection:set_selection(new_quad)
+      interface.move_quad_into_view(data.quad_scrollpane_state, new_quad[1])
     end
   end,
 
@@ -407,7 +410,7 @@ function QuadtasticLogic.transitions(interface) return {
     data.history:add(do_action, undo_action)
     -- Note that we deliberately do not call the do_action here, since the quads
     -- are already at the position where the user wants them.
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
   end,
 
@@ -498,7 +501,7 @@ function QuadtasticLogic.transitions(interface) return {
     data.history:add(do_action, undo_action)
     -- Note that we deliberately do not call the do_action here, since the quads
     -- are already resized to the size that the user wants.
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
   end,
 
@@ -570,7 +573,7 @@ function QuadtasticLogic.transitions(interface) return {
 
     data.history:add(do_action, undo_action)
     do_action()
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
   end,
 
@@ -647,7 +650,7 @@ function QuadtasticLogic.transitions(interface) return {
     end
     data.history:add(do_action, undo_action)
     do_action()
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
 
   end,
 
@@ -665,14 +668,14 @@ function QuadtasticLogic.transitions(interface) return {
     if not data.history:can_undo() then return end
     local undo_action = data.history:undo()
     undo_action()
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
   end,
 
   redo = function(app, data)
     if not data.history:can_redo() then return end
     local redo_action = data.history:redo()
     redo_action()
-    if data.turbo_workflow then app.quadtastic.save() end
+    if data.turbo_workflow then app.quadtastic.turbo_workflow_on_change() end
   end,
 
   new = function(app, data)
@@ -683,6 +686,12 @@ function QuadtasticLogic.transitions(interface) return {
       _META = {}
     }
     data.quadpath = nil -- path to the file containing the quad definitions
+    -- The name of the last used exporter
+    data.prev_exporter = nil
+    -- A mapping from exporter name to last used path. This is convenient
+    -- in case specific export targets are always saved in the same location.
+    -- These are populated from the loaded application settings.
+    data.exportpath = {}
     data.image = nil -- the loaded image
     interface.reset_view(data)
     -- Reset list of collapsed groups
@@ -696,6 +705,15 @@ function QuadtasticLogic.transitions(interface) return {
     app.quadtastic.switch_tool("create")
   end,
 
+  -- The steps that need to be taken when turbo workflow is enabled and
+  -- some quads changed.
+  turbo_workflow_on_change = function(app, data)
+    app.quadtastic.save()
+    if data.prev_exporter then
+      app.quadtastic.repeat_export()
+    end
+  end,
+
   switch_tool = function(app, data, tool)
     data.tool = tool
     data.toolstate = {}
@@ -705,12 +723,15 @@ function QuadtasticLogic.transitions(interface) return {
     if not data.quadpath or data.quadpath == "" then
       app.quadtastic.save_as(callback)
     else
-      QuadExport.export(data.quads, data.quadpath)
+      app.quadtastic.export_with(data.quadpath, common.exporter_table)
       data.history:mark()
       if callback then callback(data.quadpath) end
     end
   end,
 
+  -- Have user pick a path where to save the quad file.
+  -- This is separate from export_as so that data.quadpath and data.exportpath
+  -- don't get mixed up.
   save_as = function(app, data, callback)
     local basepath
 
@@ -730,6 +751,82 @@ function QuadtasticLogic.transitions(interface) return {
       app.quadtastic.save(callback)
       add_path_to_recent_files(interface, data, filepath)
     end
+  end,
+
+  -- Exports the current quads to the previously used file, using the previously
+  -- used exporter.
+  repeat_export = function(app, data, callback)
+    if not data.prev_exporter then return end
+
+    local exporter = data.prev_exporter
+    if not data.exportpath[exporter.name] then
+      -- Have user pick an export file
+      app.quadtastic.export_as(exporter, callback)
+    else
+      local path = data.exportpath[exporter.name]
+
+      -- Check that the exporter can indeed export the quad definitions.
+      -- If the exporter does not define this function, we assume that it can
+      -- export everything.
+      if exporter.can_export then
+        local success, can_export, msg = pcall(exporter.can_export, data.quads)
+        if success then
+          if not can_export then
+            interface.show_dialog(S.dialogs.err_cannot_export(msg))
+            return
+          end
+        else
+          local err = can_export -- the second returned value contains the error
+          interface.show_dialog(S.dialogs.err_exporting(err))
+          return
+        end
+      end
+
+      local success, err = pcall(app.quadtastic.export_with, path, exporter)
+      if success then
+        if callback then callback(path) end
+      else
+        interface.show_dialog(S.dialogs.err_exporting(err))
+      end
+    end
+  end,
+
+  -- Exports the current quads using the given exporter. The user will be asked
+  -- to pick a file.
+  export_as = function(app, data, exporter, callback)
+    local basepath
+
+    if data.exportpath[exporter.name] then
+      basepath = data.exportpath[exporter.name]
+    elseif data.quadpath then
+      local path, filename = common.split(data.quadpath)
+      local export_filename = string.format("%s.%s",
+                                            common.split_extension(filename),
+                                            exporter.ext)
+      basepath = path .. export_filename
+    elseif data.quads and data.quads._META and data.quads._META.image_path then
+      basepath = common.split(data.quads._META.image_path)
+    elseif data.settings.latest_qua then
+      basepath = data.settings.latest_qua
+    else
+      basepath = love.filesystem.getUserDirectory()
+    end
+
+    local buttons = {escape = S.buttons.cancel,
+                     enter = S.buttons.export_as(exporter.name)}
+    local ret, filepath = interface.save_file(basepath, exporter.ext, buttons)
+    if ret == S.buttons.save then
+      -- Store that path, so that the file browser starts off at that path in
+      -- the future for this exporter.
+      data.exportpath[exporter.name] = filepath
+      data.prev_exporter = exporter
+      app.quadtastic.repeat_export(callback)
+    end
+
+  end,
+
+  export_with = function(app, data, path, exporter)
+    QuadExport.export(data.quads, exporter, path)
   end,
 
   choose_quad = function(app, data, basepath)
@@ -853,6 +950,22 @@ function QuadtasticLogic.transitions(interface) return {
     else
       -- Try to load this as an image
       app.quadtastic.load_image(filepath)
+    end
+  end,
+
+  reload_exporters = function(app, data, callback)
+    local success, more, count = pcall(exporters.list, S.exporters_dirname)
+    if success then
+      data.exporters = more
+      -- Update previous exporter
+      if data.prev_exporter then
+        -- This will clear the previous exporter if there is none with that
+        -- name in the new set of exporters, or update the previous exporter.
+        data.prev_exporter = data.exporters[data.prev_exporter.name]
+      end
+      if callback then callback(count) end
+    else
+      interface.show_dialog(S.dialogs.err_reload_exporters(more))
     end
   end,
 

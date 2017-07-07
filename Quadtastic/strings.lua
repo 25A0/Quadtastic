@@ -8,6 +8,26 @@ local function f(str)
   end
 end
 
+-- This function can be used to return different strings for different
+-- numbers of items. For example:
+-- local t = {[0] = "no items",
+--            [1] = "one item",
+--            [2] = "two items",
+--            ["other"] = f("%d items")}
+-- c(t) returns a function that, when called with a count, returns the
+-- appropriate string for that count. If no value is defined for that specific
+-- count, a field "other" is called with the count.
+local function c(tab)
+  return function(count)
+    if tab[count] then
+      return tab[count]
+    else
+      assert(tab["other"])
+      return tab["other"](count)
+    end
+  end
+end
+
 local function menu_table(menu_string, table)
   return setmetatable(table,{__call = function() return menu_string end})
 end
@@ -27,9 +47,16 @@ strings.report_email = "moritz@25a0.com"
 strings.update_base_url = "http://www.25a0.com/quadtastic/latest_version"
 strings.itchio_url = "https://25a0.itch.io/quadtastic"
 
+strings.exporters_dirname = "exporters"
+strings.custom_exporters_dirname = "custom exporters"
+
 strings.toast = {
   saved_as = f "Saved as %s",
+  exported_as = f "Exported as %s",
   reloaded = f "Reloaded %s",
+  exporters_reloaded = c({[0] = "No exporters were found",
+                          [1] = "Successfully loaded one exporter",
+                          ["other"] = f "Successfully loaded %d exporters"}),
   copied_to_clipboard = "Copied to clipboard",
   err_cannot_fetch_version = "Could not fetch update information :(",
 }
@@ -46,6 +73,11 @@ strings.menu = {
       open = "Open...",
       save = "Save",
       save_as = "Save as...",
+      repeat_export = "Repeat last export",
+      export_as = menu_table("Export as...", {
+        manage_exporters = "Manage exporters",
+        reload_exporters = "Reload exporters"
+      }),
       open_recent = "Open recent",
       quit = "Quit",
     }),
@@ -107,7 +139,7 @@ strings.tooltips = {
   zoom_in = "Zoom in",
   zoom_out = "Zoom out",
   turbo_workflow = s[[Reloads image whenever it changes on disk, and repeats
-                      export whenever quads change.]],
+                      export and saves whenever quads change.]],
   rename = "Rename (" .. Keybindings.to_string("rename") .. ")",
   delete = "Delete selected quad(s) (" .. Keybindings.to_string("delete") .. ")",
   sort = "Sort unnamed quads from top to bottom, left to right",
@@ -128,6 +160,7 @@ strings.buttons = {
   swap = "Swap",
   replace = "Replace",
   save = "Save",
+  export_as = f "Export as %s",
   discard = "Discard",
   open = "Open",
   close = "Close",
@@ -168,6 +201,9 @@ strings.dialogs = {
   offer_load = "We found a quad file in %s.\nWould you like to load it?",
   err_save_directory = f "%s is a directory.",
   save_replace = f "File %s already exists. Do you want to replace it?",
+  err_reload_exporters = f "An error occurred while reloading the exporters: %s",
+  err_exporting = f "An error occurred while exporting the quad definitions: %s",
+  err_cannot_export = f "These quads cannot be exported with the chosen exporter: %s",
   about = f "Quadtastic %s",
   acknowledgements = "Quadtastic uses the following open-source software projects:",
   update = {

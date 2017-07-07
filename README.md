@@ -1,8 +1,7 @@
 <h1 align="center">Quadtastic!</h1>
 
 <p align="center">
-  A simple standalone tool to manage sprite sheets and color palettes for
-  <a href="https://www.love2d.org">LÖVE</a> projects.
+  A simple standalone tool to manage sprite sheets and color palettes
 </p>
 
 <p align="center">
@@ -23,7 +22,7 @@
 
 ## Features
 
- - Create quads straight on your spritesheet -- no need to ever type out coordinates again
+ - Create quads straight on your sprite sheet -- no need to ever type out coordinates again
  - Keep your quads neatly organized by giving them descriptive names and grouping them
  - Move and resize existing quads
  - Use the wand tool to create quads from opaque areas automatically
@@ -31,43 +30,31 @@
  - Use the palette tool to create quads from areas that have the same color
  ![Using the palette tool](screenshots/palette.gif)
  - Learn more about how to [**use Quadtastic**](https://github.com/25a0/Quadtastic/wiki/Using-Quadtastic)
- - Save quads as a simple lua table.
-   As you expand your sprite sheet, you can re-open this file in Quadtastic
-   to add or modify quads
-```lua
-return {
-  base = {x = 16, y = 27, w = 16, h = 8},
-  bubbles = {
-    {x = 2, y = 18, w = 5, h = 5},
-    {x = 1, y = 25, w = 3, h = 4},
-    {x = 10, y = 18, w = 5, h = 3},
-    {x = 7, y = 24, w = 7, h = 6},
-    {x = 3, y = 8, w = 5, h = 4},
-    {x = 10, y = 11, w = 4, h = 3},
-    {x = 7, y = 3, w = 6, h = 4},
-  },
-  lid = {x = 16, y = 7, w = 16, h = 15},
-  liquid = {x = 0, y = 32, w = 3, h = 3},
-  stand = {x = 32, y = 32, w = 16, h = 16},
-}
- ```
+ - Save quads as a simple lua table, export them to [other formats](https://github.com/25A0/Quadtastic/blob/master/Exporter/README.md)
+   like JSON or XML, or [create your own exporter](https://github.com/25a0/Quadtastic/wiki/Exporters).
  - Enable ![Turbo Workflow](screenshots/turboworkflow.gif) to reload the
    spritesheet whenever it changes on disk, and to re-export the quads whenever
    you change them
- - In your LÖVE project, turn these quads into LÖVE Quad objects with just a
-   few lines of code
-```lua
-  -- load the raw quad definitions that you created with Quadtastic
-  local raw_quads = require("res/quads")
-  image = love.graphics.newImage("res/sheet.png") -- load spritesheet
 
-  -- Create LÖVE Quads from raw quad definitions
-  quads = libquadtastic.create_quads(raw_quads, image:getWidth(), image:getHeight())
-```
+If you're using [LÖVE](https://www.love2d.org):
+
+ - Save your quads as a lua table, and turn them into LÖVE Quad objects with just a
+   few lines of code
+
+    ```lua
+    -- load the raw quad definitions that you created with Quadtastic
+    local raw_quads = require("res/quads")
+    image = love.graphics.newImage("res/sheet.png") -- load spritesheet
+
+    -- Create LÖVE Quads from raw quad definitions
+    quads = libquadtastic.create_quads(raw_quads, image:getWidth(), image:getHeight())
+    ```
+
  - You can then draw these quads like so:
-```lua
-  love.graphics.draw(image, quads.base)
-```
+
+    ```lua
+    love.graphics.draw(image, quads.base)
+    ```
 
  - Learn more about how to [**use quads and palettes in your LÖVE project**](https://github.com/25a0/Quadtastic/wiki/Using-quads-and-palettes)
 

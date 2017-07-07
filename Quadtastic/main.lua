@@ -10,6 +10,7 @@ local imgui = require(current_folder .. ".imgui")
 local AppLogic = require(current_folder .. ".AppLogic")
 local Quadtastic = require(current_folder .. ".Quadtastic")
 local libquadtastic = require(current_folder .. ".libquadtastic")
+local exporters = require(current_folder .. ".Exporters")
 
 local Transform = require(current_folder .. '.transform')
 local Toast = require(current_folder .. '.Toast')
@@ -63,6 +64,23 @@ function love.load()
       lua_print(...)
       io.write(...)
       io.write('\n')
+    end
+  end
+
+  -- Initialize the exporters directory structure
+  do
+    local success, err = pcall(exporters.init, S.custom_exporters_dirname)
+    if not success then
+      print("Could not initialize exporters: " .. err)
+    else
+      -- Fetch exporters
+      local list_success, more = pcall(exporters.list,
+                                       {S.exporters_dirname, S.custom_exporters_dirname})
+      if not list_success then
+        print("Could not fetch list of exporters: " .. more)
+      else
+        Quadtastic.data.exporters = more
+      end
     end
   end
 
