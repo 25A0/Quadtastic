@@ -10,6 +10,8 @@ os.mac = os_string == "OS X"
 os.win = os_string == "Windows"
 os.linux = os_string == "Linux"
 
+os.os = os.mac and "mac" or os.win and "win" or os.linux and "linux"
+
 function os.cursors()
   local cursors = {
     arrow = love.mouse.getSystemCursor("arrow"),
