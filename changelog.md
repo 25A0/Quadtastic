@@ -7,6 +7,7 @@
 ### Unreleased
 
  - Fix slow scrolling on Linux and Windows
+ - On Windows and Linux, scroll horizontally when shift is pressed
  - Capture output in a log file `log.txt`. This file can be found in:
     - `%appdata%\Quadtastic\`                      on Windows,
     - `~/Library/Application\ Support/Quadtastic/` on macOS,
