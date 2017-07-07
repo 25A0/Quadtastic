@@ -13,7 +13,7 @@ local scroll_delta = 2
 local scrollwheel_multipliers = {
   mac = 4,
   win = 16,
-  linux = 12,
+  linux = 16,
 }
 
 local scrollwheel_multiplier = scrollwheel_multipliers[os.os] or 1
