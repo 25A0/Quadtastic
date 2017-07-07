@@ -48,6 +48,7 @@ strings.update_base_url = "http://www.25a0.com/quadtastic/latest_version"
 strings.itchio_url = "https://25a0.itch.io/quadtastic"
 
 strings.exporters_dirname = "exporters"
+strings.custom_exporters_dirname = "custom exporters"
 
 strings.toast = {
   saved_as = f "Saved as %s",

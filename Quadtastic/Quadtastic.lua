@@ -174,7 +174,7 @@ Quadtastic.draw = function(app, state, gui_state)
           then
             love.system.openURL("file://" ..
                                 love.filesystem.getSaveDirectory() .. "/" ..
-                                S.exporters_dirname)
+                                S.custom_exporters_dirname)
           end
           if Menu.action_item(gui_state, S.menu.file.export_as.reload_exporters)
           then
