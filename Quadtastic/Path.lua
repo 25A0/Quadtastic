@@ -173,7 +173,7 @@ end
 -- filename part of a path.
 function Path.split_extension(filename)
   local file, ext = string.gmatch(filename, "(.*)%.([^%.]*)")()
-  return file or filename, ext or ""
+  return file or filename, ext
 end
 
 -- Returns whether the given string is an absolute path.

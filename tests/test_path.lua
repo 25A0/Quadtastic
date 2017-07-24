@@ -72,7 +72,7 @@ do
   do
     local fname, ext = Path.split_extension(Path("/foo/bar/filec"):basename())
     assert(fname == "filec")
-    assert(ext == "")
+    assert(ext == nil)
   end
 end
 
