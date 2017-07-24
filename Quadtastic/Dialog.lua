@@ -345,9 +345,9 @@ function Dialog.open_file(basepath)
   local transitions = {
     -- luacheck: no unused args
     respond = function(app, data, response)
-      return response, (data.basepath or "") .. os.pathsep .. (
+      return response, tostring(Path(os.path(data.basepath)) .. (
         data.committed_file and data.committed_file.name or ""
-      )
+      ))
     end,
 
     err = function(app, data, err)
@@ -494,7 +494,7 @@ function Dialog.save_file(basepath, default_extension, buttons)
                 filename = filename .. "." .. default_extension
               end
               local filetype = lfs.attributes(filename, "mode")
-              local filepath = (data.basepath or "") .. os.pathsep .. (filename or "")
+              local filepath = tostring(Path(os.path(data.basepath)) .. (filename or ""))
               if filetype == "file" then
                 app.save_file.override(filepath)
               elseif filetype == "directory" then
