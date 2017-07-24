@@ -73,6 +73,10 @@ local function init_input()
   }
 end
 
+imgui.set_frame_bounds = function(gui_state, frame_bounds)
+  gui_state.frame_bounds = frame_bounds
+end
+
 imgui.reset_input = function(gui_state)
   gui_state.input = init_input()
 end
