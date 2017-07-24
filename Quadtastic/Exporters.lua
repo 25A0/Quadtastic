@@ -6,7 +6,7 @@ local exporters = {}
 -- Creates the empty exporters directory and copies the Readme file to it.
 function exporters.init(dirname)
   if not love.filesystem.exists(dirname) then
-    local success, more = love.filesystem.createDirectory(dirname)
+    local success = love.filesystem.createDirectory(dirname)
     assert(success)
   end
 
