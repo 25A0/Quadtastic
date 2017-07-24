@@ -149,7 +149,7 @@ end
 
 -- Returns the filename portion of the given path
 function Path.basename(path)
-  return path.elements[#path.elements]
+  return path.elements[#path.elements] or ""
 end
 
 -- Returns the directory portion of this path.
