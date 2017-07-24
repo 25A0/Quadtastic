@@ -52,7 +52,7 @@ local function show_buttons(gui_state, buttons, options)
     for key,button in pairs(buttons) do
 
       local button_options = {}
-      if options and options.disabled[button] then
+      if options and options.disabled[key] then
         button_options.disabled = true
       end
 
