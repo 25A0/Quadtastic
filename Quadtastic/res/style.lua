@@ -1,7 +1,7 @@
 return {
   _META = {
-    image_path = "/Users/moritz/Projects/Quadtastic/Quadtastic/res/style.png",
-    version = "v0.5.3-106-g516c865",
+    image_path = "./style.png",
+    version = "v0.5.3-108-g89fb772",
   },
   background = {x = 48, y = 16, w = 8, h = 8},
   button_border = {
