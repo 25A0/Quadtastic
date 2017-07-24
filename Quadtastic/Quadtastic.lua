@@ -365,9 +365,11 @@ Quadtastic.draw = function(app, state, gui_state)
         Layout.next(gui_state, "|", 1)
 
         do Layout.start(gui_state) -- Zoom buttons
+          local disable_zoom_buttons = not state.image
           do
             local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil,
-              gui_state.style.quads.buttons.plus)
+              gui_state.style.quads.buttons.plus,
+              {disabled = disable_zoom_buttons})
             if pressed then
               ImageEditor.zoom(state, 1)
             end
@@ -376,7 +378,8 @@ Quadtastic.draw = function(app, state, gui_state)
           Layout.next(gui_state, "-")
           do
             local pressed = Button.draw(gui_state, nil, nil, nil, nil, nil,
-              gui_state.style.quads.buttons.minus)
+              gui_state.style.quads.buttons.minus,
+              {disabled = disable_zoom_buttons})
             if pressed then
               ImageEditor.zoom(state, -1)
             end

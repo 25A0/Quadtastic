@@ -10,6 +10,9 @@ local img_analysis = require(current_folder .. ".img_analysis")
 local ImageEditor = {}
 
 function ImageEditor.zoom(state, delta)
+  -- Ignore zoom instructions if no image is loaded
+  if not state.image then return end
+
   if not state.display.zoom then state.display.zoom = 1 end
   local cx, cy = Rectangle.center(state.scrollpane_state)
   cx, cy = cx / state.display.zoom, cy / state.display.zoom
