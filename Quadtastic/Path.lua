@@ -164,10 +164,12 @@ end
 -- follows the last period in filename.
 -- So, calling `Path.split_extension("/foo/bar/code.c")` returns "code", "c".
 -- If filename contains no extension, then the first return value will be
--- filename, and the second return value will be nil.
+-- filename, and the second return value will be the empty string "".
+-- This function expects a filename, not a path. Use basename to extract the
+-- filename part of a path.
 function Path.split_extension(filename)
   local file, ext = string.gmatch(filename, "(.*)%.([^%.]*)")()
-  return file or filename, ext
+  return file or filename, ext or ""
 end
 
 setmetatable(Path,
