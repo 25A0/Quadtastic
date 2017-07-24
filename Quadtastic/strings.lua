@@ -51,9 +51,9 @@ strings.exporters_dirname = "exporters"
 strings.custom_exporters_dirname = "custom exporters"
 
 strings.toast = {
-  saved_as = f "Saved as %s",
-  exported_as = f "Exported as %s",
-  reloaded = f "Reloaded %s",
+  saved_as = f "Saved as '%s'",
+  exported_as = f "Exported as '%s'",
+  reloaded = f "Reloaded '%s'",
   exporters_reloaded = c({[0] = "No exporters were found",
                           [1] = "Successfully loaded one exporter",
                           ["other"] = f "Successfully loaded %d exporters"}),
@@ -170,7 +170,7 @@ strings.buttons = {
 strings.dialogs = {
   rename = {
     err_only_one = "You cannot rename more than one element at once.",
-    err_nested_quad = f(s("The element %s is a quad, and can therefore not have\
+    err_nested_quad = f(s("The element '%s' is a quad, and can therefore not have\
                            nested quads.")),
     err_exists = f "The element '%s' already exists.",
     name_prompt = "Name:",
@@ -192,16 +192,16 @@ strings.dialogs = {
     err_name_conflict = f(s[[This group cannot be broken up since there is
                              already an element called '%s'.]]),
   },
-  offer_reload = f(s[[The image %s has changed on disk.
+  offer_reload = f(s[[The image '%s' has changed on disk.
 
                       Do you want to reload it?]]),
   save_changes = "Do you want to save the changes you made in the current file?",
   err_load_quads = f "Could not load quads: %s",
   err_load_image = f "Could not load image: %s",
-  offer_load = "We found a quad file in %s.\nWould you like to load it?",
-  err_save_directory = f "%s is a directory.",
-  save_replace = f "File %s already exists. Do you want to replace it?",
-  default_extension = f "Will be saved as %s.%s.",
+  offer_load = "We found a quad file in '%s'.\nWould you like to load it?",
+  err_save_directory = f "'%s' is a directory.",
+  save_replace = f "File '%s' already exists. Do you want to replace it?",
+  default_extension = f "Will be saved as '%s.%s'.",
   err_reload_exporters = f "An error occurred while reloading the exporters: %s",
   err_exporting = f "An error occurred while exporting the quad definitions: %s",
   err_cannot_export = f "These quads cannot be exported with the chosen exporter: %s",
