@@ -310,7 +310,8 @@ function Dialog.open_file(basepath)
         imgui.pop_style(gui_state, "font")
         Layout.next(gui_state, "|")
         local clicked_button = show_buttons(gui_state, data.buttons,
-          {disabled = {Open = data.chosen_file == nil or data.chosen_file.type == "directory"}})
+          {disabled = {enter = data.chosen_file == nil or
+                               data.chosen_file.type == "directory"}})
         if clicked_button then
 
           -- Set chosen file as committed when open is clicked
@@ -472,8 +473,9 @@ function Dialog.save_file(basepath, default_extension, buttons)
         Layout.next(gui_state, "|")
 
         local clicked_button = show_buttons(gui_state, data.buttons,
-          {disabled = {Open = data.chosen_file == nil or
-                       data.editing_filename == ""}})
+          {disabled = {enter = data.chosen_file == nil or
+                               (not data.editing_filename or
+                                #data.editing_filename == 0)}})
         if clicked_button then
 
           if clicked_button == S.buttons.save then
@@ -729,7 +731,7 @@ function Dialog.check_updates()
         Layout.next(gui_state, "|")
         local clicked_button = show_buttons(gui_state, {S.buttons.close,
                                                         S.buttons.download},
-                                            {disabled = {[S.buttons.download] = not can_update}})
+                                            {disabled = {[2] = not can_update}})
         if clicked_button then
           app.check_updates[clicked_button]()
         end
