@@ -54,12 +54,6 @@ function common.split(filepath)
   return dirname, basename
 end
 
--- Returns the filename without extension as the first return value, and the
--- extension as the second return value
-function common.split_extension(filename)
-  return string.gmatch(filename, "(.*)%.([^%.]*)")()
-end
-
 local function export_quad(handle, quadtable)
   handle(string.format(
     "{x = %d, y = %d, w = %d, h = %d}",

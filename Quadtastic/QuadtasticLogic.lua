@@ -5,6 +5,7 @@ local table = require(current_folder.. ".tableplus")
 local libquadtastic = require(current_folder.. ".libquadtastic")
 local common = require(current_folder.. ".common")
 local exporters = require(current_folder.. "Exporters")
+local Path = require(current_folder.. "Path")
 local os = require(current_folder.. ".os")
 local S = require(current_folder.. ".strings")
 
@@ -801,7 +802,7 @@ function QuadtasticLogic.transitions(interface) return {
     elseif data.quadpath then
       local path, filename = common.split(data.quadpath)
       local export_filename = string.format("%s.%s",
-                                            common.split_extension(filename),
+                                            Path.split_extension(filename),
                                             exporter.ext)
       basepath = path .. export_filename
     elseif data.quads and data.quads._META and data.quads._META.image_path then
@@ -944,7 +945,7 @@ function QuadtasticLogic.transitions(interface) return {
 
   load_dropped_file = function(app, data, filepath)
     -- Determine how to treat this file depending on its extensions
-    local _, extension = common.split_extension(filepath)
+    local _, extension = Path.split_extension(filepath)
     if extension == "lua" or extension == "qua" then
       app.quadtastic.load_quad(filepath)
     else
