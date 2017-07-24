@@ -12,8 +12,8 @@ local find_tooltip_position = function(gui_state, x, y, w, h, label)
   local textlength = Text.min_width(gui_state, label or "Someone forgot to set the tooltip text...")
 
   -- Determine where the most room is to show the tooltip
-  local above = y - gui_state.window_bounds.y
-  local below = gui_state.window_bounds.h - (h + y)
+  local above = y
+  local below = gui_state.frame_bounds.h - (h + y)
 
   local tty, tip_y, orientation
   local tooltip_height = 12
@@ -27,14 +27,14 @@ local find_tooltip_position = function(gui_state, x, y, w, h, label)
     orientation = "upwards"
   end
 
-  -- Change the x position depending on how close we are to the window's border
-  if textlength > gui_state.window_bounds.w and _DEBUG then
-    print("Warning: tooltip label "..label.." exceeds window bounds")
+  -- Change the x position depending on how close we are to the frame border
+  if textlength > gui_state.frame_bounds.w and _DEBUG then
+    print("Warning: tooltip label "..label.." exceeds frame bounds")
   end
   local tooltip_width = textlength + 2*2
   local ttx = x + w / 2 - tooltip_width/2
-  ttx = math.max(gui_state.window_bounds.x + 2, ttx)
-  ttx = math.min(gui_state.window_bounds.w - gui_state.window_bounds.x - tooltip_width - 2, ttx)
+  ttx = math.max(2, ttx)
+  ttx = math.min(gui_state.frame_bounds.w - tooltip_width - 2, ttx)
   local tip_x = x + w/2 - 5/2
 
   return ttx, tty,
