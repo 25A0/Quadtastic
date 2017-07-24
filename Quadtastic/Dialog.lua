@@ -12,6 +12,7 @@ local Window = require(current_folder .. ".Window")
 local imgui = require(current_folder .. ".imgui")
 local licenses = require(current_folder .. ".res.licenses")
 local S = require(current_folder .. ".strings")
+local Path = require(current_folder .. ".Path")
 local Version = require(current_folder .. ".Version")
 local common = require(current_folder .. ".common")
 local os = require(current_folder .. ".os")
@@ -464,7 +465,8 @@ function Dialog.save_file(basepath, default_extension, buttons)
                              data.editing_filename
             if filename then
               -- Add default file extension unless the user specified one
-              if default_extension and not common.split_extension(filename) then
+              local _, extension = Path.split_extension(filename)
+              if default_extension and not extension then
                 filename = filename .. "." .. default_extension
               end
               local filetype = lfs.attributes(filename, "mode")
