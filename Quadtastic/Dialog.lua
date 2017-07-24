@@ -52,7 +52,7 @@ local function show_buttons(gui_state, buttons, options)
     for key,button in pairs(buttons) do
 
       local button_options = {}
-      if options and options.disabled[key] then
+      if options and options.disabled and options.disabled[key] then
         button_options.disabled = true
       end
 
@@ -65,6 +65,13 @@ local function show_buttons(gui_state, buttons, options)
       if button_pressed or key_pressed then
         clicked_button = button
       end
+
+      if options and options.tooltip and options.tooltip[key] then
+        Tooltip.draw(gui_state, options.tooltip[key], nil, nil, nil, nil,
+                     {tooltip_threshold = 0})
+
+      end
+
       Layout.next(gui_state, "-")
     end
   end Layout.finish(gui_state, "-")
@@ -439,15 +446,12 @@ function Dialog.save_file(basepath, default_extension, buttons)
         -- If the filename does not contain an extension, the default extension
         -- will be added automatically. Show a label to tell the user about
         -- that.
+        local tooltip_label
         if data.editing_filename and #data.editing_filename > 0 then
           local _, extension = Path.split_extension(data.editing_filename)
           if default_extension and not extension then
-            local label_content = S.dialogs.default_extension(data.editing_filename,
+            tooltip_label = S.dialogs.default_extension(data.editing_filename,
                                                         default_extension)
-            imgui.push_style(gui_state, "font", gui_state.style.small_font)
-            Tooltip.draw(gui_state, label_content, nil, nil, nil, nil,
-                         {tooltip_threshold = 0})
-            imgui.pop_style(gui_state, "font")
           end
         end
 
@@ -475,7 +479,9 @@ function Dialog.save_file(basepath, default_extension, buttons)
         local clicked_button = show_buttons(gui_state, data.buttons,
           {disabled = {enter = data.chosen_file == nil or
                                (not data.editing_filename or
-                                #data.editing_filename == 0)}})
+                                #data.editing_filename == 0)},
+           -- Set the tooltip label for the save button, if applicable
+           tooltip  = tooltip_label and {enter = tooltip_label} or {}})
         if clicked_button then
 
           if clicked_button == S.buttons.save then
