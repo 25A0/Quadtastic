@@ -3,6 +3,7 @@ local State = require(current_folder .. ".State")
 local Scrollpane = require(current_folder .. ".Scrollpane")
 local Frame = require(current_folder .. ".Frame")
 local InputField = require(current_folder .. ".Inputfield")
+local Tooltip = require(current_folder .. ".Tooltip")
 local Layout = require(current_folder .. ".Layout")
 local Button = require(current_folder .. ".Button")
 local LoadingAnim = require(current_folder .. ".LoadingAnim")
@@ -433,6 +434,21 @@ function Dialog.save_file(basepath, default_extension, buttons)
                           nil, nil, intended_width, nil, data.editing_filename or
                           data.chosen_file and data.chosen_file.type == "file" and
                           data.chosen_file.name or "")
+
+        -- If the filename does not contain an extension, the default extension
+        -- will be added automatically. Show a label to tell the user about
+        -- that.
+        if data.editing_filename and #data.editing_filename > 0 then
+          local _, extension = Path.split_extension(data.editing_filename)
+          if default_extension and not extension then
+            local label_content = S.dialogs.default_extension(data.editing_filename,
+                                                        default_extension)
+            imgui.push_style(gui_state, "font", gui_state.style.small_font)
+            Tooltip.draw(gui_state, label_content, nil, nil, nil, nil,
+                         {tooltip_threshold = 0})
+            imgui.pop_style(gui_state, "font")
+          end
+        end
 
         if data.committed_filename then
           local filetype = lfs.attributes(data.committed_filename, "mode")

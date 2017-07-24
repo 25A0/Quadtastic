@@ -201,6 +201,7 @@ strings.dialogs = {
   offer_load = "We found a quad file in %s.\nWould you like to load it?",
   err_save_directory = f "%s is a directory.",
   save_replace = f "File %s already exists. Do you want to replace it?",
+  default_extension = f "Will be saved as %s.%s.",
   err_reload_exporters = f "An error occurred while reloading the exporters: %s",
   err_exporting = f "An error occurred while exporting the quad definitions: %s",
   err_cannot_export = f "These quads cannot be exported with the chosen exporter: %s",
