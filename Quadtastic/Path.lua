@@ -9,6 +9,11 @@ local function split(path_string)
   return string.gmatch(path_string, regex)
 end
 
+local function get_root(path_string)
+  return string.match(path_string, "^([A-Za-z]:/)") or
+         string.match(path_string, "^(/)")
+end
+
 function Path.new(path_string)
   assert(path_string and type(path_string) == "string" and #path_string > 0)
 
@@ -18,8 +23,7 @@ function Path.new(path_string)
   }
 
   -- The root is either a single "/" or a drive letter, followed by ":/"
-  path.root = string.match(path_string, "^([A-Za-z]:/)") or
-              string.match(path_string, "^(/)")
+  path.root = get_root(path_string)
   if not path.root then
     error("Path string does not describe an absolute path.")
   end
@@ -170,6 +174,18 @@ end
 function Path.split_extension(filename)
   local file, ext = string.gmatch(filename, "(.*)%.([^%.]*)")()
   return file or filename, ext or ""
+end
+
+-- Returns whether the given string is an absolute path.
+-- An absolute path is anything that begins with a / or [a-zA-Z]:/
+function Path.is_absolute_path(path_string)
+  -- Explicitly comparing to nil so that this function returns a boolean and
+  -- not some weird string value that the caller needs to interpret.
+  return get_root(path_string) ~= nil
+end
+
+function Path.is_relative_path(path_string)
+  return string.match(path_string, "^%./") ~= nil
 end
 
 setmetatable(Path,

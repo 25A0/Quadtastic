@@ -75,3 +75,29 @@ do
     assert(ext == "")
   end
 end
+
+-- test detecting absolute paths
+do
+  assert(Path.is_absolute_path("/"))
+  assert(Path.is_absolute_path("/foo/./"))
+  assert(Path.is_absolute_path("C:/foo/./"))
+
+  assert(not Path.is_absolute_path("Drive:/foo/./"))
+  assert(not Path.is_absolute_path("./foo/./"))
+  assert(not Path.is_absolute_path("../foo/./"))
+  assert(not Path.is_absolute_path("../C:/./"))
+  assert(not Path.is_absolute_path("foo/./"))
+end
+
+-- test detecting relative paths
+do
+  assert(Path.is_relative_path("./"))
+  assert(Path.is_relative_path("./foo/./"))
+
+  assert(not Path.is_relative_path("Drive:/foo/./"))
+  assert(not Path.is_relative_path("/foo/./"))
+  assert(not Path.is_relative_path("C:/foo/./"))
+  assert(not Path.is_relative_path(".././foo/./"))
+  assert(not Path.is_relative_path("../C:/./"))
+  assert(not Path.is_relative_path("foo/./"))
+end
