@@ -39,3 +39,39 @@ do
   assert(Path("/foo/bar/"):get_relative_to(basepath) ==
          "./../../..")
 end
+
+-- test constructing the parent of a path
+do
+  local basepath = Path("/foo/bar/some/file.lua")
+  assert(tostring(basepath:parent()) == "/foo/bar/some")
+  assert(tostring(basepath:parent() .. "other_file.lua") ==
+         "/foo/bar/some/other_file.lua")
+  assert(tostring(Path("/"):parent()) == "/")
+end
+
+-- test basename and dirname
+do
+  assert(tostring(Path("/foo/bar/file.c"):dirname()) == "/foo/bar")
+  assert(tostring(Path("/foo/bar/file.c"):basename()) == "file.c")
+  assert(tostring(Path("/"):dirname()) == "/")
+  assert(tostring(Path("/"):basename()) == "")
+end
+
+-- test splitting off the extension
+do
+  do
+    local fname, ext = Path.split_extension(Path("/foo/bar/file.c"):basename())
+    assert(fname == "file")
+    assert(ext == "c")
+  end
+  do
+    local fname, ext = Path.split_extension(Path("/foo/bar/file.c.old"):basename())
+    assert(fname == "file.c")
+    assert(ext == "old")
+  end
+  do
+    local fname, ext = Path.split_extension(Path("/foo/bar/filec"):basename())
+    assert(fname == "filec")
+    assert(ext == "")
+  end
+end
