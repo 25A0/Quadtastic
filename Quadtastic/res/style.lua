@@ -1,7 +1,7 @@
 return {
   _META = {
     image_path = "/Users/moritz/Projects/Quadtastic/Quadtastic/res/style.png",
-    version = "v0.4.1-86-gc277354",
+    version = "v0.5.3-106-g516c865",
   },
   background = {x = 48, y = 16, w = 8, h = 8},
   button_border = {
@@ -203,8 +203,8 @@ return {
       tr = {x = 3, y = 48, w = 2, h = 2},
     },
     tip = {
-      downwards = {x = 5, y = 48, w = 7, h = 3},
-      upwards = {x = 5, y = 50, w = 7, h = 3},
+      downwards = {x = 5, y = 48, w = 9, h = 4},
+      upwards = {x = 5, y = 51, w = 9, h = 4},
     },
   },
   window_border = {

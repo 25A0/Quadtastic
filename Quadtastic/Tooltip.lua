@@ -19,7 +19,7 @@ local find_tooltip_position = function(gui_state, x, y, w, h, label)
   local tooltip_height = 12
   if above > below then
     tty = y - (3 + tooltip_height) -- move tooltip above the frame
-    tip_y = y - 3
+    tip_y = y - 4
     orientation = "downwards"
   else
     tty = y + h + 3 -- move tooltip below the frame
@@ -35,7 +35,7 @@ local find_tooltip_position = function(gui_state, x, y, w, h, label)
   local ttx = x + w / 2 - tooltip_width/2
   ttx = math.max(2, ttx)
   ttx = math.min(gui_state.frame_bounds.w - tooltip_width - 2, ttx)
-  local tip_x = x + w/2 - 5/2
+  local tip_x = x + w/2 - 7/2
 
   return ttx, tty,
          tooltip_width,
