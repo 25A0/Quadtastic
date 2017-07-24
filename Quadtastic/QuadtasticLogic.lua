@@ -896,6 +896,20 @@ function QuadtasticLogic.transitions(interface) return {
       data.image = nil
 
       if metainfo.image_path then
+        local abs_path
+        if Path.is_absolute_path(metainfo.image_path) then
+          abs_path = metainfo.image_path
+        elseif Path.is_relative_path(metainfo.image_path) then
+          -- Create an absolute path to the image file by concatenating the
+          -- absolute path to the directory containing the quadfile and the
+          -- relative image path
+          abs_path = tostring(Path(filepath):parent() .. metainfo.image_path)
+        else
+          error("Path to image is neither absolute nor relative.")
+        end
+        -- Store the image path as an absolute path. It will be converted back
+        -- to a relative path when the quads are saved or exported.
+        metainfo.image_path = abs_path
         app.quadtastic.load_image(metainfo.image_path)
       end
 
