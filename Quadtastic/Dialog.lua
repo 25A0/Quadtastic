@@ -236,6 +236,9 @@ local function switch_to(data, new_basepath)
   -- Clear chosen file
   data.chosen_file = nil
 
+  -- Clear scrollpane state to reset the scroll position to the top
+  data.scrollpane_state = nil
+
   local success, err = lfs.chdir(new_basepath)
   if success then
     data.basepath = lfs.currentdir()
