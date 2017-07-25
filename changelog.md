@@ -19,6 +19,7 @@
    quads change, but now the last export will be repeated, too.
  - Use <kbd>ctrl+e</kbd> or <kbd>cmd+e</kbd> to repeat the previous export
  - Use relative paths in quadfile's metadata if possible
+ - Double-click a quad or group in the quad list to rename it
 
 ### Release 0.5.3, 2017-05-02
 

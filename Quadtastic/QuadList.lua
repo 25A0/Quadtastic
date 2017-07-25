@@ -10,7 +10,7 @@ local Button = require(current_folder .. ".Button")
 local QuadList = {}
 
 local function draw_elements(gui_state, state, elements, last_hovered, quad_bounds)
-  local clicked_element, hovered_element
+  local clicked_element, hovered_element, double_clicked_element
   for name,element in pairs(elements) do
     if name ~= "_META" then
       local row_height = 16
@@ -90,6 +90,9 @@ local function draw_elements(gui_state, state, elements, last_hovered, quad_boun
       local w, h = gui_state.layout.adv_x, gui_state.layout.adv_y
       if not input_consumed and imgui.was_mouse_pressed(gui_state, x, y, w, h) then
         clicked_element = element
+        if gui_state.input.mouse.buttons[1].double_clicked then
+          double_clicked_element = element
+        end
       end
       hovered_element = not input_consumed and
                         imgui.is_mouse_in_rect(gui_state, x, y, w, h) and
@@ -108,7 +111,7 @@ local function draw_elements(gui_state, state, elements, last_hovered, quad_boun
       end
     end
   end
-  return clicked_element, hovered_element
+  return clicked_element, hovered_element, double_clicked_element
 end
 
 -- Draw the quads in the current state.
@@ -118,13 +121,14 @@ QuadList.draw = function(gui_state, state, x, y, w, h, last_hovered)
   -- The quad that the user clicked on
   local clicked
   local hovered
+  local double_clicked
   local quad_bounds = {}
   do Frame.start(gui_state, x, y, w, h)
     imgui.push_style(gui_state, "font", gui_state.style.small_font)
     imgui.push_style(gui_state, "font_color", gui_state.style.palette.shades.brightest)
     do state.quad_scrollpane_state = Scrollpane.start(gui_state, nil, nil, nil, nil, state.quad_scrollpane_state)
       do Layout.start(gui_state, nil, nil, nil, nil, {noscissor = true})
-        clicked, hovered = draw_elements(gui_state, state, state.quads, last_hovered, quad_bounds)
+        clicked, hovered, double_clicked = draw_elements(gui_state, state, state.quads, last_hovered, quad_bounds)
       end Layout.finish(gui_state, "|")
       -- Restrict the viewport's position to the visible content as good as
       -- possible
@@ -148,7 +152,7 @@ QuadList.draw = function(gui_state, state, x, y, w, h, last_hovered)
     state.quad_scrollpane_state.focus_quad = nil
   end
 
-  return clicked, hovered
+  return clicked, hovered, double_clicked
 end
 
 QuadList.move_quad_into_view = function(scrollpane_state, quad)

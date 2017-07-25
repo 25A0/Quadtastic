@@ -432,7 +432,7 @@ Quadtastic.draw = function(app, state, gui_state)
         do Layout.start(gui_state)
           do Layout.start(gui_state, nil, nil, gui_state.layout.max_w - 21)
             -- Draw the list of quads
-            local clicked, hovered =
+            local clicked, hovered, double_clicked =
               QuadList.draw(gui_state, state, nil, nil, nil, gui_state.layout.max_h - 33,
                             state.hovered)
             if clicked then
@@ -498,7 +498,7 @@ Quadtastic.draw = function(app, state, gui_state)
               else
                 state.selection:set_selection(new_quads)
               end
-            end
+            end -- if clicked
 
             -- Move viewport so that clicked quad is visible
             if clicked and libquadtastic.is_quad(clicked) then
@@ -512,6 +512,13 @@ Quadtastic.draw = function(app, state, gui_state)
 
               -- Move the image editor's viewport to the focused quad
               Scrollpane.set_focus(state.scrollpane_state, bounds)
+            end
+
+            if double_clicked then
+              -- Set the selection to the double-clicked element
+              state.selection:set_selection({double_clicked})
+              -- Open a rename dialog for the clicked element
+              app.quadtastic.rename(state.selection:get_selection())
             end
 
             state.hovered = hovered
