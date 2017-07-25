@@ -20,6 +20,7 @@
  - When Turbo-Workflow is enabled, not only will the quad file be saved whenever
    quads change, but now the last export will be repeated, too.
  - Use <kbd>ctrl+e</kbd> or <kbd>cmd+e</kbd> to repeat the previous export
+ - Double-click a quad or group in the quad list to rename it
 
 ### Release 0.5.3, 2017-05-02
 
