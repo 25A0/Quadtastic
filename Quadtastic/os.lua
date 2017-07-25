@@ -3,7 +3,7 @@ local common = require(current_folder.. ".common")
 
 -- OS-specific code
 
-local os = {}
+local os = os
 
 local os_string = love.system.getOS()
 os.mac = os_string == "OS X"

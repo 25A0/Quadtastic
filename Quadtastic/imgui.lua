@@ -4,6 +4,10 @@ local os = require(current_folder .. ".os")
 
 local imgui = {}
 
+-- If the same mouse button is clicked more than once within this threshold,
+-- then that counts as a double-click. This threshold is in seconds.
+imgui.double_click_threshold = .5
+
 imgui.init_layout_state = function(
   parent_layout, -- the layout that contains this layout
   next_x, -- where the next layout-aware component should be drawn
@@ -201,14 +205,31 @@ local function init_mouse_state(state, button)
 end
 
 imgui.mousepressed = function(state, x, y, button)
-  -- We can't know in advance how many buttons there will be, so we might
-  -- need to initialize this table.
-  init_mouse_state(state, button)
   local button_state = state.input.mouse.buttons[button]
+  -- If that button was already initialized, grab the time of the last button
+  -- press before we start overriding things
+  if button_state then
+    button_state.prev_pressed_at = button_state.pressed_at -- might be nil
+  end
+
+  -- We can't know in advance how many buttons there will be, so we might
+  -- need to initialize this table. Even if it has been initialized in the
+  -- past, we want to reset the counters for presses and releases.
+  init_mouse_state(state, button)
+  button_state = state.input.mouse.buttons[button]
+
   -- Track that this button was pressed
   button_state.pressed = true
   -- and where it was pressed
   button_state.at_x, button_state.at_y = x, y
+  -- Remember the time at which this button was pressed
+  button_state.pressed_at = os.time()
+
+  if button_state.prev_pressed_at then
+    local delta = os.difftime(button_state.pressed_at -
+                              button_state.prev_pressed_at)
+    button_state.double_clicked = delta < imgui.double_click_threshold
+  end
   -- Increment the number of clicks that happened since the last update
   button_state.presses = button_state.presses + 1
 end
