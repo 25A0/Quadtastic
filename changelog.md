@@ -4,6 +4,12 @@
 
 ### Unreleased
 
+There are currently no unreleased changes
+
+### Release 0.6.1, 2017-07-28
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.6.1)
+
  - Fix crash in initialization of default exporters in binary distributions
 
 ### Release 0.6.0, 2017-07-28
