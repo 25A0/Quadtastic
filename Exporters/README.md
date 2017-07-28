@@ -50,7 +50,7 @@ following details:
 	```json
 	{
 	  "_META": {
-	    "image_path": "\/Users\/moritz\/Projects\/Quadtastic\/example\/res\/sheet.png",
+	    "image_path": ".\/sheet.png",
 	    "version": "v0.5.3-60-g70c7852"
 	  },
 	  "base": {"x":16, "y": 27, "w": 16, "h": 8},
@@ -80,7 +80,7 @@ following details:
  	<?xml encoding='UTF-8'?>
 	<quad_definitions>
 	  <group key="_META">
-	    <string key="image_path">/Users/moritz/Projects/Quadtastic/example/res/sheet.png</string>
+	    <string key="image_path">./sheet.png</string>
 	    <string key="version">v0.5.3-60-g70c7852</string>
 	  </group>
 	  <quad key="base", x="16", y="27", w="16", h="8" />
