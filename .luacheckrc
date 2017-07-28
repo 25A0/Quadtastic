@@ -1,1 +1,1 @@
-globals = {"love", "_DEBUG", "print"}
+globals = {"love", "_DEBUG", "print", "os"}
