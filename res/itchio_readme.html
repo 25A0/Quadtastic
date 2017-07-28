@@ -18,28 +18,32 @@
     Use the palette tool to create quads from areas that have the same color
     <img src="http://imgur.com/d27NDVI.gif">
   </li>
-  <li>Save quads as a simple lua table, or export them to other formats like JSON or XML
+  <li>Save quads as a simple lua table, or <a href="https://github.com/25A0/Quadtastic/blob/master/Exporters/README.md">export them</a> to formats like <b>JSON</b> or <b>XML</b>
   </li>
   <li>Enable <img src="http://i.imgur.com/uYNOhGl.gif" alt="Turbo-Workflow">
     to reload the spritesheet whenever it changes on disk,
     and to re-export the quads whenever you change them
   </li>
-  <li>
-    If you're using LÖVE, you can use the quads in your LÖVE projects like so:
+</ul>
+
+<p>If you're using <a href="https://www.love2d.org">LÖVE</a>:</p>
+<ul>
+  <li> Save your quads as a lua table, and turn them into LÖVE Quad objects
+    with just a few lines of code:
     <pre>
   local libquadtastic = require("libquadtastic")
 
-  -- do this once in love.load
-  local image = love.graphics.newImage("path/to/spritesheet")
-
-  local quads = libquadtastic.import_quads(require("path/to/quadfile"),
-                                           image:getWidth(), image:getHeight())
-
-   -- do this whenever you want to draw the quads
+  local image = love.graphics.newImage("res/sprites.png")
+  local raw_quads = require("res/quads")
+  local quads = libquadtastic.import_quads(raw_quads,
+                                           image:getWidth(),
+                                           image:getHeight())</pre>
+  </li>
+  <li> You can then draw these quads like so:
+    <pre>
   love.graphics.draw(image, quads.head, 2, 0)
   love.graphics.draw(image, quads.legs, 2, 47)
-  love.graphics.draw(image, quads.torso, 0, 15)
-    </pre>
+  love.graphics.draw(image, quads.torso, 0, 15)</pre>
   </li>
 </ul>
 
