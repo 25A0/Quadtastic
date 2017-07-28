@@ -5,6 +5,7 @@ local table = require(current_folder.. ".tableplus")
 local libquadtastic = require(current_folder.. ".libquadtastic")
 local common = require(current_folder.. ".common")
 local exporters = require(current_folder.. "Exporters")
+local Path = require(current_folder.. "Path")
 local os = require(current_folder.. ".os")
 local S = require(current_folder.. ".strings")
 
@@ -801,7 +802,7 @@ function QuadtasticLogic.transitions(interface) return {
     elseif data.quadpath then
       local path, filename = common.split(data.quadpath)
       local export_filename = string.format("%s.%s",
-                                            common.split_extension(filename),
+                                            Path.split_extension(filename),
                                             exporter.ext)
       basepath = path .. export_filename
     elseif data.quads and data.quads._META and data.quads._META.image_path then
@@ -895,6 +896,20 @@ function QuadtasticLogic.transitions(interface) return {
       data.image = nil
 
       if metainfo.image_path then
+        local abs_path
+        if Path.is_absolute_path(metainfo.image_path) then
+          abs_path = metainfo.image_path
+        elseif Path.is_relative_path(metainfo.image_path) then
+          -- Create an absolute path to the image file by concatenating the
+          -- absolute path to the directory containing the quadfile and the
+          -- relative image path
+          abs_path = tostring(Path(filepath):parent() .. metainfo.image_path)
+        else
+          error("Path to image is neither absolute nor relative.")
+        end
+        -- Store the image path as an absolute path. It will be converted back
+        -- to a relative path when the quads are saved or exported.
+        metainfo.image_path = abs_path
         app.quadtastic.load_image(metainfo.image_path)
       end
 
@@ -944,7 +959,7 @@ function QuadtasticLogic.transitions(interface) return {
 
   load_dropped_file = function(app, data, filepath)
     -- Determine how to treat this file depending on its extensions
-    local _, extension = common.split_extension(filepath)
+    local _, extension = Path.split_extension(filepath)
     if extension == "lua" or extension == "qua" then
       app.quadtastic.load_quad(filepath)
     else

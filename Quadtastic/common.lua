@@ -54,12 +54,6 @@ function common.split(filepath)
   return dirname, basename
 end
 
--- Returns the filename without extension as the first return value, and the
--- extension as the second return value
-function common.split_extension(filename)
-  return string.gmatch(filename, "(.*)%.([^%.]*)")()
-end
-
 local function export_quad(handle, quadtable)
   handle(string.format(
     "{x = %d, y = %d, w = %d, h = %d}",
@@ -229,6 +223,23 @@ function common.export_table_to_file(filehandle, tab)
   local writer = common.get_writer(filehandle)
   common.export_table_content(writer, tab)
   filehandle:close()
+end
+
+-- Clones table tab.
+-- Values are deeply cloned. Can handle string and number keys.
+function common.clone(tab)
+  assert(type(tab) == "table")
+  local clone = {}
+
+  for k,v in pairs(tab) do
+    if type(v) == "table" then
+      clone[k] = common.clone(v)
+    else
+      clone[k] = v
+    end
+  end
+
+  return clone
 end
 
 -- The name of the "exporter" that exports the quads as a quadfile.

@@ -1,12 +1,12 @@
 local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
-local common = require(current_folder .. ".common")
+local Path = require(current_folder .. ".Path")
 
 local exporters = {}
 
 -- Creates the empty exporters directory and copies the Readme file to it.
 function exporters.init(dirname)
   if not love.filesystem.exists(dirname) then
-    local success, more = love.filesystem.createDirectory(dirname)
+    local success = love.filesystem.createDirectory(dirname)
     assert(success)
   end
 
@@ -45,7 +45,7 @@ function exporters.list(dirnames)
       local files = love.filesystem.getDirectoryItems(dirname)
       for _, file in ipairs(files) do
 
-        local _, extension = common.split_extension(file)
+        local _, extension = Path.split_extension(file)
         if extension == "lua" then
 
           -- try to load the exporter
