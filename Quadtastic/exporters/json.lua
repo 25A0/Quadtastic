@@ -1,5 +1,5 @@
-local libquadtastic = require("Quadtastic.libquadtastic")
-local common = require("Quadtastic.common")
+local libquadtastic = require("libquadtastic")
+local common = require("common")
 local utf8 = require("utf8")
 
 local exporter = {}

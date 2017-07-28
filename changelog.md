@@ -4,7 +4,7 @@
 
 ### Unreleased
 
-There are currently no unreleased changes
+ - Fix crash in initialization of default exporters in binary distributions
 
 ### Release 0.6.0, 2017-07-28
 
