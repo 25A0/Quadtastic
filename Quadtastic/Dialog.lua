@@ -369,7 +369,8 @@ function Dialog.open_file(basepath)
   return coroutine.yield(file_state)
 end
 
-function Dialog.save_file(basepath, default_extension, buttons)
+function Dialog.save_file(basepath, default_extension, save_button_label)
+  if not save_button_label then save_button_label = S.buttons.save end
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
     if not data.basepath then
@@ -487,7 +488,7 @@ function Dialog.save_file(basepath, default_extension, buttons)
            tooltip  = tooltip_label and {enter = tooltip_label} or {}})
         if clicked_button then
 
-          if clicked_button == S.buttons.save then
+          if clicked_button == save_button_label then
             local filename = data.committed_file and data.committed_file.name or
                              data.editing_filename
             if filename then
@@ -526,14 +527,14 @@ function Dialog.save_file(basepath, default_extension, buttons)
   local transitions = {
     -- luacheck: no unused args
     save = function(app, data, filepath)
-      return S.buttons.save, filepath
+      return save_button_label, filepath
     end,
 
     override = function(app, data, filepath)
       local ret = Dialog.show_dialog(S.dialogs.save_replace(filepath),
                                      {S.buttons.yes, S.buttons.no})
       if ret == S.buttons.yes then
-        return S.buttons.save, filepath
+        return save_button_label, filepath
       end
     end,
 
@@ -548,8 +549,8 @@ function Dialog.save_file(basepath, default_extension, buttons)
 
   local file_state = State("save_file", transitions,
                              {basepath = basepath or "/",
-                              buttons = buttons or {escape = S.buttons.cancel,
-                                                    enter = S.buttons.save},
+                              buttons = {escape = S.buttons.cancel,
+                                         enter = save_button_label},
                              })
 
   -- Store the draw function in the state
