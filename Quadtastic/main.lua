@@ -208,6 +208,8 @@ function love.draw()
   local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
   )
+  imgui.set_frame_bounds(gui_state, {w = w, h = h})
+
   if app:has_active_state_changed() then
     imgui.reset_input(gui_state)
   end

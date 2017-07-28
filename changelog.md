@@ -2,8 +2,6 @@
 
 ### Planned
 
- - Use relative paths in quadfile's metadata if possible
-
 ### Unreleased
 
  - Fix slow scrolling on Linux and Windows
@@ -20,6 +18,8 @@
  - When Turbo-Workflow is enabled, not only will the quad file be saved whenever
    quads change, but now the last export will be repeated, too.
  - Use <kbd>ctrl+e</kbd> or <kbd>cmd+e</kbd> to repeat the previous export
+ - The reference to the image is now stored as a relative path in the quad
+   file, so that quad files can be loaded on different computers without hassle
  - Double-click a quad or group in the quad list to rename it
  - Fix a bug where changing directories in the file browser would not reset the
    file list to the beginning

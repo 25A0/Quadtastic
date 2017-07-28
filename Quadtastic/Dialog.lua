@@ -3,6 +3,7 @@ local State = require(current_folder .. ".State")
 local Scrollpane = require(current_folder .. ".Scrollpane")
 local Frame = require(current_folder .. ".Frame")
 local InputField = require(current_folder .. ".Inputfield")
+local Tooltip = require(current_folder .. ".Tooltip")
 local Layout = require(current_folder .. ".Layout")
 local Button = require(current_folder .. ".Button")
 local LoadingAnim = require(current_folder .. ".LoadingAnim")
@@ -12,6 +13,7 @@ local Window = require(current_folder .. ".Window")
 local imgui = require(current_folder .. ".imgui")
 local licenses = require(current_folder .. ".res.licenses")
 local S = require(current_folder .. ".strings")
+local Path = require(current_folder .. ".Path")
 local Version = require(current_folder .. ".Version")
 local common = require(current_folder .. ".common")
 local os = require(current_folder .. ".os")
@@ -50,7 +52,7 @@ local function show_buttons(gui_state, buttons, options)
     for key,button in pairs(buttons) do
 
       local button_options = {}
-      if options and options.disabled[button] then
+      if options and options.disabled and options.disabled[key] then
         button_options.disabled = true
       end
 
@@ -63,6 +65,13 @@ local function show_buttons(gui_state, buttons, options)
       if button_pressed or key_pressed then
         clicked_button = button
       end
+
+      if options and options.tooltip and options.tooltip[key] then
+        Tooltip.draw(gui_state, options.tooltip[key], nil, nil, nil, nil,
+                     {tooltip_threshold = 0})
+
+      end
+
       Layout.next(gui_state, "-")
     end
   end Layout.finish(gui_state, "-")
@@ -236,6 +245,9 @@ local function switch_to(data, new_basepath)
   -- Clear chosen file
   data.chosen_file = nil
 
+  -- Clear scrollpane state to reset the scroll position to the top
+  data.scrollpane_state = nil
+
   local success, err = lfs.chdir(new_basepath)
   if success then
     data.basepath = lfs.currentdir()
@@ -308,7 +320,8 @@ function Dialog.open_file(basepath)
         imgui.pop_style(gui_state, "font")
         Layout.next(gui_state, "|")
         local clicked_button = show_buttons(gui_state, data.buttons,
-          {disabled = {Open = data.chosen_file == nil or data.chosen_file.type == "directory"}})
+          {disabled = {enter = data.chosen_file == nil or
+                               data.chosen_file.type == "directory"}})
         if clicked_button then
 
           -- Set chosen file as committed when open is clicked
@@ -335,9 +348,9 @@ function Dialog.open_file(basepath)
   local transitions = {
     -- luacheck: no unused args
     respond = function(app, data, response)
-      return response, (data.basepath or "") .. os.pathsep .. (
+      return response, tostring(Path(os.path(data.basepath)) .. (
         data.committed_file and data.committed_file.name or ""
-      )
+      ))
     end,
 
     err = function(app, data, err)
@@ -433,6 +446,18 @@ function Dialog.save_file(basepath, default_extension, buttons)
                           data.chosen_file and data.chosen_file.type == "file" and
                           data.chosen_file.name or "")
 
+        -- If the filename does not contain an extension, the default extension
+        -- will be added automatically. Show a label to tell the user about
+        -- that.
+        local tooltip_label
+        if data.editing_filename and #data.editing_filename > 0 then
+          local _, extension = Path.split_extension(data.editing_filename)
+          if default_extension and not extension then
+            tooltip_label = S.dialogs.default_extension(data.editing_filename,
+                                                        default_extension)
+          end
+        end
+
         if data.committed_filename then
           local filetype = lfs.attributes(data.committed_filename, "mode")
           filetype = filetype or "new" -- Assume that this file doesn't exist if
@@ -455,8 +480,11 @@ function Dialog.save_file(basepath, default_extension, buttons)
         Layout.next(gui_state, "|")
 
         local clicked_button = show_buttons(gui_state, data.buttons,
-          {disabled = {Open = data.chosen_file == nil or
-                       data.editing_filename == ""}})
+          {disabled = {enter = data.chosen_file == nil or
+                               (not data.editing_filename or
+                                #data.editing_filename == 0)},
+           -- Set the tooltip label for the save button, if applicable
+           tooltip  = tooltip_label and {enter = tooltip_label} or {}})
         if clicked_button then
 
           if clicked_button == S.buttons.save then
@@ -464,11 +492,12 @@ function Dialog.save_file(basepath, default_extension, buttons)
                              data.editing_filename
             if filename then
               -- Add default file extension unless the user specified one
-              if default_extension and not common.split_extension(filename) then
+              local _, extension = Path.split_extension(filename)
+              if default_extension and not extension then
                 filename = filename .. "." .. default_extension
               end
               local filetype = lfs.attributes(filename, "mode")
-              local filepath = (data.basepath or "") .. os.pathsep .. (filename or "")
+              local filepath = tostring(Path(os.path(data.basepath)) .. (filename or ""))
               if filetype == "file" then
                 app.save_file.override(filepath)
               elseif filetype == "directory" then
@@ -711,7 +740,7 @@ function Dialog.check_updates()
         Layout.next(gui_state, "|")
         local clicked_button = show_buttons(gui_state, {S.buttons.close,
                                                         S.buttons.download},
-                                            {disabled = {[S.buttons.download] = not can_update}})
+                                            {disabled = {[2] = not can_update}})
         if clicked_button then
           app.check_updates[clicked_button]()
         end

@@ -1,6 +1,6 @@
 return {
   _META = {
-    image_path = "/Users/moritz/Projects/Quadtastic/example/res/sheet.png",
+    image_path = "./sheet.png",
   },
   base = {x = 16, y = 27, w = 16, h = 8},
   bubbles = {
