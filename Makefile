@@ -76,7 +76,7 @@ dist/releases/${APPVERSION}/libquadtastic/libquadtastic.lua: Quadtastic/libquadt
 	mkdir -p dist/releases/${APPVERSION}/libquadtastic
 	cp Quadtastic/libquadtastic.lua dist/releases/${APPVERSION}/libquadtastic/
 
-dist/${APPNAME}.love: ${APPNAME}/*.lua ${APP_RESOURCES}
+dist/${APPNAME}.love: ${APPNAME}/**/*.lua ${APPNAME}/*.lua ${APP_RESOURCES}
 	echo ${EDITION_CROSSPLATFORM} > ${APPNAME}/res/edition.txt
 	cd ${APPNAME}; zip ../dist/${APPNAME}.love -Z store -FS -r . -x .\*
 	cp -R shared dist/
