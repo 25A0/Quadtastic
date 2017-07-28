@@ -221,6 +221,11 @@ release-%: test ${LICENSES}
 	@test ! -f .git/refs/tags/$* || \
 	(echo "Version $* is already released"; exit 1)
 
+	# Check that the version to be released is tagged.
+	@if [[ ! $* =~ ^[0-9]+.[0-9]+.[0-9]+$$ ]] ; then\
+	  echo "Error: Version does not have major.minor.patch format."; false;\
+	fi
+
 	@printf "\e[1mReleasing $*\e[0m\n"
 	@printf "Press CTRL-C at any time to cancel the release\n"
 
