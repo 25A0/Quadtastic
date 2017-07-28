@@ -4,12 +4,12 @@
 
 ### Unreleased
 
- - Fix slow scrolling on Linux and Windows
- - On Windows and Linux, scroll horizontally when shift is pressed
- - Capture output in a log file `log.txt`. This file can be found in:
-    - `%appdata%\Quadtastic\`                      on Windows,
-    - `~/Library/Application\ Support/Quadtastic/` on macOS,
-    - `~/.local/share/love/`                       on Linux
+There are currently no unreleased changes
+
+### Release 0.6.0, 2017-07-28
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.6.0)
+
  - Add custom exporters. Custom exporters can be used to export quad definitions
    to formats other than the default quad file used by Quadtastic. There are
    default exporters for JSON and XML, but you can also write your own exporter,
@@ -21,6 +21,12 @@
  - The reference to the image is now stored as a relative path in the quad
    file, so that quad files can be loaded on different computers without hassle
  - Double-click a quad or group in the quad list to rename it
+ - On Windows and Linux, scroll horizontally when shift is pressed
+ - Fix slow scrolling on Linux and Windows
+ - Capture output in a log file `log.txt`. This file can be found in:
+    - `%appdata%\Quadtastic\`                      on Windows,
+    - `~/Library/Application\ Support/Quadtastic/` on macOS,
+    - `~/.local/share/love/`                       on Linux
  - Fix a bug where changing directories in the file browser would not reset the
    file list to the beginning
 
