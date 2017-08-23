@@ -4,7 +4,7 @@
 
 ### Unreleased
 
-There are currently no unreleased changes
+ - (macOS) Quadtastic will no longer be listed under apps that can open .love archives
 
 ### Release 0.6.1, 2017-07-28
 
