@@ -1,24 +1,69 @@
-59c59
+11,54d10
+< 		<dict>
+< 			<key>CFBundleTypeExtensions</key>
+< 			<array>
+< 				<string>love</string>
+< 			</array>
+< 			<key>CFBundleTypeIconFile</key>
+< 			<string>GameIcon</string>
+< 			<key>CFBundleTypeName</key>
+< 			<string>LÖVE Project</string>
+< 			<key>CFBundleTypeRole</key>
+< 			<string>Viewer</string>
+< 			<key>LSHandlerRank</key>
+< 			<string>Owner</string>
+< 			<key>LSItemContentTypes</key>
+< 			<array>
+< 				<string>org.love2d.love-game</string>
+< 			</array>
+< 			<key>LSTypeIsPackage</key>
+< 			<integer>1</integer>
+< 		</dict>
+< 		<dict>
+< 			<key>CFBundleTypeName</key>
+< 			<string>Folder</string>
+< 			<key>CFBundleTypeOSTypes</key>
+< 			<array>
+< 				<string>fold</string>
+< 			</array>
+< 			<key>CFBundleTypeRole</key>
+< 			<string>Viewer</string>
+< 			<key>LSHandlerRank</key>
+< 			<string>None</string>
+< 		</dict>
+< 		<dict>
+< 			<key>CFBundleTypeIconFile</key>
+< 			<string>Document</string>
+< 			<key>CFBundleTypeName</key>
+< 			<string>Document</string>
+< 			<key>CFBundleTypeOSTypes</key>
+< 			<array>
+< 				<string>****</string>
+< 			</array>
+< 			<key>CFBundleTypeRole</key>
+< 			<string>Editor</string>
+< 		</dict>
+59c15
 < 	<string>OS X AppIcon</string>
 ---
 > 	<string>icon.icns</string>
-61c61
+61c17
 < 	<string>org.love2d.love</string>
 ---
 > 	<string>__APPIDENTIFIER</string>
-65c65
+65c21
 < 	<string>LÖVE</string>
 ---
 > 	<string>__APPNAME</string>
-69c69
+69c25
 < 	<string>0.10.2</string>
 ---
 > 	<string>__APPVERSION</string>
-95c95
+95c51
 < 	<string>© 2006-2016 LÖVE Development Team</string>
 ---
 > 	<string>© __APPCOPYRIGHT</string>
-98,126d97
+98,126d53
 < 	<key>UTExportedTypeDeclarations</key>
 < 	<array>
 < 		<dict>
