@@ -4,6 +4,14 @@
 
 ### Unreleased
 
+There are currently no unreleased changes
+
+### Release 0.6.2, 2017-08-23
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.6.2)
+
+Just a smol macOS bugfix.
+
  - (macOS) Quadtastic will no longer be listed under apps that can open .love archives
 
 ### Release 0.6.1, 2017-07-28
