@@ -623,7 +623,7 @@ ImageEditor.draw = function(app, gui_state, state, x, y, w, h)
 
     -- Draw background pattern
     local img_w, img_h = state.image:getDimensions()
-    local backgroundquad = love.graphics.newQuad(0, 0, img_w, img_h, 8, 8)
+    local backgroundquad = love.graphics.newQuad(0, 0, img_w, img_h, 2 * state.settings.grid.x, 2 * state.settings.grid.y)
     love.graphics.draw(gui_state.style.backgroundcanvas, backgroundquad)
 
     love.graphics.draw(state.image)

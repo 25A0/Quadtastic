@@ -149,7 +149,7 @@ function love.load()
 
   gui_state.style.font_color = gui_state.style.palette.shades.darkest
 
-  gui_state.style.backgroundcanvas = love.graphics.newCanvas(8, 8)
+  gui_state.style.backgroundcanvas = love.graphics.newCanvas(2, 2)
   do
     -- Create a canvas with the background texture on it
     gui_state.style.backgroundcanvas:setWrap("repeat", "repeat")

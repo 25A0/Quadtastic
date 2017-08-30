@@ -1,9 +1,9 @@
 return {
   _META = {
     image_path = "./style.png",
-    version = "v0.5.3-108-g89fb772",
+    version = "v0.6.2-13-g7f8f70b",
   },
-  background = {x = 48, y = 16, w = 8, h = 8},
+  background = {x = 48, y = 16, w = 2, h = 2},
   button_border = {
     b = {x = 3, y = 13, w = 1, h = 3},
     bl = {x = 0, y = 13, w = 3, h = 3},
