@@ -54,6 +54,20 @@ local function assert_sane_settings(user_settings)
     settings.latest_img = user_settings.latest_img
   end
 
+  -- Grid settings
+  settings.grid = {x = 8, y = 8, always_snap = false}
+  if user_settings.grid and type(user_settings.grid) == "table" then
+    if user_settings.grid.x and type(user_settings.grid.x) == "number" then
+      settings.grid.x = user_settings.grid.x
+    end
+    if user_settings.grid.y and type(user_settings.grid.y) == "number" then
+      settings.grid.y = user_settings.grid.y
+    end
+    if user_settings.grid.always_snap and type(user_settings.grid.always_snap) == "boolean" then
+      settings.grid.always_snap = user_settings.grid.always_snap
+    end
+  end
+
   return settings
 end
 
