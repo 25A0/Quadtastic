@@ -251,7 +251,7 @@ local function create_tool(app, gui_state, state, img_w, img_h)
         gui_state.input.mouse.x, gui_state.input.mouse.y)
       mx, my = math.floor(mx), math.floor(my)
       if should_snap_to_grid(gui_state, state) then
-        mx, my = snap_point_to_grid(8, 8, mx, my)
+        mx, my = snap_point_to_grid(state.settings.grid.x, state.settings.grid.y, mx, my)
       end
       love.graphics.rectangle("fill", mx, my, 1, 1)
     end
@@ -264,7 +264,7 @@ local function create_tool(app, gui_state, state, img_w, img_h)
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
           if should_snap_to_grid(gui_state, state) then
-            rect = snap_rect_to_grid(8, 8, rect)
+            rect = snap_rect_to_grid(state.settings.grid.x, state.settings.grid.y, rect)
           end
           show_quad(gui_state, state, rect)
           gui_state.mousestring = string.format("%dx%d", rect.w, rect.h)
@@ -282,7 +282,7 @@ local function create_tool(app, gui_state, state, img_w, img_h)
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
           if should_snap_to_grid(gui_state, state) then
-            rect = snap_rect_to_grid(8, 8, rect)
+            rect = snap_rect_to_grid(state.settings.grid.x, state.settings.grid.y, rect)
           end
 
           if rect.w > 0 and rect.h > 0 then
@@ -318,7 +318,7 @@ local function wand_tool(app, gui_state, state)
       if should_snap_to_grid(gui_state, state) then
         -- Expand all rectangles to tile size
         for i, r in ipairs(rects) do
-          rects[i] = expand_rect_to_grid(8, 8, r)
+          rects[i] = expand_rect_to_grid(state.settings.grid.x, state.settings.grid.y, r)
         end
       end
       for _, r in ipairs(rects) do
@@ -332,7 +332,7 @@ local function wand_tool(app, gui_state, state)
       -- Find strip of opaque pixels
       local quad = img_analysis.outter_bounding_box(state.image, mx, my)
       if quad and should_snap_to_grid(gui_state, state) then
-        quad = expand_rect_to_grid(8, 8, quad)
+        quad = expand_rect_to_grid(state.settings.grid.x, state.settings.grid.y, quad)
       end
       if quad then
         draw_dashed_line(quad, gui_state, state.display.zoom)
