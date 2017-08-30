@@ -26,13 +26,44 @@ local lfs = require("lfs")
 
 local settings_filename = "settings"
 
+-- Make sure that the settings table contains things we expect, to a reasonable
+-- degree.
+local function assert_sane_settings(user_settings)
+  if not user_settings or type(user_settings) ~= "table" then
+    user_settings = {}
+  end
+  local settings = {}
+
+  -- Recently opened files
+  settings.recent = {}
+  if user_settings.recent and type(user_settings.recent) == "table" then
+    for _,v in ipairs(user_settings.recent) do
+      if type(v) == "string" then
+        table.insert(settings.recent, v)
+      end
+    end
+  end
+
+  -- Most recent directory for quad files
+  if user_settings.latest_qua and type(user_settings.latest_qua) == "string" then
+    settings.latest_qua = user_settings.latest_qua
+  end
+
+  -- Most recent directory for images
+  if user_settings.latest_img and type(user_settings.latest_img) == "string" then
+    settings.latest_img = user_settings.latest_img
+  end
+
+  return settings
+end
+
 local function load_settings()
   local success, more = pcall(function()
     return require(settings_filename)
   end)
 
   if success then
-    return more
+    return assert_sane_settings(more)
   else
     print("Warning: Could not load settings. " .. more)
     return nil
@@ -51,6 +82,10 @@ local function store_settings(settings)
   return success, more
 end
 
+local function get_default_settings()
+  return assert_sane_settings()
+end
+
 local Quadtastic = State("quadtastic",
   nil,
   -- initial data
@@ -60,7 +95,7 @@ local Quadtastic = State("quadtastic",
     },
     scrollpane_state = nil,
     quad_scrollpane_state = nil,
-    settings = load_settings() or {recent = {}},
+    settings = load_settings() or get_default_settings(),
     collapsed_groups = {},
     selection = Selection(),
     exporters = {},
