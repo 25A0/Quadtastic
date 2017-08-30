@@ -234,8 +234,22 @@ end
 
 local function switch_to(data, new_basepath)
   local function create_filelist()
-    local filelist = {}
+
+    -- First accumulate all file names into a table
+    local filenames = {}
     for file in lfs.dir(".") do
+      table.insert(filenames, file)
+    end
+
+    -- Then sort the file names so that the files are displayed in alphabetical
+    -- order no matter how they are returned by the file system.
+    -- A custom comparator is used to sort the file names case-insensitive.
+    table.sort(filenames,
+               function(a, b) return string.lower(a) < string.lower(b) end)
+
+    -- Then store file name and type into a new table
+    local filelist = {}
+    for _, file in ipairs(filenames) do
       local mode = lfs.attributes(file, "mode")
       table.insert(filelist, {name=file, type=mode})
     end
