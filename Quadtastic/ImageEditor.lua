@@ -234,8 +234,13 @@ local function get_dragged_rect(state, gui_state, img_w, img_h)
   end
 end
 
-local function should_snap_to_grid(gui_state)
-  return imgui.are_exact_modifiers_pressed(gui_state, {"*alt"})
+local function should_snap_to_grid(gui_state, state)
+  local should_snap = state.settings.grid.always_snap
+  if imgui.are_exact_modifiers_pressed(gui_state, {"*alt"}) then
+    -- invert should_snap
+    should_snap = not should_snap
+  end
+  return should_snap
 end
 
 local function create_tool(app, gui_state, state, img_w, img_h)
@@ -245,7 +250,7 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       local mx, my = gui_state.transform:unproject(
         gui_state.input.mouse.x, gui_state.input.mouse.y)
       mx, my = math.floor(mx), math.floor(my)
-      if should_snap_to_grid(gui_state) then
+      if should_snap_to_grid(gui_state, state) then
         mx, my = snap_point_to_grid(8, 8, mx, my)
       end
       love.graphics.rectangle("fill", mx, my, 1, 1)
@@ -258,7 +263,7 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       then
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
-          if should_snap_to_grid(gui_state) then
+          if should_snap_to_grid(gui_state, state) then
             rect = snap_rect_to_grid(8, 8, rect)
           end
           show_quad(gui_state, state, rect)
@@ -276,7 +281,7 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       then
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
-          if should_snap_to_grid(gui_state) then
+          if should_snap_to_grid(gui_state, state) then
             rect = snap_rect_to_grid(8, 8, rect)
           end
 
@@ -310,7 +315,7 @@ local function wand_tool(app, gui_state, state)
     if rect and rect.w > 1 and rect.h > 1 then
       show_quad(gui_state, state, rect)
       local rects = img_analysis.enclosed_chunks(state.image, rect.x, rect.y, rect.w, rect.h)
-      if should_snap_to_grid(gui_state) then
+      if should_snap_to_grid(gui_state, state) then
         -- Expand all rectangles to tile size
         for i, r in ipairs(rects) do
           rects[i] = expand_rect_to_grid(8, 8, r)
@@ -326,7 +331,7 @@ local function wand_tool(app, gui_state, state)
     else
       -- Find strip of opaque pixels
       local quad = img_analysis.outter_bounding_box(state.image, mx, my)
-      if quad and should_snap_to_grid(gui_state) then
+      if quad and should_snap_to_grid(gui_state, state) then
         quad = expand_rect_to_grid(8, 8, quad)
       end
       if quad then
