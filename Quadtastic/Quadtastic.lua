@@ -263,6 +263,27 @@ Quadtastic.draw = function(app, state, gui_state)
         then
           app.quadtastic.redo()
         end
+
+        Menu.separator(gui_state)
+
+        if Menu.menu_start(gui_state, w/4, h - 12, S.menu.edit.grid()) then
+          if Menu.menu_start(gui_state, w/4, h - 12, S.menu.edit.grid.grid_size()) then
+            local size_presets = {4, 8, 12, 16, 20, 24, 32}
+            for _,preset in ipairs(size_presets) do
+              local size_string = string.format("%dx%d", preset, preset)
+              if Menu.action_item(gui_state, size_string) then
+                state.settings.grid.x = preset
+                state.settings.grid.y = preset
+                store_settings(state.settings)
+              end
+            end
+
+            Menu.menu_finish(gui_state, w/4, h - 12)
+          end
+
+          Menu.menu_finish(gui_state, w/4, h - 12)
+        end
+
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
       if Menu.menu_start(gui_state, w/4, h - 12, S.menu.image()) then

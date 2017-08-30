@@ -84,6 +84,10 @@ strings.menu = {
   edit = menu_table("Edit", {
       undo = "Undo",
       redo = "Redo",
+      grid = menu_table("Grid", {
+        always_snap = "Always snap to grid",
+        grid_size = menu_table("Grid size", {}),
+      }),
     }),
   image  = menu_table("Image", {
       open_image = "Open image...",
