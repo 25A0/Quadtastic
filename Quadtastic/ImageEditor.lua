@@ -306,6 +306,12 @@ local function wand_tool(app, gui_state, state)
     if rect and rect.w > 1 and rect.h > 1 then
       show_quad(gui_state, state, rect)
       local rects = img_analysis.enclosed_chunks(state.image, rect.x, rect.y, rect.w, rect.h)
+      if true then
+        -- Expand all rectangles to tile size
+        for i, r in ipairs(rects) do
+          rects[i] = expand_rect_to_grid(8, 8, r)
+        end
+      end
       for _, r in ipairs(rects) do
         draw_dashed_line(r, gui_state, state.display.zoom)
       end
@@ -316,6 +322,9 @@ local function wand_tool(app, gui_state, state)
     else
       -- Find strip of opaque pixels
       local quad = img_analysis.outter_bounding_box(state.image, mx, my)
+      if quad and true then
+        quad = expand_rect_to_grid(8, 8, quad)
+      end
       if quad then
         draw_dashed_line(quad, gui_state, state.display.zoom)
         gui_state.mousestring = string.format("%dx%d", quad.w, quad.h)
