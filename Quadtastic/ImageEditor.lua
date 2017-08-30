@@ -149,17 +149,17 @@ local function grid_mult(grid, val)
 end
 
 -- Returns the closest grid point to px and py.
-local function snap_point_to_grid(grid_x, grid_y, px, py)
+local function snap_point_to_grid(grid, px, py)
   local gx, gy
-  if px % grid_x >= grid_x / 2 then
-    gx = grid_ceil(grid_x, px)
+  if px % grid.x >= grid.x / 2 then
+    gx = grid_ceil(grid.x, px)
   else
-    gx = grid_floor(grid_x, px)
+    gx = grid_floor(grid.x, px)
   end
-  if py % grid_y >= grid_y / 2 then
-    gy = grid_ceil(grid_y, py)
+  if py % grid.y >= grid.y / 2 then
+    gy = grid_ceil(grid.y, py)
   else
-    gy = grid_floor(grid_y, py)
+    gy = grid_floor(grid.y, py)
   end
   return gx, gy
 end
@@ -168,19 +168,19 @@ end
 -- Note that the four corners will be snapped differently. For example, in a 8x8
 -- grid, the left side of the rectangle can be at x positions 0, 8, 16, 24, ...,
 -- while the right side of the rectangle can be at x positions 7, 15, 23, 31, ....
-local function snap_rect_to_grid(grid_x, grid_y, rect)
+local function snap_rect_to_grid(grid, rect)
   return {
-    x = grid_floor(grid_x, rect.x),
-    y = grid_floor(grid_y, rect.y),
-    w = grid_mult(grid_x, rect.w),
-    h = grid_mult(grid_y, rect.h),
+    x = grid_floor(grid.x, rect.x),
+    y = grid_floor(grid.y, rect.y),
+    w = grid_mult(grid.x, rect.w),
+    h = grid_mult(grid.y, rect.h),
   }
 end
 
-local function expand_rect_to_grid(grid_x, grid_y, rect)
+local function expand_rect_to_grid(grid, rect)
   local grid_rect = {}
-  grid_rect.x = grid_floor(grid_x, rect.x)
-  grid_rect.y = grid_floor(grid_y, rect.y)
+  grid_rect.x = grid_floor(grid.x, rect.x)
+  grid_rect.y = grid_floor(grid.y, rect.y)
   -- If the rectangle was moved to the left or to the top, then the width and
   -- height need to change accordingly to make sure that the content is still
   -- enclosed in the rectangle.
@@ -189,8 +189,8 @@ local function expand_rect_to_grid(grid_x, grid_y, rect)
   -- In this function, the width and height will always expand up to the next
   -- multiple of the grid size. This prevents that small sprites snap to a
   -- width that does not include the entire sprite.
-  grid_rect.w = math.max(grid_x, grid_x * math.ceil(min_w / grid_x))
-  grid_rect.h = math.max(grid_y, grid_y * math.ceil(min_h / grid_y))
+  grid_rect.w = math.max(grid.x, grid.x * math.ceil(min_w / grid.x))
+  grid_rect.h = math.max(grid.y, grid.y * math.ceil(min_h / grid.y))
 
   return grid_rect
 end
@@ -251,7 +251,7 @@ local function create_tool(app, gui_state, state, img_w, img_h)
         gui_state.input.mouse.x, gui_state.input.mouse.y)
       mx, my = math.floor(mx), math.floor(my)
       if should_snap_to_grid(gui_state, state) then
-        mx, my = snap_point_to_grid(state.settings.grid.x, state.settings.grid.y, mx, my)
+        mx, my = snap_point_to_grid(state.settings.grid, mx, my)
       end
       love.graphics.rectangle("fill", mx, my, 1, 1)
     end
@@ -264,7 +264,7 @@ local function create_tool(app, gui_state, state, img_w, img_h)
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
           if should_snap_to_grid(gui_state, state) then
-            rect = snap_rect_to_grid(state.settings.grid.x, state.settings.grid.y, rect)
+            rect = snap_rect_to_grid(state.settings.grid, rect)
           end
           show_quad(gui_state, state, rect)
           gui_state.mousestring = string.format("%dx%d", rect.w, rect.h)
@@ -282,7 +282,7 @@ local function create_tool(app, gui_state, state, img_w, img_h)
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
           if should_snap_to_grid(gui_state, state) then
-            rect = snap_rect_to_grid(state.settings.grid.x, state.settings.grid.y, rect)
+            rect = snap_rect_to_grid(state.settings.grid, rect)
           end
 
           if rect.w > 0 and rect.h > 0 then
@@ -318,7 +318,7 @@ local function wand_tool(app, gui_state, state)
       if should_snap_to_grid(gui_state, state) then
         -- Expand all rectangles to tile size
         for i, r in ipairs(rects) do
-          rects[i] = expand_rect_to_grid(state.settings.grid.x, state.settings.grid.y, r)
+          rects[i] = expand_rect_to_grid(state.settings.grid, r)
         end
       end
       for _, r in ipairs(rects) do
@@ -332,7 +332,7 @@ local function wand_tool(app, gui_state, state)
       -- Find strip of opaque pixels
       local quad = img_analysis.outter_bounding_box(state.image, mx, my)
       if quad and should_snap_to_grid(gui_state, state) then
-        quad = expand_rect_to_grid(state.settings.grid.x, state.settings.grid.y, quad)
+        quad = expand_rect_to_grid(state.settings.grid, quad)
       end
       if quad then
         draw_dashed_line(quad, gui_state, state.display.zoom)
