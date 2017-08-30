@@ -178,15 +178,21 @@ local function snap_rect_to_grid(grid_x, grid_y, rect)
 end
 
 local function expand_rect_to_grid(grid_x, grid_y, rect)
-  return {
-    x = grid_floor(grid_x, rect.x),
-    y = grid_floor(grid_y, rect.y),
-    -- In this function, the width and height will always expand up to the next
-    -- multiple of the grid size. This prevents that small sprites snap to a
-    -- width that does not include the entire sprite.
-    w = math.max(grid_x, rect.w + grid_x - rect.w % grid_x),
-    h = math.max(grid_y, rect.h + grid_y - rect.h % grid_x),
-  }
+  local grid_rect = {}
+  grid_rect.x = grid_floor(grid_x, rect.x)
+  grid_rect.y = grid_floor(grid_y, rect.y)
+  -- If the rectangle was moved to the left or to the top, then the width and
+  -- height need to change accordingly to make sure that the content is still
+  -- enclosed in the rectangle.
+  local min_w = rect.w + rect.x - grid_rect.x
+  local min_h = rect.h + rect.y - grid_rect.y
+  -- In this function, the width and height will always expand up to the next
+  -- multiple of the grid size. This prevents that small sprites snap to a
+  -- width that does not include the entire sprite.
+  grid_rect.w = math.max(grid_x, grid_x * math.ceil(min_w / grid_x))
+  grid_rect.h = math.max(grid_y, grid_y * math.ceil(min_h / grid_y))
+
+  return grid_rect
 end
 
 local function get_dragged_rect(state, gui_state, img_w, img_h)
