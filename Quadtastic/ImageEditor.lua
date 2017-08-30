@@ -127,6 +127,68 @@ local function show_quad(gui_state, state, quad, quadname)
   end
 end
 
+-- Snap value to the left or top of the grid tile
+local function grid_floor(grid, val)
+  return val - (val % grid)
+end
+
+-- Snap value to the right or bottom of the grid tile
+local function grid_ceil(grid, val)
+  return val + (grid - val % grid - 1)
+end
+
+-- Returns the closest grid multiple of val.
+-- For example, grid_mult(8,  7) -> 8
+--              grid_mult(8, 11) -> 8
+local function grid_mult(grid, val)
+  if val % grid >= grid / 2 then
+    return val + grid - val % grid
+  else
+    return val - val % grid
+  end
+end
+
+-- Returns the closest grid point to px and py.
+local function snap_point_to_grid(grid_x, grid_y, px, py)
+  local gx, gy
+  if px % grid_x >= grid_x / 2 then
+    gx = grid_ceil(grid_x, px)
+  else
+    gx = grid_floor(grid_x, px)
+  end
+  if py % grid_y >= grid_y / 2 then
+    gy = grid_ceil(grid_y, py)
+  else
+    gy = grid_floor(grid_y, py)
+  end
+  return gx, gy
+end
+
+-- Returns a new rectangle where all four corners snapped to the grid.
+-- Note that the four corners will be snapped differently. For example, in a 8x8
+-- grid, the left side of the rectangle can be at x positions 0, 8, 16, 24, ...,
+-- while the right side of the rectangle can be at x positions 7, 15, 23, 31, ....
+local function snap_rect_to_grid(grid_x, grid_y, rect)
+  return {
+    x = grid_floor(grid_x, rect.x),
+    y = grid_floor(grid_y, rect.y),
+    w = grid_mult(grid_x, rect.w),
+    h = grid_mult(grid_y, rect.h),
+  }
+end
+
+local function expand_rect_to_grid(grid_x, grid_y, rect)
+  return {
+    x = grid_floor(grid_x, rect.x),
+    y = grid_floor(grid_y, rect.y),
+    -- In this function, the width and height will always expand up to the next
+    -- multiple of the grid size. This prevents that small sprites snap to a
+    -- width that does not include the entire sprite.
+    w = math.max(grid_x, rect.w + grid_x - rect.w % grid_x),
+    h = math.max(grid_y, rect.h + grid_y - rect.h % grid_x),
+  }
+end
+
 local function get_dragged_rect(state, gui_state, img_w, img_h)
   assert(gui_state.input)
   -- Absolute mouse coordinates
