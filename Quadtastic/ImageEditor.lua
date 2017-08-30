@@ -235,6 +235,9 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       local mx, my = gui_state.transform:unproject(
         gui_state.input.mouse.x, gui_state.input.mouse.y)
       mx, my = math.floor(mx), math.floor(my)
+      if true then
+        mx, my = snap_point_to_grid(8, 8, mx, my)
+      end
       love.graphics.rectangle("fill", mx, my, 1, 1)
     end
 
@@ -245,6 +248,9 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       then
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
+          if true then
+            rect = snap_rect_to_grid(8, 8, rect)
+          end
           show_quad(gui_state, state, rect)
           gui_state.mousestring = string.format("%dx%d", rect.w, rect.h)
         end
@@ -259,8 +265,14 @@ local function create_tool(app, gui_state, state, img_w, img_h)
         gui_state.input.mouse.buttons[1].releases > 0
       then
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
-        if rect and rect.w > 0 and rect.h > 0 then
-          app.quadtastic.create(rect)
+        if rect then
+          if true then
+            rect = snap_rect_to_grid(8, 8, rect)
+          end
+
+          if rect.w > 0 and rect.h > 0 then
+            app.quadtastic.create(rect)
+          end
         end
       end
     end
