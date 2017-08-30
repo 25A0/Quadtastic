@@ -4,7 +4,8 @@
 
 ### Unreleased
 
-There are currently no unreleased changes
+ - Fix an issue where files would be listed out of alphabetic order on some
+   file systems
 
 ### Release 0.6.2, 2017-08-23
 
