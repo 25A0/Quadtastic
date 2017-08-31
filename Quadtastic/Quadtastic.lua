@@ -267,6 +267,12 @@ Quadtastic.draw = function(app, state, gui_state)
         Menu.separator(gui_state)
 
         if Menu.menu_start(gui_state, w/4, h - 12, S.menu.edit.grid()) then
+          if Menu.action_item(gui_state, S.menu.edit.grid.always_snap,
+                              { checkbox = { checked = state.settings.grid.always_snap }})
+          then
+            state.settings.grid.always_snap = not state.settings.grid.always_snap
+            store_settings(state.settings)
+          end
           if Menu.menu_start(gui_state, w/4, h - 12, S.menu.edit.grid.grid_size()) then
             local size_presets = {4, 8, 12, 16, 20, 24, 32}
             for _,preset in ipairs(size_presets) do
