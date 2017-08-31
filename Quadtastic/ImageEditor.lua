@@ -169,12 +169,16 @@ end
 -- grid, the left side of the rectangle can be at x positions 0, 8, 16, 24, ...,
 -- while the right side of the rectangle can be at x positions 7, 15, 23, 31, ....
 local function snap_rect_to_grid(grid, rect)
-  return {
-    x = grid_floor(grid.x, rect.x),
-    y = grid_floor(grid.y, rect.y),
-    w = grid_mult(grid.x, rect.w),
-    h = grid_mult(grid.y, rect.h),
-  }
+  local grid_rect = {}
+  grid_rect.x = grid_floor(grid.x, rect.x)
+  grid_rect.y = grid_floor(grid.y, rect.y)
+
+  local min_w = rect.w + rect.x - grid_rect.x
+  local min_h = rect.h + rect.y - grid_rect.y
+  grid_rect.w = grid_mult(grid.x, min_w)
+  grid_rect.h = grid_mult(grid.y, min_h)
+
+  return grid_rect
 end
 
 local function expand_rect_to_grid(grid, rect)
