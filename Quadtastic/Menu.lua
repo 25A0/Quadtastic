@@ -180,8 +180,26 @@ function Menu.menu_item(gui_state, label, options)
                options.keybinding,
                {alignment_h = ">", font_color = options.font_color})
   end
-  local clicked, _, hovered = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
+  local clicked, _, hovered
+
+  Layout.start(gui_state, 1, nil, gui_state.layout.max_w - 1, nil)
+
+  if options and options.checkbox then
+    local state = options.checkbox.checked and "checked" or "unchecked"
+    local raw_quad = gui_state.style.raw_quads.menu_checkbox[state]
+    love.graphics.setColor(255, 255, 255, 255)
+    love.graphics.draw(gui_state.style.stylesheet, gui_state.style.quads.menu_checkbox[state],
+      0, (16 - raw_quad.h)/2)
+    gui_state.layout.adv_x = raw_quad.w
+    gui_state.layout.adv_y = 16
+    Layout.next(gui_state, "-", 1)
+  end
+
+  clicked, _, hovered = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
     label, nil, options)
+
+  Layout.finish(gui_state, "-")
+
   Layout.next(gui_state, "|")
 
   clicked = clicked and (not options or options and not options.disabled)
