@@ -274,6 +274,10 @@ Quadtastic.draw = function(app, state, gui_state)
             store_settings(state.settings)
           end
           if Menu.menu_start(gui_state, w/4, h - 12, S.menu.edit.grid.grid_size()) then
+            -- Add one disabled entry for the current setting
+            local size_string = string.format("%dx%d (current)", state.settings.grid.x, state.settings.grid.y)
+            Menu.action_item(gui_state, size_string, { disabled = true })
+            Menu.separator(gui_state)
             local size_presets = {4, 8, 12, 16, 20, 24, 32}
             for _,preset in ipairs(size_presets) do
               local size_string = string.format("%dx%d", preset, preset)
