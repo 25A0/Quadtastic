@@ -8,6 +8,7 @@ local exporters = require(current_folder.. "Exporters")
 local Path = require(current_folder.. "Path")
 local os = require(current_folder.. ".os")
 local S = require(current_folder.. ".strings")
+local Recent = require(current_folder.. "Recent")
 
 -- Shared library
 local lfs = require("lfs")
@@ -16,15 +17,9 @@ local function add_path_to_recent_files(interface, data, filepath)
   -- Insert new file into list of recently loaded files
   -- Remove duplicates from recent files
   filepath = os.path(filepath)
-  local remaining_files = {filepath}
-  for _,v in ipairs(data.settings.recent) do
-    -- Limit the number of recent files to 10
-    if #remaining_files >= 10 then break end
-    if v ~= filepath then
-      table.insert(remaining_files, v)
-    end
-  end
-  data.settings.recent = remaining_files
+  Recent.promote(data.settings.recent, filepath)
+  Recent.truncate(data.settings.recent, 10)
+
   -- Update latest qua dir
   data.settings.latest_qua = common.split(filepath)
   interface.store_settings(data.settings)
