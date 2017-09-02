@@ -248,11 +248,36 @@ local function wand_tool(app, gui_state, state)
     if rect and rect.w > 1 and rect.h > 1 then
       show_quad(gui_state, state, rect)
       local rects = img_analysis.enclosed_chunks(state.image, rect.x, rect.y, rect.w, rect.h)
-      for i in ipairs(rects) do
-        if should_snap_to_grid(gui_state, state) then
+
+      if should_snap_to_grid(gui_state, state) then
+        -- First expand all new quads so that they occupy complete grid cells
+        for i,v in ipairs(rects) do
           -- Expand rect to tile size
           rects[i] = Grid.expand_rect(state.settings.grid, rects[i])
         end
+
+        -- Now remove duplicates.
+        -- TODO: This is slow. Could be faster when quads are sorted
+        local remaining = {}
+        for i,rect in ipairs(rects) do
+          local is_new = true
+          for j,existing in ipairs(remaining) do
+            -- Compare rect to the existing rectangle
+            if rect.x == existing.x and rect.y == existing.y and
+               rect.w == existing.w and rect.h == existing.h
+            then
+              is_new = false
+              break
+            end
+          end
+          if is_new then
+            table.insert(remaining, rect)
+          end
+        end
+        rects = remaining
+      end
+
+      for i in ipairs(rects) do
         draw_dashed_line(rects[i], gui_state, state.display.zoom)
       end
       gui_state.mousestring = string.format("%d quads", #rects)
