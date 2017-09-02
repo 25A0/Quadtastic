@@ -308,27 +308,9 @@ Quadtastic.draw = function(app, state, gui_state)
 
             -- List recently used grid configurations
             for _,config in ipairs(state.settings.grid.recent) do
-              for k,v in pairs(config) do
-                print(k,v)
-              end
               local size_string = string.format("%dx%d", config.x, config.y)
               if Menu.action_item(gui_state, size_string) then
-                -- Promote current config to the most recently used config
-                local comparator = function(conf_a, conf_b)
-                  return conf_a.x == conf_b.x and conf_a.y == conf_b.y
-                end
-                local current_config = {x = state.settings.grid.x,
-                                        y = state.settings.grid.y}
-                Recent.promote(state.settings.grid.recent, current_config,
-                               comparator)
-                -- Remove the new entry from the list of recent entries.
-                -- Otherwise it is shown as the current configs, but might show
-                -- up in the list of recent configs, too.
-                Recent.remove(state.settings.grid.recent, config, comparator)
-                Recent.truncate(state.settings.grid.recent, 10)
-                state.settings.grid.x = config.x
-                state.settings.grid.y = config.y
-                store_settings(state.settings)
+                app.quadtastic.change_grid_config(config.x, config.y)
               end
             end
 

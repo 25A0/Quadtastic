@@ -963,6 +963,34 @@ function QuadtasticLogic.transitions(interface) return {
     end
   end,
 
+  -- Change the current grid configuration to the given grid configuration,
+  -- update the list of recent grid configurations and save the changed settings
+  change_grid_config = function(app, state, grid_x, grid_y)
+
+    -- Promote current config to the most recently used config
+    local comparator = function(conf_a, conf_b)
+      return conf_a.x == conf_b.x and conf_a.y == conf_b.y
+    end
+    local current_config = {x = state.settings.grid.x,
+                            y = state.settings.grid.y}
+    Recent.promote(state.settings.grid.recent, current_config,
+                   comparator)
+
+    -- Remove the new entry from the list of recent entries.
+    -- Otherwise it is shown as the current configs, but might show
+    -- up in the list of recent configs, too.
+    Recent.remove(state.settings.grid.recent, {x = grid_x, y = grid_y},
+                  comparator)
+    Recent.truncate(state.settings.grid.recent, 10)
+
+    -- Update current config
+    state.settings.grid.x = grid_x
+    state.settings.grid.y = grid_y
+
+    -- Save settings
+    interface.store_settings(state.settings)
+  end,
+
   reload_exporters = function(app, data, callback)
     local success, more, count = pcall(exporters.list, S.exporters_dirname)
     if success then
