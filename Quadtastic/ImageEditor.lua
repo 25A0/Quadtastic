@@ -321,14 +321,12 @@ local function wand_tool(app, gui_state, state)
     if rect and rect.w > 1 and rect.h > 1 then
       show_quad(gui_state, state, rect)
       local rects = img_analysis.enclosed_chunks(state.image, rect.x, rect.y, rect.w, rect.h)
-      if should_snap_to_grid(gui_state, state) then
-        -- Expand all rectangles to tile size
-        for i, r in ipairs(rects) do
-          rects[i] = expand_rect_to_grid(state.settings.grid, r)
+      for i in ipairs(rects) do
+        if should_snap_to_grid(gui_state, state) then
+          -- Expand rect to tile size
+          rects[i] = expand_rect_to_grid(state.settings.grid, rects[i])
         end
-      end
-      for _, r in ipairs(rects) do
-        draw_dashed_line(r, gui_state, state.display.zoom)
+        draw_dashed_line(rects[i], gui_state, state.display.zoom)
       end
       gui_state.mousestring = string.format("%d quads", #rects)
       if not gui_state.input.mouse.buttons[1].pressed and #rects > 0 then
