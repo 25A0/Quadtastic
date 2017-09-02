@@ -6,6 +6,7 @@ local Rectangle = require(current_folder .. ".Rectangle")
 local QuadList = require(current_folder .. ".QuadList")
 local fun = require(current_folder .. ".fun")
 local img_analysis = require(current_folder .. ".img_analysis")
+local Grid = require(current_folder.. ".Grid")
 
 local ImageEditor = {}
 
@@ -127,80 +128,6 @@ local function show_quad(gui_state, state, quad, quadname)
   end
 end
 
--- Snap value to the left or top of the grid tile
-local function grid_floor(grid, val)
-  return val - (val % grid)
-end
-
--- Snap value to the right or bottom of the grid tile
-local function grid_ceil(grid, val)
-  return val + (grid - val % grid - 1)
-end
-
--- Returns the closest grid multiple of val.
--- For example, grid_mult(8,  7) -> 8
---              grid_mult(8, 11) -> 8
-local function grid_mult(grid, val)
-  if val % grid > grid / 2 then
-    return val + grid - val % grid
-  else
-    return val - val % grid
-  end
-end
-
--- Returns the closest grid point to px and py.
-local function snap_point_to_grid(grid, px, py)
-  local gx, gy
-  if px % grid.x >= grid.x / 2 then
-    gx = grid_ceil(grid.x, px)
-  else
-    gx = grid_floor(grid.x, px)
-  end
-  if py % grid.y >= grid.y / 2 then
-    gy = grid_ceil(grid.y, py)
-  else
-    gy = grid_floor(grid.y, py)
-  end
-  return gx, gy
-end
-
--- Returns a new rectangle where all four corners snapped to the grid.
--- Note that the four corners will be snapped differently. For example, in a 8x8
--- grid, the left side of the rectangle can be at x positions 0, 8, 16, 24, ...,
--- while the right side of the rectangle can be at x positions 7, 15, 23, 31, ....
-local function snap_rect_to_grid(grid, rect)
-  local grid_rect = {}
-  grid_rect.x = grid_floor(grid.x, rect.x)
-  grid_rect.y = grid_floor(grid.y, rect.y)
-
-  local dx = rect.x - grid_rect.x
-  local dy = rect.y - grid_rect.y
-  local min_w = rect.w + (dx < grid.x / 2 and dx or 0)
-  local min_h = rect.h + (dy < grid.y / 2 and dy or 0)
-  grid_rect.w = grid_mult(grid.x, min_w)
-  grid_rect.h = grid_mult(grid.y, min_h)
-
-  return grid_rect
-end
-
-local function expand_rect_to_grid(grid, rect)
-  local grid_rect = {}
-  grid_rect.x = grid_floor(grid.x, rect.x)
-  grid_rect.y = grid_floor(grid.y, rect.y)
-  -- If the rectangle was moved to the left or to the top, then the width and
-  -- height need to change accordingly to make sure that the content is still
-  -- enclosed in the rectangle.
-  local min_w = rect.w + rect.x - grid_rect.x
-  local min_h = rect.h + rect.y - grid_rect.y
-  -- In this function, the width and height will always expand up to the next
-  -- multiple of the grid size. This prevents that small sprites snap to a
-  -- width that does not include the entire sprite.
-  grid_rect.w = math.max(grid.x, grid.x * math.ceil(min_w / grid.x))
-  grid_rect.h = math.max(grid.y, grid.y * math.ceil(min_h / grid.y))
-
-  return grid_rect
-end
-
 local function get_dragged_rect(state, gui_state, img_w, img_h)
   assert(gui_state.input)
   -- Absolute mouse coordinates
@@ -240,15 +167,6 @@ local function get_dragged_rect(state, gui_state, img_w, img_h)
   end
 end
 
-local function should_snap_to_grid(gui_state, state)
-  local should_snap = state.settings.grid.always_snap
-  if imgui.are_exact_modifiers_pressed(gui_state, {"*alt"}) then
-    -- invert should_snap
-    should_snap = not should_snap
-  end
-  return should_snap
-end
-
 local function create_tool(app, gui_state, state, img_w, img_h)
     -- Draw a bright pixel where the mouse is
     love.graphics.setColor(255, 255, 255, 255)
@@ -256,8 +174,8 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       local mx, my = gui_state.transform:unproject(
         gui_state.input.mouse.x, gui_state.input.mouse.y)
       mx, my = math.floor(mx), math.floor(my)
-      if should_snap_to_grid(gui_state, state) then
-        mx, my = snap_point_to_grid(state.settings.grid, mx, my)
+      if Grid.should_snap_to_grid(gui_state, state) then
+        mx, my = Grid.snap_point(state.settings.grid, mx, my)
       end
       love.graphics.rectangle("fill", mx, my, 1, 1)
     end
@@ -269,8 +187,8 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       then
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
-          if should_snap_to_grid(gui_state, state) then
-            rect = snap_rect_to_grid(state.settings.grid, rect)
+          if Grid.should_snap_to_grid(gui_state, state) then
+            rect = Grid.snap_rect(state.settings.grid, rect)
           end
           show_quad(gui_state, state, rect)
           gui_state.mousestring = string.format("%dx%d", rect.w, rect.h)
@@ -287,8 +205,8 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       then
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
-          if should_snap_to_grid(gui_state, state) then
-            rect = snap_rect_to_grid(state.settings.grid, rect)
+          if Grid.should_snap_to_grid(gui_state, state) then
+            rect = Grid.snap_rect(state.settings.grid, rect)
           end
 
           if rect.w > 0 and rect.h > 0 then
@@ -322,9 +240,9 @@ local function wand_tool(app, gui_state, state)
       show_quad(gui_state, state, rect)
       local rects = img_analysis.enclosed_chunks(state.image, rect.x, rect.y, rect.w, rect.h)
       for i in ipairs(rects) do
-        if should_snap_to_grid(gui_state, state) then
+        if Grid.should_snap_to_grid(gui_state, state) then
           -- Expand rect to tile size
-          rects[i] = expand_rect_to_grid(state.settings.grid, rects[i])
+          rects[i] = Grid.expand_rect(state.settings.grid, rects[i])
         end
         draw_dashed_line(rects[i], gui_state, state.display.zoom)
       end
@@ -335,8 +253,8 @@ local function wand_tool(app, gui_state, state)
     else
       -- Find strip of opaque pixels
       local quad = img_analysis.outter_bounding_box(state.image, mx, my)
-      if quad and should_snap_to_grid(gui_state, state) then
-        quad = expand_rect_to_grid(state.settings.grid, quad)
+      if quad and Grid.should_snap_to_grid(gui_state, state) then
+        quad = Grid.expand_rect(state.settings.grid, quad)
       end
       if quad then
         draw_dashed_line(quad, gui_state, state.display.zoom)
