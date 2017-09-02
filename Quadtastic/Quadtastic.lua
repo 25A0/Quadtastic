@@ -19,6 +19,7 @@ local Selection = require(current_folder .. ".Selection")
 local QuadtasticLogic = require(current_folder .. ".QuadtasticLogic")
 local Dialog = require(current_folder .. ".Dialog")
 local Menu = require(current_folder .. ".Menu")
+local Recent = require(current_folder .. ".Recent")
 local Keybindings = require(current_folder .. ".Keybindings")
 local S = require(current_folder .. ".strings")
 
@@ -302,13 +303,31 @@ Quadtastic.draw = function(app, state, gui_state)
             -- Add one disabled entry for the current setting
             local size_string = string.format("%dx%d (current)", state.settings.grid.x, state.settings.grid.y)
             Menu.action_item(gui_state, size_string, { disabled = true })
+
             Menu.separator(gui_state)
-            local size_presets = {4, 8, 12, 16, 20, 24, 32}
-            for _,preset in ipairs(size_presets) do
-              local size_string = string.format("%dx%d", preset, preset)
+
+            -- List recently used grid configurations
+            for _,config in ipairs(state.settings.grid.recent) do
+              for k,v in pairs(config) do
+                print(k,v)
+              end
+              local size_string = string.format("%dx%d", config.x, config.y)
               if Menu.action_item(gui_state, size_string) then
-                state.settings.grid.x = preset
-                state.settings.grid.y = preset
+                -- Promote current config to the most recently used config
+                local comparator = function(conf_a, conf_b)
+                  return conf_a.x == conf_b.x and conf_a.y == conf_b.y
+                end
+                local current_config = {x = state.settings.grid.x,
+                                        y = state.settings.grid.y}
+                Recent.promote(state.settings.grid.recent, current_config,
+                               comparator)
+                -- Remove the new entry from the list of recent entries.
+                -- Otherwise it is shown as the current configs, but might show
+                -- up in the list of recent configs, too.
+                Recent.remove(state.settings.grid.recent, config, comparator)
+                Recent.truncate(state.settings.grid.recent, 10)
+                state.settings.grid.x = config.x
+                state.settings.grid.y = config.y
                 store_settings(state.settings)
               end
             end
