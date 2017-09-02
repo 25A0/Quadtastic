@@ -3,6 +3,7 @@ local Layout = require(current_folder .. ".Layout")
 local Label = require(current_folder .. ".Label")
 local imgui = require(current_folder .. ".imgui")
 local Button = require(current_folder .. ".Button")
+local Tooltip = require(current_folder .. ".Tooltip")
 local Rectangle = require(current_folder .. ".Rectangle")
 
 local Menu = {}
@@ -197,6 +198,10 @@ function Menu.menu_item(gui_state, label, options)
 
   clicked, _, hovered = Button.draw_flat(gui_state, nil, nil, gui_state.layout.max_w, nil,
     label, nil, options)
+
+  if options and options.tooltip then
+    Tooltip.draw(gui_state, options.tooltip, nil, nil, nil, nil, {tooltip_threshold = 0})
+  end
 
   Layout.finish(gui_state, "-")
 
