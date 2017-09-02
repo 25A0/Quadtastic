@@ -45,7 +45,7 @@ local find_tooltip_position = function(gui_state, x, y, w, h, label)
 end
 
 local show_tooltip = function(gui_state, x, y, w, h, label, options)
-  gui_state.overlay_canvas:renderTo(function()
+  gui_state.tooltip_canvas:renderTo(function()
     -- Remember and remove the current scissor
     local old_scissor = {love.graphics.getScissor()}
     love.graphics.setScissor()

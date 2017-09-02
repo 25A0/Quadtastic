@@ -184,6 +184,7 @@ function love.load()
   end
 
   gui_state.overlay_canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
+  gui_state.tooltip_canvas = love.graphics.newCanvas(love.graphics.getWidth(), love.graphics.getHeight())
 
   -- Set up second thread for http requests
   local http_thread = love.thread.newThread("http_thread.lua")
@@ -204,6 +205,7 @@ function love.draw()
   love.graphics.scale(scale, scale)
 
   gui_state.overlay_canvas:renderTo(function() love.graphics.clear() end)
+  gui_state.tooltip_canvas:renderTo(function() love.graphics.clear() end)
 
   local w, h = gui_state.transform:unproject_dimensions(
     love.graphics.getWidth(), love.graphics.getHeight()
@@ -296,6 +298,7 @@ function love.draw()
 
   love.graphics.origin()
   love.graphics.draw(gui_state.overlay_canvas)
+  love.graphics.draw(gui_state.tooltip_canvas)
 
   imgui.end_frame(gui_state)
 end
@@ -429,6 +432,7 @@ end
 
 function love.resize(new_w, new_h)
   gui_state.overlay_canvas = love.graphics.newCanvas(new_w, new_h)
+  gui_state.tooltip_canvas = love.graphics.newCanvas(new_w, new_h)
 end
 
 function love.threaderror(_, errorstr)
