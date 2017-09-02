@@ -173,8 +173,10 @@ local function snap_rect_to_grid(grid, rect)
   grid_rect.x = grid_floor(grid.x, rect.x)
   grid_rect.y = grid_floor(grid.y, rect.y)
 
-  local min_w = rect.w + rect.x - grid_rect.x
-  local min_h = rect.h + rect.y - grid_rect.y
+  local dx = rect.x - grid_rect.x
+  local dy = rect.y - grid_rect.y
+  local min_w = rect.w + (dx < grid.x / 2 and dx or 0)
+  local min_h = rect.h + (dy < grid.y / 2 and dy or 0)
   grid_rect.w = grid_mult(grid.x, min_w)
   grid_rect.h = grid_mult(grid.y, min_h)
 
