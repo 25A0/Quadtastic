@@ -170,6 +170,7 @@ local interface = {
   show_about_dialog = Dialog.show_about_dialog,
   show_ack_dialog = Dialog.show_ack_dialog,
   check_updates = Dialog.check_updates,
+  choose_grid_config = Dialog.choose_grid_config,
 }
 
 Quadtastic.transitions = QuadtasticLogic.transitions(interface)
@@ -304,14 +305,18 @@ Quadtastic.draw = function(app, state, gui_state)
             local size_string = string.format("%dx%d (current)", state.settings.grid.x, state.settings.grid.y)
             Menu.action_item(gui_state, size_string, { disabled = true })
 
-            Menu.separator(gui_state)
-
             -- List recently used grid configurations
             for _,config in ipairs(state.settings.grid.recent) do
               local size_string = string.format("%dx%d", config.x, config.y)
               if Menu.action_item(gui_state, size_string) then
                 app.quadtastic.change_grid_config(config.x, config.y)
               end
+            end
+
+            Menu.separator(gui_state)
+
+            if Menu.action_item(gui_state, S.menu.edit.grid.grid_size.custom) then
+              app.quadtastic.choose_custom_grid_config()
             end
 
             Menu.menu_finish(gui_state, w/4, h - 12)

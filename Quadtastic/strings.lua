@@ -86,7 +86,7 @@ strings.menu = {
       redo = "Redo",
       grid = menu_table("Grid", {
         always_snap = "Always snap to grid",
-        grid_size = menu_table("Grid size", {}),
+        grid_size = menu_table("Grid size", {custom = "Custom size..."}),
       }),
     }),
   image  = menu_table("Image", {

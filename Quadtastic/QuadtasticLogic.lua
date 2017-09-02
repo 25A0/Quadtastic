@@ -991,6 +991,17 @@ function QuadtasticLogic.transitions(interface) return {
     interface.store_settings(state.settings)
   end,
 
+  -- Open a dialog that lets the user pick custom grid configuration.
+  -- When the user confirms the dialog, change the grid config to the chosen
+  -- grid config.
+  choose_custom_grid_config = function(app, state)
+    local ret, new_grid = interface.choose_grid_config(state.settings.grid.x,
+                                                       state.settings.grid.y)
+    if ret == S.buttons.ok then
+      app.quadtastic.change_grid_config(new_grid.x, new_grid.y)
+    end
+  end,
+
   reload_exporters = function(app, data, callback)
     local success, more, count = pcall(exporters.list, S.exporters_dirname)
     if success then
