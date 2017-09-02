@@ -141,7 +141,7 @@ end
 -- For example, grid_mult(8,  7) -> 8
 --              grid_mult(8, 11) -> 8
 local function grid_mult(grid, val)
-  if val % grid >= grid / 2 then
+  if val % grid > grid / 2 then
     return val + grid - val % grid
   else
     return val - val % grid
