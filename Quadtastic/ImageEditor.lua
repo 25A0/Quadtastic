@@ -495,7 +495,8 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     -- Move the quads by the dragged amount
     app.quadtastic.move_quads(state.selection:get_selection(),
                               state.toolstate.original_pos,
-                              dpx, dpy, img_w, img_h)
+                              dpx, dpy, img_w, img_h,
+                              should_snap_to_grid(gui_state, state))
   elseif state.toolstate.mode == "resizing" then
     love.mouse.setCursor(gui_state.style.cursors[get_cursor_string(state.toolstate.direction)])
     app.quadtastic.resize_quads(state.selection:get_selection(),

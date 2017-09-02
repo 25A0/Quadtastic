@@ -9,6 +9,7 @@ local Path = require(current_folder.. "Path")
 local os = require(current_folder.. ".os")
 local S = require(current_folder.. ".strings")
 local Recent = require(current_folder.. "Recent")
+local Grid = require(current_folder.. "Grid")
 
 -- Shared library
 local lfs = require("lfs")
@@ -353,7 +354,7 @@ function QuadtasticLogic.transitions(interface) return {
   -- quads to the bottom right corner and them moving them in the opposite
   -- direction by the same distance would not restore the quad's original
   -- position.
-  move_quads = function(app, data, quads, original_pos, dx, dy, img_w, img_h)
+  move_quads = function(app, data, quads, original_pos, dx, dy, img_w, img_h, snap_to_grid)
     if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end
     assert(#quads == #original_pos)
@@ -362,8 +363,21 @@ function QuadtasticLogic.transitions(interface) return {
       local quad = quads[i]
       local pos = original_pos[i]
       if libquadtastic.is_quad(quad) then
-        quad.x = math.max(0, math.min(img_w - quad.w, pos.x + dx))
-        quad.y = math.max(0, math.min(img_h - quad.h, pos.y + dy))
+
+        -- Offset the position by the given deltas
+        quad.x = pos.x + dx
+        quad.y = pos.y + dy
+
+        -- Clamp the coordinates
+        quad.x = math.max(0, math.min(img_w - quad.w, quad.x))
+        quad.y = math.max(0, math.min(img_h - quad.h, quad.y))
+
+        if snap_to_grid then
+          -- Snap the position of the quad to a grid point.
+          quad.x = Grid.floor(data.settings.grid.x, quad.x)
+          quad.y = Grid.floor(data.settings.grid.y, quad.y)
+        end
+
       end
     end
   end,
