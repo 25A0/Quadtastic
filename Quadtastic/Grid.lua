@@ -1,16 +1,4 @@
-local current_folder = ... and (...):match '(.-%.?)[^%.]+$' or ''
-local imgui = require(current_folder .. ".imgui")
-
 local Grid = {}
-
-function Grid.should_snap_to_grid(gui_state, state)
-  local should_snap = state.settings.grid.always_snap
-  if imgui.are_exact_modifiers_pressed(gui_state, {"*alt"}) then
-    -- invert should_snap
-    should_snap = not should_snap
-  end
-  return should_snap
-end
 
 -- Snap value to the left or top of the grid tile
 function Grid.floor(grid, val)
