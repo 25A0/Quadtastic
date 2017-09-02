@@ -68,6 +68,31 @@ local function assert_sane_settings(user_settings)
     end
   end
 
+  settings.grid.recent = nil
+  if user_settings.grid.recent and type(user_settings.grid.recent) == "table" then
+    settings.grid.recent = {}
+    for i,v in ipairs(user_settings.grid.recent) do
+      if type(v  ) == "table"  and
+         type(v.x) == "number" and
+         type(v.y) == "number"
+      then
+        settings.grid.recent[i] = {x = v.x, y = v.y}
+      end
+    end
+  end
+  -- If no recent grid elements were found, use a default set.
+  if not settings.grid.recent then
+    settings.grid.recent = {
+      {x = 4, y = 4},
+      {x = 8, y = 8},
+      {x = 12, y = 12},
+      {x = 16, y = 16},
+      {x = 20, y = 20},
+      {x = 24, y = 24},
+      {x = 32, y = 32},
+    }
+  end
+
   return settings
 end
 
