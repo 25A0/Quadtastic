@@ -1,5 +1,18 @@
 local Recent = {}
 
+function Recent.remove(list, entry, comparator)
+  -- If no comparator is specified, use default comparator
+  comparator = comparator or function(a, b) return a == b end
+
+  -- Iterate over all other elements and remove any other instances of entry
+  for i,v in ipairs(list) do
+    if comparator(entry, v) then
+      table.remove(list, i)
+    end
+  end
+  return list
+end
+
 -- Promote the given `entry` in the `list` of recent elements. The function
 -- `comparator` compares `entry` to the elements of `list` to determine if
 -- the new `entry` matches an existing element of `list`.
@@ -12,16 +25,7 @@ local Recent = {}
 -- Recent.promote(list, 'D'),
 -- Now `list` contains {'D', 'A', 'B', 'C', 'E'}
 function Recent.promote(list, entry, comparator)
-  -- If no comparator is specified, use default comparator
-  comparator = comparator or function(a, b) return a == b end
-
-  -- Iterate over all other elements and remove any other instances of entry
-  for i,v in ipairs(list) do
-    if comparator(entry, v) then
-      table.remove(list, i)
-    end
-  end
-
+  Recent.remove(list, entry, comparator)
   -- Now insert entry at the start of list, and shift all other elements back
   table.insert(list, 1, entry)
 end
