@@ -77,7 +77,7 @@ local function assert_sane_settings(user_settings)
          type(v.x) == "number" and
          type(v.y) == "number"
       then
-        settings.grid.recent[i] = {x = v.x, y = v.y}
+        table.insert(settings.grid.recent, {x = v.x, y = v.y})
       end
     end
   end
