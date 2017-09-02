@@ -433,7 +433,7 @@ function QuadtasticLogic.transitions(interface) return {
   -- and height at index x, y, w and h, respectively, of the nth quad in quads.
   -- The image dimensions are needed so that the position and size of the quads
   -- can be restricted.
-  resize_quads = function(app, data, quads, original_quad, direction, dx, dy, img_w, img_h)
+  resize_quads = function(app, data, quads, original_quad, direction, dx, dy, img_w, img_h, snap_to_grid)
     dx, dy = dx or 0, dy or 0
     -- All quads have their position in the upper left corner, and their
     -- size extends to the lower right corner.
@@ -462,13 +462,40 @@ function QuadtasticLogic.transitions(interface) return {
     for i,quad in pairs(quads) do
       local ox, oy = original_quad[i].x, original_quad[i].y
       local ow, oh = original_quad[i].w, original_quad[i].h
+
+      -- Calculate deltas specific to this quad in case we need to snap the
+      -- quad size to the grid
+      local idpx, idpy, idw, idh = dpx, dpy, dw, dh
+      if snap_to_grid then
+        local gx, gy = data.settings.grid.x, data.settings.grid.y
+        local grid_w, grid_h = Grid.mult(gx, ow + dx), Grid.mult(gy, oh + dy)
+        -- deltas after grid snapping
+        local gdx, gdy = grid_w - ow - dx, grid_h - oh - dy
+
+        -- Adjust position and size deltas
+        if direction.n then
+          idpy = idpy + gdy
+          idh = idh - gdy
+        elseif direction.s then
+          idh = idh + gdy
+        end
+
+        if direction.w then
+          idpx = idpx + gdx
+          idw = idw - gdx
+        elseif direction.e then
+          idw = idw + gdx
+        end
+
+      end
+
       -- Resize the quads, but restrict their dimensions and position
-      quad.x = math.max(0, math.min(img_w, ox + math.min(ow - 1, dpx)))
-      quad.y = math.max(0, math.min(img_h, oy + math.min(oh - 1, dpy)))
+      quad.x = math.max(0, math.min(img_w, ox + math.min(ow - 1, idpx)))
+      quad.y = math.max(0, math.min(img_h, oy + math.min(oh - 1, idpy)))
       quad.w = math.max(1, math.min(img_w - quad.x,
-                                    ow + (direction.w and math.min(ox, dw) or dw)))
+                                    ow + (direction.w and math.min(ox, idw) or idw)))
       quad.h = math.max(1, math.min(img_h - quad.y,
-                                    oh + (direction.n and math.min(oy, dh) or dh)))
+                                    oh + (direction.n and math.min(oy, idh) or idh)))
     end
   end,
 

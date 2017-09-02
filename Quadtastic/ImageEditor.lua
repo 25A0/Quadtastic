@@ -502,7 +502,8 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     app.quadtastic.resize_quads(state.selection:get_selection(),
                                 state.toolstate.original_quad,
                                 state.toolstate.direction,
-                                dpx, dpy, img_w, img_h)
+                                dpx, dpy, img_w, img_h,
+                                should_snap_to_grid(gui_state, state))
   end
 
 end
