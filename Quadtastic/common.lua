@@ -62,10 +62,20 @@ end
 
 -- Checks if a given string qualifies as a Lua Name, see "Lexical Conventions"
 function common.is_lua_Name(str)
+  local reserved = { ["and"] = true, ["break"] = true, ["do"] = true,
+    ["else"] = true, ["elseif"] = true, ["end"] = true, ["false"] = true,
+    ["for"] = true, ["function"] = true, ["if"] = true, ["in"] = true,
+    ["local"] = true, ["nil"] = true, ["not"] = true, ["or"] = true,
+    ["repeat"] = true, ["return"] = true, ["then"] = true, ["true"] = true,
+    ["until"] = true, ["while"] = true,
+  }
+
   -- Names (also called identifiers) in Lua can be any string of letters,
   -- digits, and underscores, not beginning with a digit.
+  -- Any reserved keywords are not valid Lua names.
   -- http://www.lua.org/manual/5.1/manual.html#2.1
-  return str and str == string.gmatch(str, "[A-Za-z_][A-Za-z0-9_]*")()
+  return str and not reserved[str] and
+         str == string.gmatch(str, "[A-Za-z_][A-Za-z0-9_]*")()
 end
 
 -- A slow but deterministic table iterator. Can only handle string and number
