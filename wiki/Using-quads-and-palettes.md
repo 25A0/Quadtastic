@@ -72,7 +72,7 @@ LÖVE project. Details about these functions are explained in the next sections.
 Except for some LÖVE functions, this library has no external
 dependencies.
 
-You can download `libquadtastic` [here](/libquadtastic.lua),
+You can download `libquadtastic` [here](/Quadtastic/libquadtastic.lua),
 or use the help menu in Quadtastic to access the version of `libquadtastic` that
 is guaranteed to be compatible with the version of Quadtastic that you are using.
 
