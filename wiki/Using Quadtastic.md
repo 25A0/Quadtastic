@@ -32,8 +32,8 @@
     ```
    As you expand your spritesheet, you can re-open this quadfile in Quadtastic
    to add or modify quads
- - For non-LOVE projects, you can use one of the [existing exporters](https://github.com/25A0/Quadtastic/blob/master/Exporter/README.md) (e.g. JSON, XML), or you
-   can also [[define your own exporter|Exporters]]. But you will need to save your project, too, if you want to
+ - For non-LOVE projects, you can use one of the [existing exporters](/Exporter/README.md) (e.g. JSON, XML), or you
+   can also [define your own exporter](./Exporters.md). But you will need to save your project, too, if you want to
    load it again later.
  - Enable ![Turbo-Workflow](http://imgur.com/uYNOhGl.gif) to reload the
    spritesheet whenever it changes on disk, and to save and re-export the quads

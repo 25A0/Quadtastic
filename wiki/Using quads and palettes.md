@@ -1,7 +1,7 @@
 If you don't feel like reading a lot, you can also just tinker around with the
-[example project](https://github.com/25a0/Quadtastic/tree/master/example/).
+[example project](/example/).
 
-The page **[[Using Quadtastic|Using-Quadtastic]]**
+The page **[Using Quadtastic](./Using Quadtastic.md)**
 covers how to create quads in Quadtastic and save them as a `.lua` file.
 This page covers how you use the defined files in your LÖVE project.
 
@@ -72,7 +72,7 @@ LÖVE project. Details about these functions are explained in the next sections.
 Except for some LÖVE functions, this library has no external
 dependencies.
 
-You can download the latest version of `libquadtastic` [here](https://raw.githubusercontent.com/25A0/Quadtastic/master/Quadtastic/libquadtastic.lua),
+You can download `libquadtastic` [here](/libquadtastic.lua),
 or use the help menu in Quadtastic to access the version of `libquadtastic` that
 is guaranteed to be compatible with the version of Quadtastic that you are using.
 

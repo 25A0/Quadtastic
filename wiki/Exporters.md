@@ -3,7 +3,7 @@ exporters to export your quad definitions to a different format.
 Open 'File' -> 'Export as...' to see which export formats are available.
 
 This page will cover how you can write your own exporter. See [this
-page](https://github.com/25A0/Quadtastic/blob/master/Exporter/README.md) instead
+page](/Exporter/README.md) instead
 for information about the available exporters.
 
 ## Custom exporters
@@ -181,7 +181,7 @@ design, you can check for those projects in `can_export`, and provide an
 appropriate error message that helps the user understand why your exporter does
 not support that.
 
-The file [`test_exporters/README.md`](https://github.com/25A0/Quadtastic/blob/master/test_exporters/README.md)
+The file [`test_exporters/README.md`](/test_exporters/README.md)
 explains how you can use the testing tool.
 
 You can use the table `test_cases` to provide additional test cases. Each table
