@@ -1,7 +1,7 @@
 If you don't feel like reading a lot, you can also just tinker around with the
 [example project](/example/).
 
-The page **[Using Quadtastic](./Using Quadtastic.md)**
+The page **[Using Quadtastic](./Using-Quadtastic.md)**
 covers how to create quads in Quadtastic and save them as a `.lua` file.
 This page covers how you use the defined files in your LÖVE project.
 
