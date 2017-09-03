@@ -413,17 +413,22 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     state.toolstate.mode = "selecting"
 
     local rect = get_dragged_rect(state, gui_state)
-    love.graphics.setColor(255, 255, 255, 255)
-    draw_dashed_line(rect, gui_state, state.display.zoom)
 
-    -- Highlight all quads that are enclosed in the dragged rect
-    local keys, quad = iter_quads(state.quads)
-    love.graphics.setColor(gui_state.style.palette.shades.bright(128))
-    while keys do
-      if Rectangle.contains(rect, quad.x, quad.y, quad.w, quad.h) then
-        love.graphics.rectangle("fill", quad.x, quad.y, quad.w, quad.h)
+    -- If the mouse button was pressed outside the image editor, then there is
+    -- no dragged rectangle.
+    if rect then
+      love.graphics.setColor(255, 255, 255, 255)
+      draw_dashed_line(rect, gui_state, state.display.zoom)
+
+      -- Highlight all quads that are enclosed in the dragged rect
+      local keys, quad = iter_quads(state.quads)
+      love.graphics.setColor(gui_state.style.palette.shades.bright(128))
+      while keys do
+        if Rectangle.contains(rect, quad.x, quad.y, quad.w, quad.h) then
+          love.graphics.rectangle("fill", quad.x, quad.y, quad.w, quad.h)
+        end
+        keys, quad = iter_quads(state.quads, keys)
       end
-      keys, quad = iter_quads(state.quads, keys)
     end
   end
 
@@ -434,13 +439,19 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     if state.toolstate.mode == "selecting" then
       -- Add all quads to the selection that are enclosed in the dragged rect
       local rect = get_dragged_rect(state, gui_state)
-      local keys, quad = iter_quads(state.quads)
-      while keys do
-        if Rectangle.contains(rect, quad.x, quad.y, quad.w, quad.h) then
-          state.selection:select({quad})
+
+      -- If the mouse button was pressed outside the image editor, then there is
+      -- no dragged rectangle.
+      if rect then
+        local keys, quad = iter_quads(state.quads)
+        while keys do
+          if Rectangle.contains(rect, quad.x, quad.y, quad.w, quad.h) then
+            state.selection:select({quad})
+          end
+          keys, quad = iter_quads(state.quads, keys)
         end
-        keys, quad = iter_quads(state.quads, keys)
       end
+
     elseif state.toolstate.mode == "dragging" then
       app.quadtastic.commit_movement(state.selection:get_selection(),
                                      state.toolstate.original_pos)
