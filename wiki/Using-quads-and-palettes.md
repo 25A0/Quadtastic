@@ -1,3 +1,5 @@
+<sub>[Home](./README.md) ❯ Using quads and palettes</sub>
+
 # Using quads and palettes
 
 If you don't feel like reading a lot, you can also just tinker around with the
