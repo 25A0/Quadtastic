@@ -6,6 +6,8 @@
 
  - Fix an issue where files would be listed out of alphabetic order on some
    file systems
+ - Fix the reason why double-clicking an element to rename it only worked for
+   top-level quads and groups ([#29](https://github.com/25A0/Quadtastic/issues/29))
 
 ### Release 0.6.2, 2017-08-23
 
