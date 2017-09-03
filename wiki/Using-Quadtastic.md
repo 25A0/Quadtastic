@@ -1,3 +1,4 @@
+# Using Quadtastic
 
 ## Quick start
 
