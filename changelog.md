@@ -9,6 +9,7 @@
  - Fix the reason why double-clicking an element to rename it only worked for
    top-level quads and groups ([#29](https://github.com/25A0/Quadtastic/issues/29))
  - Reserved Lua keywords can now be used as names for quads and groups
+   ([#27](https://github.com/25A0/Quadtastic/issues/27))
 
 ### Release 0.6.2, 2017-08-23
 
