@@ -67,20 +67,21 @@ local function assert_sane_settings(user_settings)
     if user_settings.grid.always_snap and type(user_settings.grid.always_snap) == "boolean" then
       settings.grid.always_snap = user_settings.grid.always_snap
     end
-  end
 
-  settings.grid.recent = nil
-  if user_settings.grid.recent and type(user_settings.grid.recent) == "table" then
-    settings.grid.recent = {}
-    for i,v in ipairs(user_settings.grid.recent) do
-      if type(v  ) == "table"  and
-         type(v.x) == "number" and
-         type(v.y) == "number"
-      then
-        table.insert(settings.grid.recent, {x = v.x, y = v.y})
+    if user_settings.grid.recent and type(user_settings.grid.recent) == "table" then
+      settings.grid.recent = {}
+      for i,v in ipairs(user_settings.grid.recent) do
+        if type(v  ) == "table"  and
+           type(v.x) == "number" and
+           type(v.y) == "number"
+        then
+          table.insert(settings.grid.recent, {x = v.x, y = v.y})
+        end
       end
     end
+
   end
+
   -- If no recent grid elements were found, use a default set.
   if not settings.grid.recent then
     settings.grid.recent = {
