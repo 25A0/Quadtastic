@@ -104,9 +104,13 @@ local function draw_elements(gui_state, state, elements, last_hovered, quad_boun
       if not libquadtastic.is_quad(element) and not state.collapsed_groups[element] then
         -- Use translate to add some indentation
         love.graphics.translate(9, 0)
-        local rec_clicked, rec_hovered = draw_elements(gui_state, state, element, last_hovered, quad_bounds)
+        local rec_clicked,
+              rec_hovered,
+              rec_double_clicked = draw_elements(gui_state, state, element,
+                                                 last_hovered, quad_bounds)
         clicked_element = clicked_element or rec_clicked
         hovered_element = hovered_element or rec_hovered
+        double_clicked_element = double_clicked_element or rec_double_clicked
         love.graphics.translate(-9, 0)
       end
     end
