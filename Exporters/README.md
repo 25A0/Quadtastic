@@ -19,7 +19,7 @@ The following exporters are available in Quadtastic by default:
 ## How to contribute custom exporters
 
 With some knowledge about Lua, you can easily [write your own
-exporter](https://github.com/25A0/Quadtastic/wiki/Exporters). If you wrote a
+exporter](/wiki/Exporters.md). If you wrote a
 custom exporter that you would like to share with others, feel free to send a
 pull request to this repo. Your custom exporter should be a single lua file in `Exporters/source/`.
 

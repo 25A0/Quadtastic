@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/25a0/Quadtastic/wiki">
+  <a href="/wiki/README.md">
     <img src="http://imgur.com/Kkquk1h.png" alt="Documentation">
   </a>
 </p>
@@ -29,9 +29,9 @@
  ![Using the wand tool](screenshots/wand.gif)
  - Use the palette tool to create quads from areas that have the same color
  ![Using the palette tool](screenshots/palette.gif)
- - Learn more about how to [**use Quadtastic**](https://github.com/25a0/Quadtastic/wiki/Using-Quadtastic)
- - Save quads as a simple lua table, export them to [other formats](https://github.com/25A0/Quadtastic/blob/master/Exporter/README.md)
-   like JSON or XML, or [create your own exporter](https://github.com/25a0/Quadtastic/wiki/Exporters).
+ - Learn more about how to [**use Quadtastic**](/wiki/Using-Quadtastic.md)
+ - Save quads as a simple lua table, export them to [other formats](/Exporters/README.md)
+   like JSON or XML, or [create your own exporter](/wiki/Exporters.md).
  - Enable ![Turbo Workflow](screenshots/turboworkflow.gif) to reload the
    spritesheet whenever it changes on disk, and to re-export the quads whenever
    you change them
@@ -56,7 +56,7 @@ If you're using [LÖVE](https://www.love2d.org):
     love.graphics.draw(image, quads.base)
     ```
 
- - Learn more about how to [**use quads and palettes in your LÖVE project**](https://github.com/25a0/Quadtastic/wiki/Using-quads-and-palettes)
+ - Learn more about how to [**use quads and palettes in your LÖVE project**](/wiki/Using-quads-and-palettes.md)
 
 ## Binary downloads
 
