@@ -10,6 +10,8 @@ local Grid = require(current_folder.. ".Grid")
 
 local ImageEditor = {}
 
+local grid_mesh
+
 function ImageEditor.zoom(state, delta)
   -- Ignore zoom instructions if no image is loaded
   if not state.image then return end
@@ -185,6 +187,19 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       mx, my = math.floor(mx), math.floor(my)
       if should_snap_to_grid(gui_state, state) then
         mx, my = Grid.snap_point(state.settings.grid, mx, my)
+
+        -- Update and draw grid mesh
+        local cx, cy = Grid.cell_center(state.settings.grid, mx, my)
+        grid_mesh:setVertex(1, mx, my    , 0, 0, 255, 255, 255, 128)
+        grid_mesh:setVertex(2, mx, my + 1, 0, 0, 255, 255, 255, 128)
+        grid_mesh:setVertex(3, cx, my + 1, 0, 0, 255, 255, 255, 0)
+        grid_mesh:setVertex(4, cx, my    , 0, 0, 255, 255, 255, 0)
+        love.graphics.draw(grid_mesh)
+        grid_mesh:setVertex(1, mx    , my, 0, 0, 255, 255, 255, 128)
+        grid_mesh:setVertex(2, mx + 1, my, 0, 0, 255, 255, 255, 128)
+        grid_mesh:setVertex(3, mx + 1, cy, 0, 0, 255, 255, 255, 0)
+        grid_mesh:setVertex(4, mx    , cy, 0, 0, 255, 255, 255, 0)
+        love.graphics.draw(grid_mesh)
       end
       love.graphics.rectangle("fill", mx, my, 1, 1)
     end
@@ -583,6 +598,11 @@ local function handle_input(app, gui_state, state, img_w, img_h)
 end
 
 ImageEditor.draw = function(app, gui_state, state, x, y, w, h)
+  -- make sure that the grid mesh is created
+  if not grid_mesh then
+    grid_mesh = love.graphics.newMesh(4, "fan", "stream")
+  end
+
   local content_w, content_h
   do state.scrollpane_state = Scrollpane.start(gui_state, x, y, w, h,
     state.scrollpane_state

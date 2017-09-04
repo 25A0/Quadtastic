@@ -56,6 +56,12 @@ function Grid.snap_rect(grid, rect)
   return grid_rect
 end
 
+-- Returns the center coordinate of the cell around the given point
+function Grid.cell_center(grid, px, py)
+  return Grid.floor(grid.x, px) + grid.x / 2,
+         Grid.floor(grid.y, py) + grid.y / 2
+end
+
 function Grid.expand_rect(grid, rect)
   local grid_rect = {}
   grid_rect.x = Grid.floor(grid.x, rect.x)
