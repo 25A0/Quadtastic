@@ -30,7 +30,7 @@
  - Use the palette tool to create quads from areas that have the same color
  ![Using the palette tool](screenshots/palette.gif)
  - Learn more about how to [**use Quadtastic**](/wiki/Using-Quadtastic.md)
- - Save quads as a simple lua table, export them to [other formats](/Exporter/README.md)
+ - Save quads as a simple lua table, export them to [other formats](/Exporters/README.md)
    like JSON or XML, or [create your own exporter](/wiki/Exporters.md).
  - Enable ![Turbo Workflow](screenshots/turboworkflow.gif) to reload the
    spritesheet whenever it changes on disk, and to re-export the quads whenever
