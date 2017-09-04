@@ -279,8 +279,15 @@ release-%: test ${LICENSES}
 	@printf "\e[1m4. Tag release\e[0m\n"
 	@git tag -s $* -F .tmp/tagmessage
 
+	@# Merge master into stable
+	@printf "\e[1m4. Merge master branch into stable branch\e[0m\n"
+	git checkout stable
+	git merge --ff-only master
+	git checkout master
+
 	@rm -rf .tmp
 	@printf "\e[1mAll done.\e[0m You can now run 'make publish' to publish version $*\n"
+	@printf "Remember to push the new tag, as well as the master and stable branch.\n"
 
 publish: ${DISTFILES}
 	# Check that the version to be released is tagged.
