@@ -217,9 +217,13 @@ ${APPNAME}/libquadtastic.lua:
 # Build as $ make release-0.2.0
 # Tag names MUST follow the major.minor.patch pattern.
 release-%: test ${LICENSES}
+	@# Only allow releases from the master branch.
+	@git status -b --porcelain | head -n 1 | grep --silent "## master" || \
+	(echo "Error: Can only release from master"; exit 1)
+
 	@# Only proceed if that version doesn't already exist
 	@test ! -f .git/refs/tags/$* || \
-	(echo "Version $* is already released"; exit 1)
+	(echo "Error: Version $* is already released"; exit 1)
 
 	# Check that the version to be released is tagged.
 	@if [[ ! $* =~ ^[0-9]+.[0-9]+.[0-9]+$$ ]] ; then\
