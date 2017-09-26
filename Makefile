@@ -221,6 +221,10 @@ release-%: test ${LICENSES}
 	@git status -b --porcelain | head -n 1 | grep --silent "## master" || \
 	(echo "Error: Can only release from master"; exit 1)
 
+	@# Only allow releasing a clean working directory
+	@test -z "`git status --porcelain --untracked-files=no`" || \
+	(echo "Error: Working directory is not clean"; exit 1)
+
 	@# Only proceed if that version doesn't already exist
 	@test ! -f .git/refs/tags/$* || \
 	(echo "Error: Version $* is already released"; exit 1)
