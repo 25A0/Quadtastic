@@ -264,7 +264,7 @@ release-%: test ${LICENSES}
 
 	@# Now we use the composed tag message to update the changelog, so that
 	@# changelog and release notes are uniform.
-	@sed -i '' "/#.*/ d" .tmp/releasemessage
+	@sed -i '' "/^#.*/ d" .tmp/releasemessage
 	@sed -i '' "/Changelog:/ d" .tmp/releasemessage
 
 	@# Can't use multi-line sed commands in Make, so this is stored separately
