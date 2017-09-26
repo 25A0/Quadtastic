@@ -19,7 +19,6 @@ local Selection = require(current_folder .. ".Selection")
 local QuadtasticLogic = require(current_folder .. ".QuadtasticLogic")
 local Dialog = require(current_folder .. ".Dialog")
 local Menu = require(current_folder .. ".Menu")
-local Recent = require(current_folder .. ".Recent")
 local Keybindings = require(current_folder .. ".Keybindings")
 local S = require(current_folder .. ".strings")
 
@@ -70,7 +69,7 @@ local function assert_sane_settings(user_settings)
 
     if user_settings.grid.recent and type(user_settings.grid.recent) == "table" then
       settings.grid.recent = {}
-      for i,v in ipairs(user_settings.grid.recent) do
+      for _,v in ipairs(user_settings.grid.recent) do
         if type(v  ) == "table"  and
            type(v.x) == "number" and
            type(v.y) == "number"
@@ -302,9 +301,11 @@ Quadtastic.draw = function(app, state, gui_state)
             store_settings(state.settings)
           end
           if Menu.menu_start(gui_state, w/4, h - 12, S.menu.edit.grid.grid_size()) then
-            -- Add one disabled entry for the current setting
-            local size_string = string.format("%dx%d (current)", state.settings.grid.x, state.settings.grid.y)
-            Menu.action_item(gui_state, size_string, { disabled = true })
+            do
+              -- Add one disabled entry for the current setting
+              local size_string = string.format("%dx%d (current)", state.settings.grid.x, state.settings.grid.y)
+              Menu.action_item(gui_state, size_string, { disabled = true })
+            end
 
             -- List recently used grid configurations
             for _,config in ipairs(state.settings.grid.recent) do

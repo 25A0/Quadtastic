@@ -266,7 +266,7 @@ local function wand_tool(app, gui_state, state)
 
       if should_snap_to_grid(gui_state, state) then
         -- First expand all new quads so that they occupy complete grid cells
-        for i,v in ipairs(rects) do
+        for i in ipairs(rects) do
           -- Expand rect to tile size
           rects[i] = Grid.expand_rect(state.settings.grid, rects[i])
         end
@@ -274,19 +274,19 @@ local function wand_tool(app, gui_state, state)
         -- Now remove duplicates.
         -- TODO: This is slow. Could be faster when quads are sorted
         local remaining = {}
-        for i,rect in ipairs(rects) do
+        for _,r in ipairs(rects) do
           local is_new = true
-          for j,existing in ipairs(remaining) do
-            -- Compare rect to the existing rectangle
-            if rect.x == existing.x and rect.y == existing.y and
-               rect.w == existing.w and rect.h == existing.h
+          for _,existing in ipairs(remaining) do
+            -- Compare r to the existing rectangle
+            if r.x == existing.x and r.y == existing.y and
+               r.w == existing.w and r.h == existing.h
             then
               is_new = false
               break
             end
           end
           if is_new then
-            table.insert(remaining, rect)
+            table.insert(remaining, r)
           end
         end
         rects = remaining
@@ -574,7 +574,9 @@ local function handle_input(app, gui_state, state, img_w, img_h)
 
     -- If the middle mouse button was dragged in this scrollpane, pan the image
     -- by the dragged distance
-    if gui_state.input and gui_state.input.mouse.buttons[3] and gui_state.input.mouse.buttons[3].pressed then
+    if gui_state.input and gui_state.input.mouse.buttons[3] and
+       gui_state.input.mouse.buttons[3].pressed
+    then
       local button_state = gui_state.input.mouse.buttons[3]
       if Scrollpane.is_mouse_inside_widget(gui_state, state.scrollpane_state,
                                            button_state.at_x, button_state.at_y)
@@ -614,7 +616,9 @@ ImageEditor.draw = function(app, gui_state, state, x, y, w, h)
 
     -- Draw background pattern
     local img_w, img_h = state.image:getDimensions()
-    local backgroundquad = love.graphics.newQuad(0, 0, img_w, img_h, 2 * state.settings.grid.x, 2 * state.settings.grid.y)
+    local backgroundquad = love.graphics.newQuad(0, 0, img_w, img_h,
+                                                 2 * state.settings.grid.x,
+                                                 2 * state.settings.grid.y)
     love.graphics.draw(gui_state.style.backgroundcanvas, backgroundquad)
 
     love.graphics.draw(state.image)

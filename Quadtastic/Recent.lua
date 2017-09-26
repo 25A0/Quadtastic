@@ -34,8 +34,9 @@ end
 -- The given list is manipulated in-place, but also returned for convenience.
 function Recent.truncate(list, length)
 
+  -- Remove elements from the end of the list until the desired length is reached
   local len = #list
-  for i = len, length + 1, -1 do
+  for _ = len, length + 1, -1 do
     list[len] = nil
   end
 
