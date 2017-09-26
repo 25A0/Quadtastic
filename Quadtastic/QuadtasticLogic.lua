@@ -8,6 +8,8 @@ local exporters = require(current_folder.. "Exporters")
 local Path = require(current_folder.. "Path")
 local os = require(current_folder.. ".os")
 local S = require(current_folder.. ".strings")
+local Recent = require(current_folder.. "Recent")
+local Grid = require(current_folder.. "Grid")
 
 -- Shared library
 local lfs = require("lfs")
@@ -16,15 +18,9 @@ local function add_path_to_recent_files(interface, data, filepath)
   -- Insert new file into list of recently loaded files
   -- Remove duplicates from recent files
   filepath = os.path(filepath)
-  local remaining_files = {filepath}
-  for _,v in ipairs(data.settings.recent) do
-    -- Limit the number of recent files to 10
-    if #remaining_files >= 10 then break end
-    if v ~= filepath then
-      table.insert(remaining_files, v)
-    end
-  end
-  data.settings.recent = remaining_files
+  Recent.promote(data.settings.recent, filepath)
+  Recent.truncate(data.settings.recent, 10)
+
   -- Update latest qua dir
   data.settings.latest_qua = common.split(filepath)
   interface.store_settings(data.settings)
@@ -358,7 +354,7 @@ function QuadtasticLogic.transitions(interface) return {
   -- quads to the bottom right corner and them moving them in the opposite
   -- direction by the same distance would not restore the quad's original
   -- position.
-  move_quads = function(app, data, quads, original_pos, dx, dy, img_w, img_h)
+  move_quads = function(app, data, quads, original_pos, dx, dy, img_w, img_h, snap_to_grid)
     if not quads then quads = data.selection:get_selection() end
     if #quads == 0 then return end
     assert(#quads == #original_pos)
@@ -367,8 +363,21 @@ function QuadtasticLogic.transitions(interface) return {
       local quad = quads[i]
       local pos = original_pos[i]
       if libquadtastic.is_quad(quad) then
-        quad.x = math.max(0, math.min(img_w - quad.w, pos.x + dx))
-        quad.y = math.max(0, math.min(img_h - quad.h, pos.y + dy))
+
+        -- Offset the position by the given deltas
+        quad.x = pos.x + dx
+        quad.y = pos.y + dy
+
+        -- Clamp the coordinates
+        quad.x = math.max(0, math.min(img_w - quad.w, quad.x))
+        quad.y = math.max(0, math.min(img_h - quad.h, quad.y))
+
+        if snap_to_grid then
+          -- Snap the position of the quad to a grid point.
+          quad.x = Grid.floor(data.settings.grid.x, quad.x)
+          quad.y = Grid.floor(data.settings.grid.y, quad.y)
+        end
+
       end
     end
   end,
@@ -424,7 +433,7 @@ function QuadtasticLogic.transitions(interface) return {
   -- and height at index x, y, w and h, respectively, of the nth quad in quads.
   -- The image dimensions are needed so that the position and size of the quads
   -- can be restricted.
-  resize_quads = function(app, data, quads, original_quad, direction, dx, dy, img_w, img_h)
+  resize_quads = function(app, data, quads, original_quad, direction, dx, dy, img_w, img_h, snap_to_grid)
     dx, dy = dx or 0, dy or 0
     -- All quads have their position in the upper left corner, and their
     -- size extends to the lower right corner.
@@ -453,13 +462,40 @@ function QuadtasticLogic.transitions(interface) return {
     for i,quad in pairs(quads) do
       local ox, oy = original_quad[i].x, original_quad[i].y
       local ow, oh = original_quad[i].w, original_quad[i].h
+
+      -- Calculate deltas specific to this quad in case we need to snap the
+      -- quad size to the grid
+      local idpx, idpy, idw, idh = dpx, dpy, dw, dh
+      if snap_to_grid then
+        local gx, gy = data.settings.grid.x, data.settings.grid.y
+        local grid_w, grid_h = Grid.mult(gx, ow + dx), Grid.mult(gy, oh + dy)
+        -- deltas after grid snapping
+        local gdx, gdy = grid_w - ow - dx, grid_h - oh - dy
+
+        -- Adjust position and size deltas
+        if direction.n then
+          idpy = idpy + gdy
+          idh = idh - gdy
+        elseif direction.s then
+          idh = idh + gdy
+        end
+
+        if direction.w then
+          idpx = idpx + gdx
+          idw = idw - gdx
+        elseif direction.e then
+          idw = idw + gdx
+        end
+
+      end
+
       -- Resize the quads, but restrict their dimensions and position
-      quad.x = math.max(0, math.min(img_w, ox + math.min(ow - 1, dpx)))
-      quad.y = math.max(0, math.min(img_h, oy + math.min(oh - 1, dpy)))
+      quad.x = math.max(0, math.min(img_w, ox + math.min(ow - 1, idpx)))
+      quad.y = math.max(0, math.min(img_h, oy + math.min(oh - 1, idpy)))
       quad.w = math.max(1, math.min(img_w - quad.x,
-                                    ow + (direction.w and math.min(ox, dw) or dw)))
+                                    ow + (direction.w and math.min(ox, idw) or idw)))
       quad.h = math.max(1, math.min(img_h - quad.y,
-                                    oh + (direction.n and math.min(oy, dh) or dh)))
+                                    oh + (direction.n and math.min(oy, idh) or idh)))
     end
   end,
 
@@ -965,6 +1001,45 @@ function QuadtasticLogic.transitions(interface) return {
     else
       -- Try to load this as an image
       app.quadtastic.load_image(filepath)
+    end
+  end,
+
+  -- Change the current grid configuration to the given grid configuration,
+  -- update the list of recent grid configurations and save the changed settings
+  change_grid_config = function(app, state, grid_x, grid_y)
+
+    -- Promote current config to the most recently used config
+    local comparator = function(conf_a, conf_b)
+      return conf_a.x == conf_b.x and conf_a.y == conf_b.y
+    end
+    local current_config = {x = state.settings.grid.x,
+                            y = state.settings.grid.y}
+    Recent.promote(state.settings.grid.recent, current_config,
+                   comparator)
+
+    -- Remove the new entry from the list of recent entries.
+    -- Otherwise it is shown as the current configs, but might show
+    -- up in the list of recent configs, too.
+    Recent.remove(state.settings.grid.recent, {x = grid_x, y = grid_y},
+                  comparator)
+    Recent.truncate(state.settings.grid.recent, 10)
+
+    -- Update current config
+    state.settings.grid.x = grid_x
+    state.settings.grid.y = grid_y
+
+    -- Save settings
+    interface.store_settings(state.settings)
+  end,
+
+  -- Open a dialog that lets the user pick custom grid configuration.
+  -- When the user confirms the dialog, change the grid config to the chosen
+  -- grid config.
+  choose_custom_grid_config = function(app, state)
+    local ret, new_grid = interface.choose_grid_config(state.settings.grid.x,
+                                                       state.settings.grid.y)
+    if ret == S.buttons.ok then
+      app.quadtastic.change_grid_config(new_grid.x, new_grid.y)
     end
   end,
 

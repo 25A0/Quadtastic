@@ -572,6 +572,58 @@ function Dialog.save_file(basepath, default_extension, save_button_label)
   return coroutine.yield(file_state)
 end
 
+function Dialog.choose_grid_config(current_grid_x, current_grid_y)
+  -- Draw the dialog
+  local function draw(app, data, gui_state, w, h)
+    do window_start(data, gui_state, w, h)
+      do Layout.start(gui_state)
+        do Layout.start(gui_state)
+          Label.draw(gui_state, nil, nil, nil, nil, "Grid size")
+          Layout.next(gui_state, "-", 2)
+          Label.draw(gui_state, nil, nil, nil, nil, "x:")
+          Layout.next(gui_state, "-")
+          data.x = InputField.draw(gui_state, nil, nil, 40, nil, tostring(data.x))
+          Layout.next(gui_state, "-")
+          Label.draw(gui_state, nil, nil, nil, nil, "y:")
+          Layout.next(gui_state, "-")
+          data.y = InputField.draw(gui_state, nil, nil, 40, nil, tostring(data.y))
+          Layout.next(gui_state, "-")
+        end Layout.finish(gui_state, "-")
+        Layout.next(gui_state, "|")
+        local is_invalid = type(tonumber(data.x)) ~= "number" or
+                           type(tonumber(data.y)) ~= "number" or
+                           tonumber(data.x) <= 0              or
+                           tonumber(data.y) <= 0
+        local clicked_button = show_buttons(gui_state, data.buttons,
+          {disabled = {enter = is_invalid}})
+
+        if clicked_button then
+          if clicked_button == S.buttons.ok then
+            app.choose_grid_config.ok(tonumber(data.x), tonumber(data.y))
+          else
+            app.choose_grid_config.close()
+          end
+        end
+      end Layout.finish(gui_state, "|")
+    end window_finish(data, gui_state, w, h)
+  end
+
+  assert(coroutine.running(), "This function must be run in a coroutine.")
+  local transitions = {
+    -- luacheck: no unused args
+    ok = function(app, data, x, y) return S.buttons.ok, {x = x, y = y} end,
+    close = function(app, data) return S.buttons.close end,
+  }
+  local dialog_state = State("choose_grid_config", transitions,
+                             {x = current_grid_x,
+                              y = current_grid_y,
+                              buttons = {escape = S.buttons.cancel,
+                                         enter = S.buttons.ok}})
+  -- Store the draw function in the state
+  dialog_state.draw = draw
+  return coroutine.yield(dialog_state)
+end
+
 function Dialog.show_about_dialog()
   local version_info = common.get_version()
   local copyright_info = love.filesystem.read("res/copyright.txt")

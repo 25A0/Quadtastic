@@ -4,6 +4,7 @@
 
 ### Unreleased
 
+ - Add snapping to grid. See [this wiki page](/wiki/Using-Quadtastic.md#grid) for more information
  - Fix an issue where files would be listed out of alphabetic order on some
    file systems
  - Fix the reason why double-clicking an element to rename it only worked for

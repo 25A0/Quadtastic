@@ -19,6 +19,7 @@ local Selection = require(current_folder .. ".Selection")
 local QuadtasticLogic = require(current_folder .. ".QuadtasticLogic")
 local Dialog = require(current_folder .. ".Dialog")
 local Menu = require(current_folder .. ".Menu")
+local Recent = require(current_folder .. ".Recent")
 local Keybindings = require(current_folder .. ".Keybindings")
 local S = require(current_folder .. ".strings")
 
@@ -26,13 +27,84 @@ local lfs = require("lfs")
 
 local settings_filename = "settings"
 
+-- Make sure that the settings table contains things we expect, to a reasonable
+-- degree.
+local function assert_sane_settings(user_settings)
+  if not user_settings or type(user_settings) ~= "table" then
+    user_settings = {}
+  end
+  local settings = {}
+
+  -- Recently opened files
+  settings.recent = {}
+  if user_settings.recent and type(user_settings.recent) == "table" then
+    for _,v in ipairs(user_settings.recent) do
+      if type(v) == "string" then
+        table.insert(settings.recent, v)
+      end
+    end
+  end
+
+  -- Most recent directory for quad files
+  if user_settings.latest_qua and type(user_settings.latest_qua) == "string" then
+    settings.latest_qua = user_settings.latest_qua
+  end
+
+  -- Most recent directory for images
+  if user_settings.latest_img and type(user_settings.latest_img) == "string" then
+    settings.latest_img = user_settings.latest_img
+  end
+
+  -- Grid settings
+  settings.grid = {x = 8, y = 8, always_snap = false}
+  if user_settings.grid and type(user_settings.grid) == "table" then
+    if user_settings.grid.x and type(user_settings.grid.x) == "number" then
+      settings.grid.x = user_settings.grid.x
+    end
+    if user_settings.grid.y and type(user_settings.grid.y) == "number" then
+      settings.grid.y = user_settings.grid.y
+    end
+    if user_settings.grid.always_snap and type(user_settings.grid.always_snap) == "boolean" then
+      settings.grid.always_snap = user_settings.grid.always_snap
+    end
+
+    if user_settings.grid.recent and type(user_settings.grid.recent) == "table" then
+      settings.grid.recent = {}
+      for i,v in ipairs(user_settings.grid.recent) do
+        if type(v  ) == "table"  and
+           type(v.x) == "number" and
+           type(v.y) == "number"
+        then
+          table.insert(settings.grid.recent, {x = v.x, y = v.y})
+        end
+      end
+    end
+
+  end
+
+  -- If no recent grid elements were found, use a default set.
+  if not settings.grid.recent then
+    settings.grid.recent = {
+      {x = 4, y = 4},
+      {x = 8, y = 8},
+      {x = 12, y = 12},
+      {x = 16, y = 16},
+      {x = 20, y = 20},
+      {x = 24, y = 24},
+      {x = 32, y = 32},
+    }
+  end
+
+  return settings
+end
+
 local function load_settings()
   local success, more = pcall(function()
     return require(settings_filename)
   end)
 
   if success then
-    return more
+    return assert_sane_settings(more)
   else
     print("Warning: Could not load settings. " .. more)
     return nil
@@ -51,6 +123,10 @@ local function store_settings(settings)
   return success, more
 end
 
+local function get_default_settings()
+  return assert_sane_settings()
+end
+
 local Quadtastic = State("quadtastic",
   nil,
   -- initial data
@@ -60,7 +136,7 @@ local Quadtastic = State("quadtastic",
     },
     scrollpane_state = nil,
     quad_scrollpane_state = nil,
-    settings = load_settings() or {recent = {}},
+    settings = load_settings() or get_default_settings(),
     collapsed_groups = {},
     selection = Selection(),
     exporters = {},
@@ -95,6 +171,7 @@ local interface = {
   show_about_dialog = Dialog.show_about_dialog,
   show_ack_dialog = Dialog.show_ack_dialog,
   check_updates = Dialog.check_updates,
+  choose_grid_config = Dialog.choose_grid_config,
 }
 
 Quadtastic.transitions = QuadtasticLogic.transitions(interface)
@@ -214,6 +291,41 @@ Quadtastic.draw = function(app, state, gui_state)
         then
           app.quadtastic.redo()
         end
+
+        Menu.separator(gui_state)
+
+        if Menu.menu_start(gui_state, w/4, h - 12, S.menu.edit.grid()) then
+          if Menu.action_item(gui_state, S.menu.edit.grid.always_snap,
+                              { checkbox = { checked = state.settings.grid.always_snap }})
+          then
+            state.settings.grid.always_snap = not state.settings.grid.always_snap
+            store_settings(state.settings)
+          end
+          if Menu.menu_start(gui_state, w/4, h - 12, S.menu.edit.grid.grid_size()) then
+            -- Add one disabled entry for the current setting
+            local size_string = string.format("%dx%d (current)", state.settings.grid.x, state.settings.grid.y)
+            Menu.action_item(gui_state, size_string, { disabled = true })
+
+            -- List recently used grid configurations
+            for _,config in ipairs(state.settings.grid.recent) do
+              local size_string = string.format("%dx%d", config.x, config.y)
+              if Menu.action_item(gui_state, size_string) then
+                app.quadtastic.change_grid_config(config.x, config.y)
+              end
+            end
+
+            Menu.separator(gui_state)
+
+            if Menu.action_item(gui_state, S.menu.edit.grid.grid_size.custom) then
+              app.quadtastic.choose_custom_grid_config()
+            end
+
+            Menu.menu_finish(gui_state, w/4, h - 12)
+          end
+
+          Menu.menu_finish(gui_state, w/4, h - 12)
+        end
+
         Menu.menu_finish(gui_state, w/4, h - 12)
       end
       if Menu.menu_start(gui_state, w/4, h - 12, S.menu.image()) then

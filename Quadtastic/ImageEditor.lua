@@ -6,8 +6,11 @@ local Rectangle = require(current_folder .. ".Rectangle")
 local QuadList = require(current_folder .. ".QuadList")
 local fun = require(current_folder .. ".fun")
 local img_analysis = require(current_folder .. ".img_analysis")
+local Grid = require(current_folder.. ".Grid")
 
 local ImageEditor = {}
+
+local grid_mesh
 
 function ImageEditor.zoom(state, delta)
   -- Ignore zoom instructions if no image is loaded
@@ -166,6 +169,15 @@ local function get_dragged_rect(state, gui_state, img_w, img_h)
   end
 end
 
+local function should_snap_to_grid(gui_state, state)
+  local should_snap = state.settings.grid.always_snap
+  if imgui.are_exact_modifiers_pressed(gui_state, {"*alt"}) then
+    -- invert should_snap
+    should_snap = not should_snap
+  end
+  return should_snap
+end
+
 local function create_tool(app, gui_state, state, img_w, img_h)
     -- Draw a bright pixel where the mouse is
     love.graphics.setColor(255, 255, 255, 255)
@@ -173,6 +185,22 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       local mx, my = gui_state.transform:unproject(
         gui_state.input.mouse.x, gui_state.input.mouse.y)
       mx, my = math.floor(mx), math.floor(my)
+      if should_snap_to_grid(gui_state, state) then
+        mx, my = Grid.snap_point(state.settings.grid, mx, my)
+
+        -- Update and draw grid mesh
+        local cx, cy = Grid.cell_center(state.settings.grid, mx, my)
+        grid_mesh:setVertex(1, mx, my    , 0, 0, 255, 255, 255, 128)
+        grid_mesh:setVertex(2, mx, my + 1, 0, 0, 255, 255, 255, 128)
+        grid_mesh:setVertex(3, cx, my + 1, 0, 0, 255, 255, 255, 0)
+        grid_mesh:setVertex(4, cx, my    , 0, 0, 255, 255, 255, 0)
+        love.graphics.draw(grid_mesh)
+        grid_mesh:setVertex(1, mx    , my, 0, 0, 255, 255, 255, 128)
+        grid_mesh:setVertex(2, mx + 1, my, 0, 0, 255, 255, 255, 128)
+        grid_mesh:setVertex(3, mx + 1, cy, 0, 0, 255, 255, 255, 0)
+        grid_mesh:setVertex(4, mx    , cy, 0, 0, 255, 255, 255, 0)
+        love.graphics.draw(grid_mesh)
+      end
       love.graphics.rectangle("fill", mx, my, 1, 1)
     end
 
@@ -183,6 +211,9 @@ local function create_tool(app, gui_state, state, img_w, img_h)
       then
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
         if rect then
+          if should_snap_to_grid(gui_state, state) then
+            rect = Grid.snap_rect(state.settings.grid, rect)
+          end
           show_quad(gui_state, state, rect)
           gui_state.mousestring = string.format("%dx%d", rect.w, rect.h)
         end
@@ -197,8 +228,14 @@ local function create_tool(app, gui_state, state, img_w, img_h)
         gui_state.input.mouse.buttons[1].releases > 0
       then
         local rect = get_dragged_rect(state, gui_state, img_w, img_h)
-        if rect and rect.w > 0 and rect.h > 0 then
-          app.quadtastic.create(rect)
+        if rect then
+          if should_snap_to_grid(gui_state, state) then
+            rect = Grid.snap_rect(state.settings.grid, rect)
+          end
+
+          if rect.w > 0 and rect.h > 0 then
+            app.quadtastic.create(rect)
+          end
         end
       end
     end
@@ -226,8 +263,37 @@ local function wand_tool(app, gui_state, state)
     if rect and rect.w > 1 and rect.h > 1 then
       show_quad(gui_state, state, rect)
       local rects = img_analysis.enclosed_chunks(state.image, rect.x, rect.y, rect.w, rect.h)
-      for _, r in ipairs(rects) do
-        draw_dashed_line(r, gui_state, state.display.zoom)
+
+      if should_snap_to_grid(gui_state, state) then
+        -- First expand all new quads so that they occupy complete grid cells
+        for i,v in ipairs(rects) do
+          -- Expand rect to tile size
+          rects[i] = Grid.expand_rect(state.settings.grid, rects[i])
+        end
+
+        -- Now remove duplicates.
+        -- TODO: This is slow. Could be faster when quads are sorted
+        local remaining = {}
+        for i,rect in ipairs(rects) do
+          local is_new = true
+          for j,existing in ipairs(remaining) do
+            -- Compare rect to the existing rectangle
+            if rect.x == existing.x and rect.y == existing.y and
+               rect.w == existing.w and rect.h == existing.h
+            then
+              is_new = false
+              break
+            end
+          end
+          if is_new then
+            table.insert(remaining, rect)
+          end
+        end
+        rects = remaining
+      end
+
+      for i in ipairs(rects) do
+        draw_dashed_line(rects[i], gui_state, state.display.zoom)
       end
       gui_state.mousestring = string.format("%d quads", #rects)
       if not gui_state.input.mouse.buttons[1].pressed and #rects > 0 then
@@ -236,6 +302,9 @@ local function wand_tool(app, gui_state, state)
     else
       -- Find strip of opaque pixels
       local quad = img_analysis.outter_bounding_box(state.image, mx, my)
+      if quad and should_snap_to_grid(gui_state, state) then
+        quad = Grid.expand_rect(state.settings.grid, quad)
+      end
       if quad then
         draw_dashed_line(quad, gui_state, state.display.zoom)
         gui_state.mousestring = string.format("%dx%d", quad.w, quad.h)
@@ -477,13 +546,15 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     -- Move the quads by the dragged amount
     app.quadtastic.move_quads(state.selection:get_selection(),
                               state.toolstate.original_pos,
-                              dpx, dpy, img_w, img_h)
+                              dpx, dpy, img_w, img_h,
+                              should_snap_to_grid(gui_state, state))
   elseif state.toolstate.mode == "resizing" then
     love.mouse.setCursor(gui_state.style.cursors[get_cursor_string(state.toolstate.direction)])
     app.quadtastic.resize_quads(state.selection:get_selection(),
                                 state.toolstate.original_quad,
                                 state.toolstate.direction,
-                                dpx, dpy, img_w, img_h)
+                                dpx, dpy, img_w, img_h,
+                                should_snap_to_grid(gui_state, state))
   end
 
 end
@@ -527,6 +598,11 @@ local function handle_input(app, gui_state, state, img_w, img_h)
 end
 
 ImageEditor.draw = function(app, gui_state, state, x, y, w, h)
+  -- make sure that the grid mesh is created
+  if not grid_mesh then
+    grid_mesh = love.graphics.newMesh(4, "fan", "stream")
+  end
+
   local content_w, content_h
   do state.scrollpane_state = Scrollpane.start(gui_state, x, y, w, h,
     state.scrollpane_state
@@ -536,7 +612,7 @@ ImageEditor.draw = function(app, gui_state, state, x, y, w, h)
 
     -- Draw background pattern
     local img_w, img_h = state.image:getDimensions()
-    local backgroundquad = love.graphics.newQuad(0, 0, img_w, img_h, 8, 8)
+    local backgroundquad = love.graphics.newQuad(0, 0, img_w, img_h, 2 * state.settings.grid.x, 2 * state.settings.grid.y)
     love.graphics.draw(gui_state.style.backgroundcanvas, backgroundquad)
 
     love.graphics.draw(state.image)

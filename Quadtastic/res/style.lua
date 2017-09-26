@@ -1,9 +1,9 @@
 return {
   _META = {
     image_path = "./style.png",
-    version = "v0.5.3-108-g89fb772",
+    version = "v0.6.2-15-gc6047cf",
   },
-  background = {x = 48, y = 16, w = 8, h = 8},
+  background = {x = 48, y = 16, w = 2, h = 2},
   button_border = {
     b = {x = 3, y = 13, w = 1, h = 3},
     bl = {x = 0, y = 13, w = 3, h = 3},
@@ -78,6 +78,10 @@ return {
     t = {x = 98, y = 32, w = 1, h = 2},
     tl = {x = 96, y = 32, w = 2, h = 2},
     tr = {x = 110, y = 32, w = 2, h = 2},
+  },
+  menu_checkbox = {
+    checked = {x = 73, y = 81, w = 7, h = 7},
+    unchecked = {x = 65, y = 81, w = 7, h = 7},
   },
   palette = {
     image_editor = {
