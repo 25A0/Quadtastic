@@ -12,6 +12,7 @@
  - Reserved Lua keywords can now be used as names for quads and groups
    ([#27](https://github.com/25A0/Quadtastic/issues/27))
  - The wiki has moved to https://github.com/25A0/Quadtastic/blob/master/wiki ([#26](https://github.com/25A0/Quadtastic/issues/26))
+ - Fix a crash ([#31](https://github.com/25A0/Quadtastic/issues/31))
 
 ### Release 0.6.2, 2017-08-23
 
