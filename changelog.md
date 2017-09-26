@@ -4,6 +4,12 @@
 
 ### Unreleased
 
+There are currently no unreleased changes
+
+### Release 0.6.3, 2017-09-26
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.6.3)
+
  - Add snapping to grid. See [this wiki page](/wiki/Using-Quadtastic.md#grid) for more information
  - Fix an issue where files would be listed out of alphabetic order on some
    file systems
