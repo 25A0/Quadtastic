@@ -201,6 +201,8 @@ visual guide; you can also snap quads to the grid.
     - New quads created in this mode will always occupy entire grid cells.
       Their position will be a grid point, and their size will be a multiple
       of the grid size.
+    - When creating new quads in this mode, lines next to the highlighted pixel
+      indicate the enclosing grid cell.
     - When moving quads with the select tool, their position will be set to
       the closest grid point.
     - When resizing quads with the select tool, their size will be set to
