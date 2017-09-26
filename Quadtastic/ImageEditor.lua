@@ -404,7 +404,9 @@ local function select_tool(app, gui_state, state, img_w, img_h)
     end
 
     -- Check if the mouse was pressed on the border of a selected quad
-    if state.hovered and state.selection:is_selected(state.hovered) then
+    if state.hovered and libquadtastic.is_quad(state.hovered) and
+       state.selection:is_selected(state.hovered)
+    then
       direction = get_resize_directions(state.hovered)
     else -- check each selected quad
       for _, quad in pairs(state.selection:get_selection()) do
