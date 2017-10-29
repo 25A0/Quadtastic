@@ -389,7 +389,7 @@ function Dialog.save_file(basepath, default_extension, save_button_label)
   if not save_button_label then save_button_label = S.buttons.save end
 
   local function valid_filename_candidate(candidate)
-    return candidate and #candidate > 0 and not candidate:match("/")
+    return candidate and #candidate > 0 and not candidate:match("[/\\]")
   end
 
   local function process_chosen_filename(app, data, filename)
