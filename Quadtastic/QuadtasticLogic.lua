@@ -764,6 +764,7 @@ function QuadtasticLogic.transitions(interface) return {
                                  data.quadpath, common.exporter_table)
       if success then
         data.history:mark()
+        add_path_to_recent_files(interface, data, data.quadpath)
         if callback then callback(data.quadpath) end
       else
         interface.show_dialog(S.dialogs.err_save_quads(err))
@@ -791,7 +792,6 @@ function QuadtasticLogic.transitions(interface) return {
     if ret == S.buttons.save then
       data.quadpath = filepath
       app.quadtastic.save(callback)
-      add_path_to_recent_files(interface, data, filepath)
     end
   end,
 
