@@ -760,9 +760,14 @@ function QuadtasticLogic.transitions(interface) return {
     if not data.quadpath or data.quadpath == "" then
       app.quadtastic.save_as(callback)
     else
-      app.quadtastic.export_with(data.quadpath, common.exporter_table)
-      data.history:mark()
-      if callback then callback(data.quadpath) end
+      local success, err = pcall(app.quadtastic.export_with,
+                                 data.quadpath, common.exporter_table)
+      if success then
+        data.history:mark()
+        if callback then callback(data.quadpath) end
+      else
+        interface.show_dialog(S.dialogs.err_save_quads(err))
+      end
     end
   end,
 
@@ -862,6 +867,7 @@ function QuadtasticLogic.transitions(interface) return {
 
   end,
 
+  -- expect this function to fail! Wrap it in a pcall!
   export_with = function(app, data, path, exporter)
     QuadExport.export(data.quads, exporter, path)
   end,
