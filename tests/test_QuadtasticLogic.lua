@@ -7,6 +7,7 @@ local QuadtasticLogic = require("Quadtastic.QuadtasticLogic")
 local Selection = require("Quadtastic.Selection")
 local History = require("Quadtastic.History")
 local testutils = require("tests.testutils")
+local S = require("Quadtastic.strings")
 
 local app_stub = function(data, logic)
   local app = {}
@@ -819,9 +820,117 @@ do
   -- NYI
 end
 
--- proceed_despite_unsaved_changes
+--[[
+                                   _        _                 _ _                                              _         _
+ _ __  _ __ ___   ___ ___  ___  __| |    __| | ___  ___ _ __ (_) |_ ___    _   _ _ __  ___  __ ___   _____  __| |    ___| |__   __ _ _ __   __ _  ___  ___
+| '_ \| '__/ _ \ / __/ _ \/ _ \/ _` |   / _` |/ _ \/ __| '_ \| | __/ _ \  | | | | '_ \/ __|/ _` \ \ / / _ \/ _` |   / __| '_ \ / _` | '_ \ / _` |/ _ \/ __|
+| |_) | | | (_) | (_|  __/  __/ (_| |  | (_| |  __/\__ \ |_) | | ||  __/  | |_| | | | \__ \ (_| |\ V /  __/ (_| |  | (__| | | | (_| | | | | (_| |  __/\__ \
+| .__/|_|  \___/ \___\___|\___|\__,_|___\__,_|\___||___/ .__/|_|\__\___|___\__,_|_| |_|___/\__,_| \_/ \___|\__,_|___\___|_| |_|\__,_|_| |_|\__, |\___||___/
+|_|                                |_____|             |_|            |_____|                                  |_____|                     |___/
+proceed_despite_unsaved_changes
+]]
+
+-- make sure that the opened dialog contains the buttons we expect in these tests
 do
-  -- NYI
+  local show_dialog_stub, show_dialog_spy = testutils.call_spy(function(text, options)
+    assert(text == S.dialogs.save_changes, text)
+    assert(options[1] == S.buttons.cancel, options[1])
+    assert(options[2] == S.buttons.discard, options[2])
+    assert(options[3] == S.buttons.save, options[3])
+    return S.buttons.discard
+  end)
+
+  local data = test_data()
+  local interface = test_interface()
+  interface.show_dialog = show_dialog_stub
+  local logic = test_logic(interface)
+  local app_stub = app_stub(data, logic)
+  -- since the data is not saved, the dialog should open
+  logic.proceed_despite_unsaved_changes(app_stub, data)
+  assert(show_dialog_spy() == 1)
+end
+
+-- if the project contains no unsaved changes, then proceed_despite_unsaved_changes
+-- should return true immediately
+do
+  local data = test_data({saved = true})
+  local logic = test_logic()
+  local app_stub = app_stub(data, logic)
+  -- since the data is not saved, the dialog should open
+  assert(logic.proceed_despite_unsaved_changes(app_stub, data),
+         "Should return true if project contains no unsaved changes")
+end
+
+-- if the project contains unsaved changes, then proceed_despite_unsaved_changes
+-- should return true if the user clicks either the save or the discard button,
+-- and false otherwise
+do
+  local data = test_data()
+  local interface = test_interface()
+  local logic = test_logic(interface)
+  local app_stub = app_stub(data, logic)
+
+  -- when the user clicks 'save', then save_file will be called
+  local save_file_stub, save_file_spy
+  interface.save_file, save_file_spy = testutils.call_spy()
+
+  local discard_stub, discard_spy = testutils.call_spy(function(text, options)
+    return S.buttons.discard
+  end)
+
+  interface.show_dialog = discard_stub
+  assert(logic.proceed_despite_unsaved_changes(app_stub, data),
+         "Should return true when user clicks 'discard'")
+  assert(discard_spy() == 1)
+  assert(save_file_spy() == 0)
+
+  local save_stub, save_spy = testutils.call_spy(function(text, options)
+    return S.buttons.save
+  end)
+
+  local cancel_stub, cancel_spy = testutils.call_spy(function(text, options)
+    return S.buttons.cancel
+  end)
+
+  interface.show_dialog = cancel_stub
+  assert(not logic.proceed_despite_unsaved_changes(app_stub, data),
+         "Should return false when user clicks 'cancel'")
+  assert(cancel_spy() == 1)
+  assert(save_file_spy() == 0)
+
+  interface.show_dialog = save_stub
+  assert(logic.proceed_despite_unsaved_changes(app_stub, data),
+         "Should return true when user clicks 'save'")
+  assert(save_spy() == 1)
+  assert(save_file_spy() == 1)
+end
+
+-- Now check that proceed_despite_unsaved_changes is called whenever the user
+-- would lose unsaved changes.
+do
+  local data = test_data()
+  local interface = test_interface()
+  local logic = test_logic(interface)
+  local app_stub = app_stub(data, logic)
+
+  -- Create a call stub and spy for proceed_despite_unsaved_changes that returns
+  -- false, so that none of the actions actually proceed.
+  local proceed_stub, proceed_spy
+  logic.proceed_despite_unsaved_changes, proceed_spy =
+    testutils.call_spy(function() return false end)
+
+  -- load_quad
+  logic.load_quad(app_stub, data, "some/path.lua")
+  assert(proceed_spy() == 1)
+
+  -- new
+  logic.new(app_stub, data)
+  assert(proceed_spy() == 2)
+
+  -- quit
+  logic.quit(app_stub, data)
+  assert(proceed_spy() == 3)
+
 end
 
 -- load_quad
