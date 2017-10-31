@@ -764,7 +764,6 @@ function QuadtasticLogic.transitions(interface) return {
                                  data.quadpath, common.exporter_table)
       if success then
         data.history:mark()
-        add_path_to_recent_files(interface, data, data.quadpath)
         if callback then callback(data.quadpath) end
       else
         interface.show_dialog(S.dialogs.err_save_quads(err))
@@ -791,7 +790,13 @@ function QuadtasticLogic.transitions(interface) return {
     local ret, filepath = interface.save_file(basepath, "lua")
     if ret == S.buttons.save then
       data.quadpath = filepath
-      app.quadtastic.save(callback)
+      -- pass a callback to the save function that stores the used path in the
+      -- list of recently opened files if saving succeeded.
+      local function save_as_callback(quadpath)
+        add_path_to_recent_files(interface, data, quadpath)
+        if callback then callback(quadpath) end
+      end
+      app.quadtastic.save(save_as_callback)
     end
   end,
 
