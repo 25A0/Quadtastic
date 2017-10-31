@@ -202,6 +202,7 @@ strings.dialogs = {
   save_changes = "Do you want to save the changes you made in the current file?",
   err_load_quads = f "Could not load quads: %s",
   err_load_image = f "Could not load image: %s",
+  err_save_quads = f "Could not save quads: %s",
   offer_load = "We found a quad file in '%s'.\nWould you like to load it?",
   err_save_directory = f "'%s' is a directory.",
   save_replace = f "File '%s' already exists. Do you want to replace it?",

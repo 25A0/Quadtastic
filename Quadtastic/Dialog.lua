@@ -51,18 +51,20 @@ local function show_buttons(gui_state, buttons, options)
   do Layout.start(gui_state)
     for key,button in pairs(buttons) do
 
-      local button_options = {}
-      if options and options.disabled and options.disabled[key] then
-        button_options.disabled = true
-      end
+      local button_disabled = options and options.disabled and options.disabled[key]
+      local button_options = {
+        disabled = button_disabled
+      }
 
       local button_pressed = Button.draw(gui_state, nil, nil, nil, nil,
         string.upper(button), nil, button_options)
+
       local key_pressed = type(key) == "string" and
         (imgui.was_key_pressed(gui_state, key) or
          -- Special case since "return" is a reserved keyword
          key == "enter" and imgui.was_key_pressed(gui_state, "return"))
-      if button_pressed or key_pressed then
+
+      if not button_disabled and (button_pressed or key_pressed) then
         clicked_button = button
       end
 
@@ -385,6 +387,32 @@ end
 
 function Dialog.save_file(basepath, default_extension, save_button_label)
   if not save_button_label then save_button_label = S.buttons.save end
+
+  local function valid_filename_candidate(candidate)
+    return candidate and #candidate > 0 and not candidate:match("[/\\]")
+  end
+
+  local function process_chosen_filename(app, data, filename)
+    local filetype = lfs.attributes(filename, "mode")
+    filetype = filetype or "new" -- Assume that this file doesn't exist if
+                                 -- we can't query its mode
+
+    local filepath = tostring(Path(os.path(data.basepath)) .. (filename or ""))
+    if filetype == "directory" then
+      -- try to switch to that directory
+      local success, err = switch_to(data, filepath)
+      if not success then
+        app.save_file.err(err)
+      end
+
+    elseif filetype == "file" then
+      -- check with the user whether they want to override this file
+      app.save_file.override(filepath)
+    elseif filetype == "new" then
+      app.save_file.save(filepath)
+    end
+  end
+
   -- Draw the dialog
   local function draw(app, data, gui_state, w, h)
     if not data.basepath then
@@ -435,14 +463,23 @@ function Dialog.save_file(basepath, default_extension, save_button_label)
     end
 
     assert(data.filelist)
-    local new_basepath
 
     local intended_width = 180
     do window_start(data, gui_state, w, h)
       do Layout.start(gui_state)
         imgui.push_style(gui_state, "font", gui_state.style.small_font)
-        data.editing_basepath, new_basepath = InputField.draw(gui_state,
-          nil, nil, intended_width, nil, data.editing_basepath or data.basepath)
+        do
+          local new_basepath
+          data.editing_basepath, new_basepath = InputField.draw(gui_state,
+            nil, nil, intended_width, nil, data.editing_basepath or data.basepath)
+          if new_basepath then
+            -- try to switch to that path
+            local success, err = switch_to(data, new_basepath)
+            if not success then
+              app.save_file.err(err)
+            end
+          end
+        end
         Layout.next(gui_state, "|")
 
         local last_chosen_file = data.chosen_file
@@ -452,6 +489,12 @@ function Dialog.save_file(basepath, default_extension, save_button_label)
         -- Clear editing filename whenever chosen file changes
         if last_chosen_file ~= data.chosen_file and data.chosen_file.type == "file" then
           data.editing_filename = nil
+        end
+
+        if data.committed_file and
+           valid_filename_candidate(data.committed_file.name)
+        then
+          process_chosen_filename(app, data, data.committed_file.name)
         end
 
         Layout.next(gui_state, "|")
@@ -465,7 +508,7 @@ function Dialog.save_file(basepath, default_extension, save_button_label)
         -- will be added automatically. Show a label to tell the user about
         -- that.
         local tooltip_label
-        if data.editing_filename and #data.editing_filename > 0 then
+        if valid_filename_candidate(data.editing_filename) then
           local _, extension = Path.split_extension(data.editing_filename)
           if default_extension and not extension then
             tooltip_label = S.dialogs.default_extension(data.editing_filename,
@@ -473,54 +516,37 @@ function Dialog.save_file(basepath, default_extension, save_button_label)
           end
         end
 
-        if data.committed_filename then
-          local filetype = lfs.attributes(data.committed_filename, "mode")
-          filetype = filetype or "new" -- Assume that this file doesn't exist if
-                                       -- we can't query its mode
-          data.committed_file = {type=filetype, name=data.committed_filename}
-        end
-
-        if data.committed_file then
-          local combined_path = data.basepath .. os.pathsep .. data.committed_file.name
-          if data.committed_file.type == "directory" then
-            new_basepath = combined_path
-          elseif data.committed_file.type == "new" then
-            app.save_file.save(combined_path)
-          elseif data.committed_file.type == "file" then
-            app.save_file.override(combined_path)
+        if valid_filename_candidate(data.committed_filename) then
+          -- Add default file extension unless the user specified one
+          local filename = data.committed_filename
+          local _, extension = Path.split_extension(filename)
+          if default_extension and not extension then
+            filename = filename .. "." .. default_extension
           end
+
+          process_chosen_filename(app, data, filename)
         end
 
         imgui.pop_style(gui_state, "font")
         Layout.next(gui_state, "|")
 
         local clicked_button = show_buttons(gui_state, data.buttons,
-          {disabled = {enter = data.chosen_file == nil or
-                               (not data.editing_filename or
-                                #data.editing_filename == 0)},
+          {disabled = {enter = not valid_filename_candidate(data.editing_filename)},
            -- Set the tooltip label for the save button, if applicable
            tooltip  = tooltip_label and {enter = tooltip_label} or {}})
         if clicked_button then
 
           if clicked_button == save_button_label then
-            local filename = data.committed_file and data.committed_file.name or
-                             data.editing_filename
-            if filename then
-              -- Add default file extension unless the user specified one
-              local _, extension = Path.split_extension(filename)
-              if default_extension and not extension then
-                filename = filename .. "." .. default_extension
-              end
-              local filetype = lfs.attributes(filename, "mode")
-              local filepath = tostring(Path(os.path(data.basepath)) .. (filename or ""))
-              if filetype == "file" then
-                app.save_file.override(filepath)
-              elseif filetype == "directory" then
-                app.save_file.err(S.dialogs.err_save_directory(filepath))
-              else -- it's a new file
-                app.save_file.save(filepath)
-              end
+            assert(valid_filename_candidate(data.editing_filename))
+
+            -- Add default file extension unless the user specified one
+            local filename = data.editing_filename
+            local _, extension = Path.split_extension(filename)
+            if default_extension and not extension then
+              filename = filename .. "." .. default_extension
             end
+
+            process_chosen_filename(app, data, filename)
           else
             app.save_file.cancel()
           end
@@ -528,13 +554,6 @@ function Dialog.save_file(basepath, default_extension, save_button_label)
         end
       end Layout.finish(gui_state, "|")
     end window_finish(data, gui_state, w, h)
-
-    if new_basepath then
-      local success, err = switch_to(data, new_basepath)
-      if not success then
-        app.save_file.err(err)
-      end
-    end
   end
 
   assert(coroutine.running(), "This function must be run in a coroutine.")
