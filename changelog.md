@@ -4,6 +4,12 @@
 
 ### Unreleased
 
+There are currently no unreleased changes
+
+### Release 0.6.4, 2017-11-01
+
+[Download](https://github.com/25A0/Quadtastic/releases/tag/0.6.4)
+
  - Fix a bunch of bugs related to saving and exporting ([#35](https://github.com/25A0/Quadtastic/issues/35))
 
 ### Release 0.6.3, 2017-09-26
