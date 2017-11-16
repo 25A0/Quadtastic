@@ -147,7 +147,7 @@ dist/res/%.icns: res/%.ase
 	# Run iconutil to create icns file
 	iconutil -c icns dist/res/$*.iconset
 
-aseprite=/Applications/Aseprite.app/Contents/MacOS/aseprite
+aseprite=/Users/moritz/Library/Application\ Support/itch/apps/Aseprite/Aseprite.app/Contents/MacOS/aseprite
 screenshots/turboworkflow.gif: res/turboworkflow-activated.ase Makefile
 	${aseprite} -b res/turboworkflow-activated.ase --scale 1 --save-as screenshots/turboworkflow.gif
 
