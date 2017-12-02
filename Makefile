@@ -178,7 +178,7 @@ ${APPNAME}/res/version.txt:
 %.gif: %.mov
 	mkdir -p .tmp
 	ffmpeg -i $*.mov -r 10 -vcodec png .tmp/out-static-%04d.png 
-	time convert -verbose +dither -layers Optimize .tmp/out-static*.png  GIF:- > $*.gif
+	time convert -verbose +dither -alpha set -layers Optimize .tmp/out-static*.png  GIF:- > $*.gif
 	rm .tmp/out-static-*
 
 tests/test_*.lua:
