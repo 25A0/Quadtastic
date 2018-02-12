@@ -625,14 +625,14 @@ do
   assert(not data.history:is_marked())
 
   local expected = {
-    quads[1],
-    {
+    [1] = quads[1],
+    [4] = {
+      quads[4], quads[5], quads[6]
+    },
+    [5] = {
       quads[2],
       quads[3],
     },
-    {
-      quads[4], quads[5], quads[6]
-    }
   }
   assert(testutils.equals(data.quads, expected))
 
@@ -663,12 +663,12 @@ do
   assert(not data.history:is_marked())
 
   local expected = {
-    quads[1],
-    {
+    [1] = quads[1],
+    [3] = quads[3],
+    [6] = quads[6],
+    [7] = {
       quads[2], quads[4], quads[5]
     },
-    quads[3],
-    quads[6]
   }
   assert(testutils.equals(data.quads, expected))
 
