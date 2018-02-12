@@ -2,9 +2,9 @@
 -- Quadtastic, along with their licenses
 
 local licenses = {
-	{
-		name = "LOVE v0.10.2",
-		license = [[
+  {
+    name = "LOVE v0.10.2",
+    license = [[
 LOVE is Copyright (c) 2006-2016 LOVE Development Team
 
 This software is provided 'as-is', without any express or implied
@@ -26,10 +26,10 @@ misrepresented as being the original software.
 3. This notice may not be removed or altered from any source
 distribution.
 ]],
-	},
-	{
-		name = "luafilesystem v1.6.3",
-		license = [[
+  },
+  {
+    name = "luafilesystem v1.6.3",
+    license = [[
 Copyright © 2003-2014 Kepler Project.
 
 Permission is hereby granted, free of charge, to any person
@@ -52,10 +52,10 @@ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ]],
-	},
-	{
-		name = "affine v1.01c",
-		license = [[
+  },
+  {
+    name = "affine v1.01c",
+    license = [[
 This is free and unencumbered software released into the public domain.
 
 Anyone is free to copy, modify, publish, use, compile, sell, or
@@ -81,10 +81,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 For more information, please refer to <http://unlicense.org/>
 ]],
-	},
-	{
-		name = "lovedebug",
-		license = [[
+  },
+  {
+    name = "lovedebug",
+    license = [[
 The MIT License (MIT)
 
 Copyright (c) 2016 Luis Pais
@@ -108,10 +108,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ]],
-	},
-        {
-          name = "inspect.lua",
-          license = [[
+  },
+  {
+    name = "inspect.lua",
+    license = [[
 Copyright (c) 2013 Enrique Garcia Cota
 
 Permission is hereby granted, free of charge, to any person obtaining a
@@ -133,7 +133,7 @@ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ]]
-        },
+  },
 }
 
 return licenses
