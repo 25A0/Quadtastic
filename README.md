@@ -105,6 +105,7 @@ reports, feature suggestions, and constructive discussions! :heart:
    similar to the gorgeous UI in aseprite.
  - [luafilesystem](https://github.com/keplerproject/luafilesystem)
  - [lovedebug](https://github.com/Ranguna/LOVEDEBUG) by kalle2990, maintained by Ranguna
+ - [inspect.lua](https://github.com/kikito/inspect.lua) by [Enrique García Cota](https://github.com/kikito)
  - [Nuklear](https://github.com/vurtun/nuklear) for guidance on how to write IMGUI
  - affine for reverse transformation by [Minh Ngo](https://github.com/markandgo/simple-transform)
  - xform by [pgimeno](https://love2d.org/forums/viewtopic.php?p=201884#p201884)
