@@ -88,6 +88,13 @@ If you prefer to run Quadtastic from source, here is what you'll need to do
 
 ## [Changelog](./changelog.md)
 
+## Acknowledgements
+
+Special thanks to the awesome people that contributed to the development of
+Quadtastic via
+[pull requests](https://github.com/25A0/Quadtastic/graphs/contributors), bug
+reports, feature suggestions, and constructive discussions! :heart:
+
 ## Credits and tools used
 
  - [LÖVE](https://love2d.org/)
