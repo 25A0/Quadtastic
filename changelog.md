@@ -4,7 +4,8 @@
 
 ### Unreleased
 
-There are currently no unreleased changes
+ - Clicking 'Reload exporters' does no longer cause an error (Found and patched by [RSDuck](https://github.com/RSDuck))
+ - 'Reload exporters' will now also find custom exporters ([#38](https://github.com/25A0/Quadtastic/issues/38))
 
 ### Release 0.6.4, 2017-11-01
 
