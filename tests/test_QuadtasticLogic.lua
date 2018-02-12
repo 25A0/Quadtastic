@@ -156,9 +156,11 @@ do
     {x = 0, y= 22, w= 2, h = 2},
   }
   logic.sort(app_stub, data, data.quads)
-  assert(testutils.equals(expected, data.quads))
+  assert(testutils.equals(expected, data.quads),
+         testutils.expected_vs_actual(expected, data.quads))
   logic.undo(app_stub, data)
-  assert(testutils.equals(original, data.quads))
+  assert(testutils.equals(original, data.quads),
+         testutils.expected_vs_actual(original, data.quads))
 end
 
 --[[
@@ -179,7 +181,8 @@ do
   logic.undo(app_stub, data)
   assert(data.history:is_marked())
   assert(data.quads.foo.bar == old_quad)
-  assert(testutils.equals(old_quads, data.quads))
+  assert(testutils.equals(old_quads, data.quads),
+         testutils.expected_vs_actual(old_quads, data.quads))
   logic.redo(app_stub, data)
   assert(data.quads.foo.bar == nil)
   logic.undo(app_stub, data)
@@ -191,7 +194,8 @@ do
   logic.undo(app_stub, data)
   assert(data.history:is_marked())
   assert(data.quads.foo == old_group)
-  assert(testutils.equals(old_quads, data.quads))
+  assert(testutils.equals(old_quads, data.quads),
+         testutils.expected_vs_actual(old_quads, data.quads))
 end
 
 --[[
@@ -634,11 +638,13 @@ do
       quads[3],
     },
   }
-  assert(testutils.equals(data.quads, expected))
+  assert(testutils.equals(data.quads, expected),
+         testutils.expected_vs_actual(expected, data.quads))
 
   logic.undo(app_stub, data)
   assert(data.history:is_marked())
-  assert(testutils.equals(data.quads, old_quads))
+  assert(testutils.equals(data.quads, old_quads),
+         testutils.expected_vs_actual(old_quads, data.quads))
 end
 
 -- Test that group preserves order
@@ -670,11 +676,13 @@ do
       quads[2], quads[4], quads[5]
     },
   }
-  assert(testutils.equals(data.quads, expected))
+  assert(testutils.equals(data.quads, expected),
+         testutils.expected_vs_actual(expected, data.quads))
 
   logic.undo(app_stub, data)
   assert(data.history:is_marked())
-  assert(testutils.equals(data.quads, old_quads))
+  assert(testutils.equals(data.quads, old_quads),
+         testutils.expected_vs_actual(old_quads, data.quads))
 end
 
 --[[
@@ -714,7 +722,8 @@ do
   assert(data.quads[6] == quads[6])
 
   logic.undo(app_stub, data)
-  assert(testutils.equals(data.quads, old_quads))
+  assert(testutils.equals(data.quads, old_quads),
+         testutils.expected_vs_actual(old_quads, data.quads))
 end
 
 -- offer_reload
