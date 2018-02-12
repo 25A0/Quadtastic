@@ -1,7 +1,7 @@
 --[[
 https://www.github.com/25a0/Quadtastic
 
-Copyright (c) 2017 Moritz Neikes
+Copyright (c) 2017-2018 Moritz Neikes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
