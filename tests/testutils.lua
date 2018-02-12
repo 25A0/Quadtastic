@@ -1,4 +1,5 @@
 local table = require("Quadtastic/tableplus")
+local inspect = require("Quadtastic/lib/inspect")
 
 local testutils = {}
 
@@ -52,6 +53,13 @@ function testutils.clone(thing)
   else -- all other types are immutable
     return thing
   end
+end
+
+function testutils.expected_vs_actual(expected, actual)
+  return table.concat({"Expected and actual result differed.",
+                       "Expected:", inspect(expected),
+                       "Actual:"  , inspect(actual  ),
+                      }, "\n")
 end
 
 return testutils
