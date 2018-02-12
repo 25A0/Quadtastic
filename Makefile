@@ -216,7 +216,7 @@ ${APPNAME}/libquadtastic.lua:
 
 # Build as $ make release-0.2.0
 # Tag names MUST follow the major.minor.patch pattern.
-release-%: test ${LICENSES}
+release-%: test ${LICENSES} ${DISTFILES}
 	@# Only allow releases from the master branch.
 	@git status -b --porcelain | head -n 1 | grep --silent "## master" || \
 	(echo "Error: Can only release from master"; exit 1)
@@ -224,6 +224,28 @@ release-%: test ${LICENSES}
 	@# Only allow releasing a clean working directory
 	@test -z "`git status --porcelain --untracked-files=no`" || \
 	(echo "Error: Working directory is not clean"; exit 1)
+
+	@# Check whether there are any files in the archive that are not in the
+	@# index
+	@mkdir -p .tmp
+	@# This writes all files in the index to indexed_files.txt that are in
+	@# Quadtastic, or in any subdirectory
+	@cd Quadtastic; git ls-files . | sort > ../.tmp/indexed_files.txt
+	@# This writes all files in the zipfile to staged_files.txt.
+	@# We explicitly remove res/version.txt since we need that file to be in
+	@# the archive, but not in the index
+	@# We also remove any directories listed in the zip, since they will not
+	@# show up in the index.
+	@unzip -Z -1 dist/${APPNAME}.love | \
+	grep -v "res/version.txt" - | \
+	grep -v "/$$" - | \
+	sort > .tmp/staged_files.txt
+	@-diff .tmp/staged_files.txt .tmp/indexed_files.txt > .tmp/filelists.diff
+	@test -s .tmp/filelists.diff && \
+	echo "Error: ${APPNAME}.love includes files that are not in the index:" && \
+	cat .tmp/filelists.diff && \
+	echo "Remove these files or add them to the index; then re-make all distfiles" && \
+	false || true
 
 	@# Only proceed if that version doesn't already exist
 	@test ! -f .git/refs/tags/$* || \
