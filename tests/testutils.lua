@@ -26,10 +26,12 @@ function testutils.equals(a, b)
     return a == b
   elseif t == "table" then
     local all_keys = table.union(table.keys(a), table.keys(b))
+    local is_equal = true
     for _,key in ipairs(all_keys) do
       if not a[key] or not b[key] then return false end
-      return testutils.equals(a[key], b[key])
+      is_equal = is_equal and testutils.equals(a[key], b[key])
     end
+    return is_equal
   else
     error("Cannot compare values of type " .. t)
   end
